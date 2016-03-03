@@ -90,8 +90,16 @@ while($row = mysql_fetch_array($result_rptrecord)){
 	} else {
 	$rowcolor="FFFF00"; //yellow
 	};
+	
+	if ( $row['ip'] ) {
+                $ip = long2ip($row['ip']);
+        }
+        if ( $row['ip6'] ) {
+                $ip = inet_ntop($row['ip6']);
+        }
+
 	echo "<tr align=center bgcolor=". $rowcolor. ">";
-        echo "<td><a name=rpt". $row['serial'].">". long2ip($row['ip']). "</td><td>". gethostbyaddr(long2ip($row['ip'])). "</td><td>". $row['rcount']. "</td><td>". $row['disposition']. "</td><td>". $row['reason']. "</td><td>". $row['dkimdomain']. "</td><td>". $row['dkimresult']. "</td><td>". $row['spfdomain']. "</td><td>". $row['spfresult']. "</td>";
+        echo "<td><a name=rpt". $row['serial'].">". $ip. "</td><td>". gethostbyaddr($ip). "</td><td>". $row['rcount']. "</td><td>". $row['disposition']. "</td><td>". $row['reason']. "</td><td>". $row['dkimdomain']. "</td><td>". $row['dkimresult']. "</td><td>". $row['spfdomain']. "</td><td>". $row['spfresult']. "</td>";
         echo "</tr>";
 	echo "\n";
 }
