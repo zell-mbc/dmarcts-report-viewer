@@ -1,116 +1,188 @@
 <?php
-///////////////////////////////////////////////////////////////////////////
+
+//####################################################################
+//### configuration ##################################################
+//####################################################################
 
 $dbhost="localhost";
 $dbname="dmarc";
 $dbuser="dmarc";
 $dbpass="xxx";
 
-/////////////// NO CHANGES BELOW //////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
+
+
+//####################################################################
+//### functions ######################################################
+//####################################################################
+
+function format_date($date, $format) {
+	$answer = date($format, strtotime($date));
+	return $answer;
+};
+
+function tmpl_reportList() {
+	$reportlist[] = "";
+	$reportlist[] = "<!-- Start of report list -->";
+
+	$reportlist[] = "<h1>DMARC Reports</h1>";
+	$reportlist[] = "<table class='reportlist'>";
+	$reportlist[] = "  <thead>";
+	$reportlist[] = "    <tr>";
+	$reportlist[] = "      <th>Start Date</th>";
+	$reportlist[] = "      <th>End Date</th>";
+	$reportlist[] = "      <th>Domain</th>";
+	$reportlist[] = "      <th>Reporting Organization</th>";
+	$reportlist[] = "      <th>Report ID</th>";
+	$reportlist[] = "      <th>Messages</th>";
+	$reportlist[] = "    </tr>";
+	$reportlist[] = "  </thead>";
+
+	$reportlist[] = "  <tbody>";
+
+	$query_report = "SELECT * FROM report ORDER BY mindate";
+	$result_report = mysql_query($query_report) or die(mysql_error());
+	while($row = mysql_fetch_array($result_report)) {
+		$message_query = "SELECT *, SUM(rcount) FROM rptrecord WHERE serial = {$row['serial']}";
+		$message_process = mysql_query($message_query) or die(mysql_error());
+		$message_result = mysql_fetch_array($message_process);
+		$date_output_format = "r";
+		$reportlist[] =  "    <tr>";
+		$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";
+		$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
+		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
+		$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
+		$reportlist[] =  "      <td class='center'><a href='?report=". $row['serial']. "#rpt". $row['serial']. "'>". $row['reportid']. "</a></td>";
+		$reportlist[] =  "      <td class='center'>". $message_result['SUM(rcount)']. "</td>";
+		$reportlist[] =  "    </tr>";
+	}
+	$reportlist[] =  "  </tbody>";
+
+	$reportlist[] =  "</table>";
+
+	$reportlist[] = "<!-- End of report list -->";
+	$reportlist[] = "";
+
+	#indent generated html by 2 extra spaces
+	return implode("\n  ",$reportlist);
+}
+
+function tmpl_reportData($reportnumber) {
+
+	if (!$reportnumber) {
+		return "";
+	}
+
+	$reportdata[] = "";
+	$reportdata[] = "<!-- Start of report rata -->";
+
+	$sql = "SELECT * FROM report where serial = $reportnumber";
+	$query = mysql_query($sql) or die(mysql_error());
+	if ($row = mysql_fetch_array($query)) {
+		$reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")</p></div>";
+	} else {
+		return "Unknown report number!";
+	}
+
+	$reportdata[] = "<a id='rpt".$reportnumber."'></a>";
+	$reportdata[] = "<table class='reportdata'>";
+	$reportdata[] = "  <thead>";
+	$reportdata[] = "    <tr>";
+	$reportdata[] = "      <th>IP Address</th>";
+	$reportdata[] = "      <th>Host Name</th>";
+	$reportdata[] = "      <th>Message Count</th>";
+	$reportdata[] = "      <th>Disposition</th>";
+	$reportdata[] = "      <th>Reason</th>";
+	$reportdata[] = "      <th>DKIM Domain</th>";
+	$reportdata[] = "      <th>Raw DKIM Result</th>";
+	$reportdata[] = "      <th>SPF Domain</th>";
+	$reportdata[] = "      <th>Raw SPF Result</th>";
+	$reportdata[] = "    </tr>";
+	$reportdata[] = "  </thead>";
+
+	$reportdata[] = "  <tbody>";
+	$sql = "SELECT * FROM rptrecord where serial = $reportnumber";
+	$query = mysql_query($sql) or die(mysql_error());
+	while($row = mysql_fetch_array($query)) {
+		$status="";
+		if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")){
+			$status="red";
+		} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")){
+			$status="orange";
+		} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
+			$status="lime";
+		} else {
+			$status="yellow";
+		};
+
+		if ( $row['ip'] ) {
+			$ip = long2ip($row['ip']);
+		}
+		if ( $row['ip6'] ) {
+			$ip = inet_ntop($row['ip6']);
+		}
+
+		$reportdata[] = "    <tr class='".$status."'>";
+		$reportdata[] = "      <td>". $ip. "</td>";
+		$reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
+		$reportdata[] = "      <td>". $row['rcount']. "</td>";
+		$reportdata[] = "      <td>". $row['disposition']. "</td>";
+		$reportdata[] = "      <td>". $row['reason']. "</td>";
+		$reportdata[] = "      <td>". $row['dkimdomain']. "</td>";
+		$reportdata[] = "      <td>". $row['dkimresult']. "</td>";
+		$reportdata[] = "      <td>". $row['spfdomain']. "</td>";
+		$reportdata[] = "      <td>". $row['spfresult']. "</td>";
+		$reportdata[] = "    </tr>";
+	}
+	$reportdata[] = "  </tbody>";
+	$reportdata[] = "</table>";
+
+	$reportdata[] = "<!-- End of report rata -->";
+	$reportdata[] = "";
+
+	#indent generated html by 2 extra spaces
+	return implode("\n  ",$reportdata);
+}
+
+function tmpl_page ($body) {
+	$html = array();
+
+	$html[] = "<!DOCTYPE html>";
+	$html[] = "<html>";
+	$html[] = "  <head>";
+	$html[] = "    <title>DMARC Report Viewer</title>";
+	$html[] = "    <link rel='stylesheet' href='default.css'>";
+	$html[] = "  </head>";
+
+	$html[] = "  <body>";
+
+	$html[] = $body;
+
+	$html[] = "  <div class='footer'>Brought to you by <a href='http://www.techsneeze.com'>TechSneeze.com</a> - <a href='mailto:dave@techsneeze.com'>dave@techsneeze.com</a></div>";
+	$html[] = "  </body>";
+	$html[] = "</html>";
+
+	return implode("\n",$html);
+}
+
+
+
+//####################################################################
+//### main ###########################################################
+//####################################################################
+
+// Override hardcoded script configuration options by local config file.
+// The file is expected to be in the same folder as this script, but it
+// does not need to exists.
+if (file_exists("dmarcts-report-viewer-config.php")) include "dmarcts-report-viewer-config.php";
+
 // Make a MySQL Connection
 mysql_connect($dbhost, $dbuser, $dbpass) or die(mysql_error());
 mysql_select_db($dbname) or die(mysql_error());
 
-$query_report = "SELECT * FROM report ORDER BY mindate"; 
-	 
-$result_report = mysql_query($query_report) or die(mysql_error());
+// Generate Page with report list and report data (if a report is selected)
+echo tmpl_page( ""
+	.tmpl_reportList()
+	.tmpl_reportData( (isset($_GET["report"]) ? $_GET["report"] : false ) )
+);
 
-echo "<title>DMARC Report</title>";
-echo "<head>\n";
-echo "</head>\n";
-echo "<html>\n";
-echo "<body>\n";
-
-echo "<center><h1>DMARC Reports</h1></center>\n";
-
-echo "<hr align=center width=90% noshade>\n";
-	 
-function format_date($date, $format){
-                    $answer = date($format, strtotime($date));
-                    return $answer;
-        };
-
-echo "<table align=center border=0 cellpadding=3>\n";
-echo "<thead><tr><th>Start Date</th><th>End Date</th><th>Domain</th><th>Reporting Organization</th><th>Report ID</th><th>Messages</th></tr></thead><tbody>\n";
-
-$result_report = mysql_query($query_report) or die(mysql_error());
-
-while($row = mysql_fetch_array($result_report)){
-	$array_report[] = $row;
-	$message_query = "SELECT *, SUM(rcount) FROM rptrecord WHERE serial = {$row['serial']}";
-	$message_process = mysql_query($message_query) or die(mysql_error());
-	$message_result = mysql_fetch_array($message_process);
-	$date_output_format = "r";
-	echo "<tr align=center>";
-	echo "<td align=right>". format_date($row['mindate'], $date_output_format). "</td><td align=right>". format_date($row['maxdate'], $date_output_format). "</td><td>". $row['domain']. "</td><td>". $row['org']. "</td><td><a href=?report=". $row['serial']. "#rpt". $row['serial']. ">". $row['reportid']. "</a></td><td>". $message_result['SUM(rcount)']. "</td>";
-	echo "</tr>";
-	echo "\n";
-}
-echo "</tbody>";
-echo "</table>";
-echo " <br />";
-echo "\n";
-//echo "-------------------------------------------------------------------------------------";
-echo "<hr align=center width=90% noshade>";
-echo " <br />";
-echo "\n";
-/////////Start Lower Section
-
-// Get value (if it exists) from URL
-$displayreport = 0;
-if ($_GET) {
-	$displayreport = $_GET["report"];
-}
-
-if($displayreport !== 0){
-
-$current = 0;
-
-$query_date = "SELECT * FROM report where serial = $displayreport";
-
-$query_rptrecord = "SELECT * FROM rptrecord where serial = $displayreport";
-
-$result_date = mysql_query($query_date) or die(mysql_error());
-$showdate = mysql_fetch_array($result_date);
-echo "<br/><center><strong>". format_date($showdate['mindate'], r ). "</strong></center><br />\n";
-
-$result_rptrecord = mysql_query($query_rptrecord) or die(mysql_error());
-
-echo "<table align=center border=0 cellpadding=2>";
-echo "<th>IP Address</th><th>Host Name</th><th>Message Count</th><th>Disposition</th><th>Reason</th><th>DKIM Domain</th><th>DKIM Result</th><th>SPF Domain</th><th>SPF Result</th>\n";
-while($row = mysql_fetch_array($result_rptrecord)){
-	$rowcolor="FFFFFF";
-	if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")){
-	$rowcolor="FF0000"; //red
-	} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")){
-	$rowcolor="FFA500"; //orange
-	} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")){
-	$rowcolor="00FF00"; //lime
-	} else {
-	$rowcolor="FFFF00"; //yellow
-	};
-	
-	if ( $row['ip'] ) {
-                $ip = long2ip($row['ip']);
-        }
-        if ( $row['ip6'] ) {
-                $ip = inet_ntop($row['ip6']);
-        }
-
-	echo "<tr align=center bgcolor=". $rowcolor. ">";
-        echo "<td><a name=rpt". $row['serial'].">". $ip. "</td><td>". gethostbyaddr($ip). "</td><td>". $row['rcount']. "</td><td>". $row['disposition']. "</td><td>". $row['reason']. "</td><td>". $row['dkimdomain']. "</td><td>". $row['dkimresult']. "</td><td>". $row['spfdomain']. "</td><td>". $row['spfresult']. "</td>";
-        echo "</tr>";
-	echo "\n";
-}
-echo "</table>";
-
-echo "<hr align=center width=90% noshade>";
-echo "<center><h5>Brought to you by <a href=http://www.techsneeze.com>TechSneeze.com</a> - <a href=mailto:dave@techsneeze.com>dave@techsneeze.com</a></h5></center><br />\n";
-}
-echo "</body>";
-echo "</html>";
-//var_dump($array_report);
-//var_dump($message_result);
-//print_r(array_keys($array_report[5]));
 ?>
