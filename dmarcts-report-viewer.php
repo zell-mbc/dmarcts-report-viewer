@@ -16,36 +16,54 @@ $dbpass="xxx";
 //####################################################################
 
 function format_date($date, $format) {
-                    $answer = date($format, strtotime($date));
-                    return $answer;
-        };
+	$answer = date($format, strtotime($date));
+	return $answer;
+};
 
 function tmpl_reportList() {
-	$reportlist = "";
+	$reportlist[] = "";
+	$reportlist[] = "<!-- Start of report list -->";
 
-	$reportlist .= "<center><h1>DMARC Reports</h1></center>\n";
-	$reportlist .= "<hr align=center width=90% noshade>";
-	$reportlist .= "<table align=center border=0 cellpadding=3>\n";
-	$reportlist .= "<thead><tr><th>Start Date</th><th>End Date</th><th>Domain</th><th>Reporting Organization</th><th>Report ID</th><th>Messages</th></tr></thead><tbody>\n";
+	$reportlist[] = "<h1>DMARC Reports</h1>";
+	$reportlist[] = "<table class='reportlist'>";
+	$reportlist[] = "  <thead>";
+	$reportlist[] = "    <tr>";
+	$reportlist[] = "      <th>Start Date</th>";
+	$reportlist[] = "      <th>End Date</th>";
+	$reportlist[] = "      <th>Domain</th>";
+	$reportlist[] = "      <th>Reporting Organization</th>";
+	$reportlist[] = "      <th>Report ID</th>";
+	$reportlist[] = "      <th>Messages</th>";
+	$reportlist[] = "    </tr>";
+	$reportlist[] = "  </thead>";
+
+	$reportlist[] = "  <tbody>";
 
 	$query_report = "SELECT * FROM report ORDER BY mindate";
 	$result_report = mysql_query($query_report) or die(mysql_error());
-	while($row = mysql_fetch_array($result_report)){
-		$array_report[] = $row;
+	while($row = mysql_fetch_array($result_report)) {
 		$message_query = "SELECT *, SUM(rcount) FROM rptrecord WHERE serial = {$row['serial']}";
 		$message_process = mysql_query($message_query) or die(mysql_error());
 		$message_result = mysql_fetch_array($message_process);
 		$date_output_format = "r";
-		$reportlist .=  "<tr align=center>";
-		$reportlist .=  "<td align=right>". format_date($row['mindate'], $date_output_format). "</td><td align=right>". format_date($row['maxdate'], $date_output_format). "</td><td>". $row['domain']. "</td><td>". $row['org']. "</td><td><a href=?report=". $row['serial']. "#rpt". $row['serial']. ">". $row['reportid']. "</a></td><td>". $message_result['SUM(rcount)']. "</td>";
-		$reportlist .=  "</tr>";
-		$reportlist .=  "\n";
+		$reportlist[] =  "    <tr>";
+		$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";
+		$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
+		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
+		$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
+		$reportlist[] =  "      <td class='center'><a href='?report=". $row['serial']. "#rpt". $row['serial']. "'>". $row['reportid']. "</a></td>";
+		$reportlist[] =  "      <td class='center'>". $message_result['SUM(rcount)']. "</td>";
+		$reportlist[] =  "    </tr>";
 	}
-	$reportlist .=  "</tbody>";
-	$reportlist .=  "</table>";
-	$reportlist .= "<hr align=center width=90% noshade>";
+	$reportlist[] =  "  </tbody>";
 
-	return $reportlist;
+	$reportlist[] =  "</table>";
+
+	$reportlist[] = "<!-- End of report list -->";
+	$reportlist[] = "";
+
+	#indent generated html by 2 extra spaces
+	return implode("\n  ",$reportlist);
 }
 
 function tmpl_reportData($reportnumber) {
@@ -54,29 +72,46 @@ function tmpl_reportData($reportnumber) {
 		return "";
 	}
 
-	$reportdata = "";
+	$reportdata[] = "";
+	$reportdata[] = "<!-- Start of report rata -->";
 
-	$query_date = "SELECT * FROM report where serial = $reportnumber";
-	$query_rptrecord = "SELECT * FROM rptrecord where serial = $reportnumber";
+	$sql = "SELECT * FROM report where serial = $reportnumber";
+	$query = mysql_query($sql) or die(mysql_error());
+	if ($row = mysql_fetch_array($query)) {
+		$reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")</p></div>";
+	} else {
+		return "Unknown report number!";
+	}
 
-	$result_date = mysql_query($query_date) or die(mysql_error());
-	$showdate = mysql_fetch_array($result_date);
+	$reportdata[] = "<a id='rpt".$reportnumber."'></a>";
+	$reportdata[] = "<table class='reportdata'>";
+	$reportdata[] = "  <thead>";
+	$reportdata[] = "    <tr>";
+	$reportdata[] = "      <th>IP Address</th>";
+	$reportdata[] = "      <th>Host Name</th>";
+	$reportdata[] = "      <th>Message Count</th>";
+	$reportdata[] = "      <th>Disposition</th>";
+	$reportdata[] = "      <th>Reason</th>";
+	$reportdata[] = "      <th>DKIM Domain</th>";
+	$reportdata[] = "      <th>Raw DKIM Result</th>";
+	$reportdata[] = "      <th>SPF Domain</th>";
+	$reportdata[] = "      <th>Raw SPF Result</th>";
+	$reportdata[] = "    </tr>";
+	$reportdata[] = "  </thead>";
 
-	$reportdata .= "<br/><center><strong>". format_date($showdate['mindate'], "r" ). "</strong></center><br />\n";
-	$reportdata .= "<table align=center border=0 cellpadding=2>";
-	$reportdata .= "<th>IP Address</th><th>Host Name</th><th>Message Count</th><th>Disposition</th><th>Reason</th><th>DKIM Domain</th><th>Raw DKIM Result</th><th>SPF Domain</th><th>Raw SPF Result</th>\n";
-
-	$result_rptrecord = mysql_query($query_rptrecord) or die(mysql_error());
-	while($row = mysql_fetch_array($result_rptrecord)){
-		$rowcolor="FFFFFF";
+	$reportdata[] = "  <tbody>";
+	$sql = "SELECT * FROM rptrecord where serial = $reportnumber";
+	$query = mysql_query($sql) or die(mysql_error());
+	while($row = mysql_fetch_array($query)) {
+		$status="";
 		if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")){
-		$rowcolor="FF0000"; //red
+			$status="red";
 		} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")){
-		$rowcolor="FFA500"; //orange
-		} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")){
-		$rowcolor="00FF00"; //lime
+			$status="orange";
+		} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
+			$status="lime";
 		} else {
-		$rowcolor="FFFF00"; //yellow
+			$status="yellow";
 		};
 
 		if ( $row['ip'] ) {
@@ -86,34 +121,47 @@ function tmpl_reportData($reportnumber) {
 			$ip = inet_ntop($row['ip6']);
 		}
 
-		$reportdata .= "<tr align=center bgcolor=". $rowcolor. ">";
-		$reportdata .= "<td><a name=rpt". $row['serial'].">". $ip. "</td><td>". gethostbyaddr($ip). "</td><td>". $row['rcount']. "</td><td>". $row['disposition']. "</td><td>". $row['reason']. "</td>";
-		$reportdata .= "<td>". $row['dkimdomain']. "</td><td>". $row['dkimresult']. "</td><td>". $row['spfdomain']. "</td><td>". $row['spfresult']. "</td></td>";
-		$reportdata .= "</tr>";
-		$reportdata .= "\n";
+		$reportdata[] = "    <tr class='".$status."'>";
+		$reportdata[] = "      <td>". $ip. "</td>";
+		$reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
+		$reportdata[] = "      <td>". $row['rcount']. "</td>";
+		$reportdata[] = "      <td>". $row['disposition']. "</td>";
+		$reportdata[] = "      <td>". $row['reason']. "</td>";
+		$reportdata[] = "      <td>". $row['dkimdomain']. "</td>";
+		$reportdata[] = "      <td>". $row['dkimresult']. "</td>";
+		$reportdata[] = "      <td>". $row['spfdomain']. "</td>";
+		$reportdata[] = "      <td>". $row['spfresult']. "</td>";
+		$reportdata[] = "    </tr>";
 	}
-	$reportdata .= "</table>";
-	$reportdata .= "<hr align=center width=90% noshade>";
+	$reportdata[] = "  </tbody>";
+	$reportdata[] = "</table>";
 
-	return $reportdata;
+	$reportdata[] = "<!-- End of report rata -->";
+	$reportdata[] = "";
+
+	#indent generated html by 2 extra spaces
+	return implode("\n  ",$reportdata);
 }
 
 function tmpl_page ($body) {
-	$html = "";
+	$html = array();
 
-	$html .= "<title>DMARC Report Viewer</title>";
-	$html .= "<head>\n";
-	$html .= "</head>\n";
-	$html .= "<html>\n";
-	$html .= "<body>\n";
+	$html[] = "<!DOCTYPE html>";
+	$html[] = "<html>";
+	$html[] = "  <head>";
+	$html[] = "    <title>DMARC Report Viewer</title>";
+	$html[] = "    <link rel='stylesheet' href='default.css'>";
+	$html[] = "  </head>";
 
-	$html .= $body;
+	$html[] = "  <body>";
 
-	$html .= "<center><h5>Brought to you by <a href=http://www.techsneeze.com>TechSneeze.com</a> - <a href=mailto:dave@techsneeze.com>dave@techsneeze.com</a></h5></center><br />\n";
-	$html .= "</body>";
-	$html .= "</html>";
+	$html[] = $body;
 
-	return $html;
+	$html[] = "  <div class='footer'>Brought to you by <a href='http://www.techsneeze.com'>TechSneeze.com</a> - <a href='mailto:dave@techsneeze.com'>dave@techsneeze.com</a></div>";
+	$html[] = "  </body>";
+	$html[] = "</html>";
+
+	return implode("\n",$html);
 }
 
 
@@ -133,11 +181,8 @@ mysql_select_db($dbname) or die(mysql_error());
 
 // Generate Page with report list and report data (if a report is selected)
 echo tmpl_page( ""
-  .tmpl_reportList()
-  .tmpl_reportData( (isset($_GET["report"]) ? $_GET["report"] : false ) )
-  );
+	.tmpl_reportList()
+	.tmpl_reportData( (isset($_GET["report"]) ? $_GET["report"] : false ) )
+);
 
-//var_dump($array_report);
-//var_dump($message_result);
-//print_r(array_keys($array_report[5]));
 ?>
