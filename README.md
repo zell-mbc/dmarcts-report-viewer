@@ -1,4 +1,4 @@
-# dmarcts-report
+# dmarcts-report-viewer
 
 Current documentation about use of this report can be found at: http://www.techsneeze.com/dmarc-report/
 
