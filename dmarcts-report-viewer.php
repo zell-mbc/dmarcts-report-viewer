@@ -38,7 +38,7 @@ function format_date($date, $format) {
 	return $answer;
 };
 
-function tmpl_reportList() {
+function tmpl_reportList($allowed_reports) {
 	$reportlist[] = "";
 	$reportlist[] = "<!-- Start of report list -->";
 
@@ -57,12 +57,7 @@ function tmpl_reportList() {
 
 	$reportlist[] = "  <tbody>";
 
-	$query_report = "SELECT * FROM report ORDER BY mindate";
-	$result_report = mysql_query($query_report) or die(mysql_error());
-	while($row = mysql_fetch_array($result_report)) {
-		$message_query = "SELECT *, SUM(rcount) FROM rptrecord WHERE serial = {$row['serial']}";
-		$message_process = mysql_query($message_query) or die(mysql_error());
-		$message_result = mysql_fetch_array($message_process);
+	foreach ($allowed_reports[BySerial] as $row) {
 		$date_output_format = "r";
 		$reportlist[] =  "    <tr>";
 		$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";
@@ -70,7 +65,7 @@ function tmpl_reportList() {
 		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
 		$reportlist[] =  "      <td class='center'><a href='?report=". $row['serial']. "#rpt". $row['serial']. "'>". $row['reportid']. "</a></td>";
-		$reportlist[] =  "      <td class='center'>". $message_result['SUM(rcount)']. "</td>";
+		$reportlist[] =  "      <td class='center'>". $row['rcount']. "</td>";
 		$reportlist[] =  "    </tr>";
 	}
 	$reportlist[] =  "  </tbody>";
@@ -84,7 +79,7 @@ function tmpl_reportList() {
 	return implode("\n  ",$reportlist);
 }
 
-function tmpl_reportData($reportnumber) {
+function tmpl_reportData($reportnumber, $allowed_reports) {
 
 	if (!$reportnumber) {
 		return "";
@@ -93,9 +88,8 @@ function tmpl_reportData($reportnumber) {
 	$reportdata[] = "";
 	$reportdata[] = "<!-- Start of report rata -->";
 
-	$sql = "SELECT * FROM report where serial = $reportnumber";
-	$query = mysql_query($sql) or die(mysql_error());
-	if ($row = mysql_fetch_array($query)) {
+	if (isset($allowed_reports[BySerial][$reportnumber])) {
+		$row = $allowed_reports[BySerial][$reportnumber];
 		$reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")</p></div>";
 	} else {
 		return "Unknown report number!";
@@ -118,13 +112,15 @@ function tmpl_reportData($reportnumber) {
 	$reportdata[] = "  </thead>";
 
 	$reportdata[] = "  <tbody>";
+
+	global $mysqli;
 	$sql = "SELECT * FROM rptrecord where serial = $reportnumber";
-	$query = mysql_query($sql) or die(mysql_error());
-	while($row = mysql_fetch_array($query)) {
+	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+	while($row = $query->fetch_assoc()) {
 		$status="";
-		if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")){
+		if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
 			$status="red";
-		} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")){
+		} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")) {
 			$status="orange";
 		} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
 			$status="lime";
@@ -193,14 +189,39 @@ function tmpl_page ($body) {
 // does not need to exists.
 if (file_exists("dmarcts-report-viewer-config.php")) include "dmarcts-report-viewer-config.php";
 
-// Make a MySQL Connection
-mysql_connect($dbhost, $dbuser, $dbpass) or die(mysql_error());
-mysql_select_db($dbname) or die(mysql_error());
+// Make a MySQL Connection using mysqli
+$mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
+if ($mysqli->connect_errno) {
+	echo "Error: Failed to make a MySQL connection, here is why: \n";
+	echo "Errno: " . $mysqli->connect_errno . "\n";
+	echo "Error: " . $mysqli->connect_error . "\n";
+	exit;
+}
 
-// Generate Page with report list and report data (if a report is selected)
+define("BySerial", 1);
+define("ByDomain", 2);
+define("ByOrganisation", 3);
+
+// Get allowed reports and cache them - using serial as key
+$allowed_reports = array();
+# Include the rcount via left join, so we do not have to make an sql query for every single report.
+$sql = "SELECT report.* , sum(rptrecord.rcount) as rcount FROM `report` LEFT Join rptrecord on report.serial = rptrecord.serial group by serial order by mindate";
+$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+while($row = $query->fetch_assoc()) {
+	//todo: check ACL if this row is allowed
+	if (true) {
+		//add data by serial
+		$allowed_reports[BySerial][$row['serial']] = $row;
+		//make a list of serials by domain and by organisation
+		$allowed_reports[ByDomain][$row['domain']][] = $row['serial'];
+		$allowed_reports[ByOrganisation][$row['org']][] = $row['serial'];
+	}
+}
+
+// Generate Page with report list and report data (if a report is selected).
 echo tmpl_page( ""
-	.tmpl_reportList()
-	.tmpl_reportData( (isset($_GET["report"]) ? $_GET["report"] : false ) )
+	.tmpl_reportList($allowed_reports)
+	.tmpl_reportData( (isset($_GET["report"]) ? $_GET["report"] : false ), $allowed_reports )
 );
 
 ?>
