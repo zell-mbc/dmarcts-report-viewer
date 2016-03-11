@@ -1,8 +1,9 @@
 <?php
 
 // dmarcts-report-viewer - A PHP based viewer of parsed DMARC reports.
-// Copyright (C) 2016 TechSneeze.com
+// Copyright (C) 2016 TechSneeze.com and John Bieling ( https://github.com/jobisoft/ )
 //
+// Available at:
 // https://github.com/techsneeze/dmarcts-report-viewer
 //
 // This program is free software: you can redistribute it and/or modify it
