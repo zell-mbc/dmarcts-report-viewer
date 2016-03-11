@@ -16,11 +16,18 @@ $dbuser="dmarc";
 $dbpass="xxx";
 ```
 
-Ensure that `dmarcts-report-viewer-config.php` and `dmarcts-report-viewer.php` are in the same folder.
+Ensure that `dmarcts-report-viewer-config.php`, `dmarcts-report-viewer.php`, anf `default.css` are in the same folder.
 ## Usage
 
-Navigate in your browser to the location of the `dmarcts-report-viewer.php` file.  
+Navigate in your browser to the location of the `dmarcts-report-viewer.php` file.
 
 You should be presented with the basic report view, allowing you to navigate through the reports that have been parsed.
+
+### Meaning of the Colors
+* Green : DKIM and SPF = pass
+* Red : DKIM and SPF = fail
+* Orange : Either DKIM or SPF (but not both) = fail
+* Yellow : Some other condition, and should be investigated (e.g. DKIM or SPF result were missing)
+
 
 More info can currently be found at : [TechSneeze.com](http://www.techsneeze.com/dmarc-report/)
