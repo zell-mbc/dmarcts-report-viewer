@@ -1,7 +1,7 @@
 <?php
 
 // dmarcts-report-viewer - A PHP based viewer of parsed DMARC reports.
-// Copyright (C) 2016 TechSneeze.com and John Bieling ( https://github.com/jobisoft/ )
+// Copyright (C) 2016 TechSneeze.com and John Bieling
 //
 // Available at:
 // https://github.com/techsneeze/dmarcts-report-viewer
@@ -23,12 +23,9 @@
 //### configuration ##################################################
 //####################################################################
 
-$dbhost="localhost";
-$dbname="dmarc";
-$dbuser="dmarc";
-$dbpass="xxx";
-
-
+// Copy dmarcts-report-viewer-config.php.sample to 
+// dmarcts-report-viewer-config.php and edit with the appropriate info
+// for your database authentication and location.
 
 //####################################################################
 //### functions ######################################################
@@ -185,10 +182,9 @@ function tmpl_page ($body) {
 //### main ###########################################################
 //####################################################################
 
-// Override hardcoded script configuration options by local config file.
-// The file is expected to be in the same folder as this script, but it
-// does not need to exists.
-if (file_exists("dmarcts-report-viewer-config.php")) include "dmarcts-report-viewer-config.php";
+// The file is expected to be in the same folder as this script, and it
+// must exist.
+include "dmarcts-report-viewer-config.php";
 
 // Make a MySQL Connection using mysqli
 $mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
