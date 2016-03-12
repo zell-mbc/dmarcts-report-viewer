@@ -18,7 +18,7 @@ Once the php files ave been downloaded, you will need to copy `dmarcts-report-vi
 cp dmarcts-report-viewer-config.php.sample dmarcts-report-viewer-config.php
 ```
 
-Next, edit these basic configuration options at the top of the `dmarcts-report-viewer-config.php` script with the appropriate information:
+Next, edit these basic configuration options at the top of the `dmarcts-report-viewer-config.php` file with the appropriate information:
 
 ```
 $dbhost="localhost";
@@ -38,7 +38,7 @@ You should be presented with the basic report view, allowing you to navigate thr
 * Green : DKIM and SPF = pass
 * Red : DKIM and SPF = fail
 * Orange : Either DKIM or SPF (but not both) = fail
-* Yellow : Some other condition, and should be investigated (e.g. DKIM or SPF result were missing)
+* Yellow : Some other condition, and should be investigated (e.g. DKIM or SPF result were missing, "softfail", "temperror", etc.)
 
 
 More info can currently be found at : [TechSneeze.com](http://www.techsneeze.com/dmarc-report/)
