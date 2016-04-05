@@ -27,7 +27,7 @@ $dbuser="dmarc";
 $dbpass="xxx";
 ```
 
-Ensure that `dmarcts-report-viewer-config.php`, `dmarcts-report-viewer.php`, anf `default.css` are in the same folder.
+Ensure that `dmarcts-report-viewer-config.php`, `dmarcts-report-viewer.php`, and `default.css` are in the same folder.
 ## Usage
 
 Navigate in your browser to the location of the `dmarcts-report-viewer.php` file.
