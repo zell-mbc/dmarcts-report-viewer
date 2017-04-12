@@ -26,7 +26,7 @@ table.reportlist tbody tr:first-child td {
 	font-weight: bold;
 	border-top: 2px solid grey;
 	width: 90%;
-	margin-left: auto; 
+	margin-left: auto;
     margin-right: auto;
 }
 
@@ -67,6 +67,14 @@ table.reportdata tr.yellow {
 	width: 90%;
 	margin: 2em auto 1em auto;
 	padding-top: 10px;
+}
+
+
+.options {
+  font-size: 90%;
+  text-align: right;
+  border: none;
+  width: 90%;
 }
 
 

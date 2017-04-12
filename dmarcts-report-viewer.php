@@ -23,7 +23,7 @@
 //### configuration ##################################################
 //####################################################################
 
-// Copy dmarcts-report-viewer-config.php.sample to 
+// Copy dmarcts-report-viewer-config.php.sample to
 // dmarcts-report-viewer-config.php and edit with the appropriate info
 // for your database authentication and location.
 
@@ -36,7 +36,7 @@ function format_date($date, $format) {
 	return $answer;
 };
 
-function tmpl_reportList($allowed_reports) {
+function tmpl_reportList($allowed_reports, $host_lookup = 1) {
 	$reportlist[] = "";
 	$reportlist[] = "<!-- Start of report list -->";
 
@@ -62,7 +62,7 @@ function tmpl_reportList($allowed_reports) {
 		$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
-		$reportlist[] =  "      <td class='center'><a href='?report=". $row['serial']. "#rpt". $row['serial']. "'>". $row['reportid']. "</a></td>";
+		$reportlist[] =  "      <td class='center'><a href='?report=" . $row['serial'] . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" ) . "#rpt". $row['serial'] . "'>". $row['reportid']. "</a></td>";
 		$reportlist[] =  "      <td class='center'>". $row['rcount']. "</td>";
 		$reportlist[] =  "    </tr>";
 	}
@@ -77,7 +77,7 @@ function tmpl_reportList($allowed_reports) {
 	return implode("\n  ",$reportlist);
 }
 
-function tmpl_reportData($reportnumber, $allowed_reports) {
+function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1) {
 
 	if (!$reportnumber) {
 		return "";
@@ -135,7 +135,11 @@ function tmpl_reportData($reportnumber, $allowed_reports) {
 
 		$reportdata[] = "    <tr class='".$status."'>";
 		$reportdata[] = "      <td>". $ip. "</td>";
-		$reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
+		if ( $host_lookup ) {
+      $reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
+    } else {
+      $reportdata[] = "      <td>#off#</td>";
+    }
 		$reportdata[] = "      <td>". $row['rcount']. "</td>";
 		$reportdata[] = "      <td>". $row['disposition']. "</td>";
 		$reportdata[] = "      <td>". $row['reason']. "</td>";
@@ -155,8 +159,10 @@ function tmpl_reportData($reportnumber, $allowed_reports) {
 	return implode("\n  ",$reportdata);
 }
 
-function tmpl_page ($body) {
-	$html = array();
+function tmpl_page ($body, $reportid, $host_lookup = 1) {
+	$html       = array();
+	$url_switch = ( $reportid ? "?report=$reportid&hostlookup=" : "?hostlookup=" )
+                . ($host_lookup ? "0" : "1" );
 
 	$html[] = "<!DOCTYPE html>";
 	$html[] = "<html>";
@@ -166,6 +172,7 @@ function tmpl_page ($body) {
 	$html[] = "  </head>";
 
 	$html[] = "  <body>";
+  $html[] = "  <div class='options'>Hostlook is " . ($host_lookup ? "on" : "off" ) . " [<a href=\"$url_switch\">" . ($host_lookup ? "off" : "on" ) . "</a>]</div>";
 
 	$html[] = $body;
 
@@ -177,7 +184,6 @@ function tmpl_page ($body) {
 }
 
 
-
 //####################################################################
 //### main ###########################################################
 //####################################################################
@@ -185,6 +191,23 @@ function tmpl_page ($body) {
 // The file is expected to be in the same folder as this script, and it
 // must exist.
 include "dmarcts-report-viewer-config.php";
+
+
+if(isset($_GET['report']) && is_numeric($_GET['report'])){
+  $reportid=$_GET['report']+0;
+}elseif(!isset($_GET['report'])){
+  $reportid=false;
+}else{
+  die('Invalid Report ID');
+}
+if(isset($_GET['hostlookup']) && is_numeric($_GET['hostlookup'])){
+  $hostlookup=$_GET['hostlookup']+0;
+}elseif(!isset($_GET['hostlookup'])){
+  $hostlookup= isset( $default_lookup ) ? $default_lookup : 1;
+}else{
+  die('Invalid hostlookup flag');
+}
+
 
 // Make a MySQL Connection using mysqli
 $mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
@@ -215,16 +238,11 @@ while($row = $query->fetch_assoc()) {
 	}
 }
 
-if(isset($_GET['report']) && is_numeric($_GET['report'])){
-	$reportid=$_GET['report'];
-}elseif(!isset($_GET['report'])){
-	$reportid=false;
-}else{
-	die('Invalid Report ID');
-}
 // Generate Page with report list and report data (if a report is selected).
 echo tmpl_page( ""
-	.tmpl_reportList($allowed_reports)
-	.tmpl_reportData($reportid, $allowed_reports )
+	.tmpl_reportList($allowed_reports, $hostlookup)
+	.tmpl_reportData($reportid, $allowed_reports, $hostlookup )
+	, $reportid
+	, $hostlookup
 );
 ?>
