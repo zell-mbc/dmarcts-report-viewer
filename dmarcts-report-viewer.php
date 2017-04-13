@@ -88,12 +88,12 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1) {
 
 	if (isset($allowed_reports[BySerial][$reportnumber])) {
 		$row = $allowed_reports[BySerial][$reportnumber];
-		$reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")</p></div>";
+    $reportdata[] = "<a id='rpt".$reportnumber."'></a>";
+		$reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row[policy_adkim] . ", aspf=" . $row[policy_aspf] .  ", p=" . $row[policy_p] .  ", sp=" . $row[policy_sp] .  ", pct=" . $row[policy_pct] . "</p></div>";
 	} else {
 		return "Unknown report number!";
 	}
 
-	$reportdata[] = "<a id='rpt".$reportnumber."'></a>";
 	$reportdata[] = "<table class='reportdata'>";
 	$reportdata[] = "  <thead>";
 	$reportdata[] = "    <tr>";
