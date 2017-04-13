@@ -12,7 +12,7 @@ Download the required files:
 git clone https://github.com/techsneeze/dmarcts-report-viewer.git
 ```
 
-Once the php files ave been downloaded, you will need to copy `dmarcts-report-viewer-config.php.sample` to `dmarcts-report-viewer-config.php`.  
+Once the php files ave been downloaded, you will need to copy `dmarcts-report-viewer-config.php.sample` to `dmarcts-report-viewer-config.php`.
 
 ```
 cp dmarcts-report-viewer-config.php.sample dmarcts-report-viewer-config.php
@@ -25,6 +25,8 @@ $dbhost="localhost";
 $dbname="dmarc";
 $dbuser="dmarc";
 $dbpass="xxx";
+
+$default_lookup = 1;  # 1= on 0=off (on is old behaviour )
 ```
 
 Ensure that `dmarcts-report-viewer-config.php`, `dmarcts-report-viewer.php`, and `default.css` are in the same folder.
