@@ -225,7 +225,7 @@ define("ByOrganisation", 3);
 // Get allowed reports and cache them - using serial as key
 $allowed_reports = array();
 # Include the rcount via left join, so we do not have to make an sql query for every single report.
-$sql = "SELECT report.* , sum(rptrecord.rcount) as rcount FROM `report` LEFT Join rptrecord on report.serial = rptrecord.serial group by serial order by mindate";
+$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount FROM `report` LEFT JOIN rptrecord ON report.serial = rptrecord.serial GROUP BY serial ORDER BY mindate,maxdate,org";
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 while($row = $query->fetch_assoc()) {
 	//todo: check ACL if this row is allowed
@@ -233,8 +233,8 @@ while($row = $query->fetch_assoc()) {
 		//add data by serial
 		$allowed_reports[BySerial][$row['serial']] = $row;
 		//make a list of serials by domain and by organisation
-		$allowed_reports[ByDomain][$row['domain']][] = $row['serial'];
-		$allowed_reports[ByOrganisation][$row['org']][] = $row['serial'];
+		//$allowed_reports[ByDomain][$row['domain']][] = $row['serial'];
+		//$allowed_reports[ByOrganisation][$row['org']][] = $row['serial'];
 	}
 }
 
