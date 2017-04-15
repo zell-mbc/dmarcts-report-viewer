@@ -54,6 +54,7 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1) {
 	$reportlist[] = "  </thead>";
 
 	$reportlist[] = "  <tbody>";
+	$reportsum    = 0;
 
 	foreach ($allowed_reports[BySerial] as $row) {
 		$date_output_format = "r";
@@ -63,9 +64,11 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1) {
 		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
 		$reportlist[] =  "      <td class='center'><a href='?report=" . $row['serial'] . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" ) . "#rpt". $row['serial'] . "'>". $row['reportid']. "</a></td>";
-		$reportlist[] =  "      <td class='center'>". $row['rcount']. "</td>";
+		$reportlist[] =  "      <td class='center'>". number_format($row['rcount']+0,0). "</td>";
 		$reportlist[] =  "    </tr>";
+		$reportsum += $row['rcount'];
 	}
+	$reportlist[] = "<tr class='sum'><td></td><td></td><td></td><td></td><td class='right'>Sum:</td><td class='center'>".number_format($reportsum,0)."</td></tr>";
 	$reportlist[] =  "  </tbody>";
 
 	$reportlist[] =  "</table>";
@@ -85,6 +88,7 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1) {
 
 	$reportdata[] = "";
 	$reportdata[] = "<!-- Start of report rata -->";
+	$reportsum    = 0;
 
 	if (isset($allowed_reports[BySerial][$reportnumber])) {
 		$row = $allowed_reports[BySerial][$reportnumber];
@@ -148,7 +152,10 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1) {
 		$reportdata[] = "      <td>". $row['spfdomain']. "</td>";
 		$reportdata[] = "      <td>". $row['spfresult']. "</td>";
 		$reportdata[] = "    </tr>";
+
+		$reportsum += $row['rcount'];
 	}
+	$reportdata[] = "<tr><td></td><td></td><td>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
 	$reportdata[] = "  </tbody>";
 	$reportdata[] = "</table>";
 
