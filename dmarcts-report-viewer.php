@@ -172,7 +172,7 @@ function tmpl_page ($body, $reportid, $host_lookup = 1) {
 	$html[] = "  </head>";
 
 	$html[] = "  <body>";
-  $html[] = "  <div class='options'>Hostlook is " . ($host_lookup ? "on" : "off" ) . " [<a href=\"$url_switch\">" . ($host_lookup ? "off" : "on" ) . "</a>]</div>";
+  $html[] = "  <div class='options'>Hostname Lookup is " . ($host_lookup ? "on" : "off" ) . " [<a href=\"$url_switch\">" . ($host_lookup ? "off" : "on" ) . "</a>]</div>";
 
 	$html[] = $body;
 
