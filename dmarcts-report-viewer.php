@@ -57,6 +57,7 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1) {
 	$reportsum    = 0;
 
 	foreach ($allowed_reports[BySerial] as $row) {
+		$row = array_map('htmlspecialchars', $row);
 		$date_output_format = "r";
 		$reportlist[] =  "    <tr>";
 		$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";
@@ -92,7 +93,8 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1) {
 
 	if (isset($allowed_reports[BySerial][$reportnumber])) {
 		$row = $allowed_reports[BySerial][$reportnumber];
-    $reportdata[] = "<a id='rpt".$reportnumber."'></a>";
+		$row = array_map('htmlspecialchars', $row);
+		$reportdata[] = "<a id='rpt".$reportnumber."'></a>";
 		$reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row[policy_adkim] . ", aspf=" . $row[policy_aspf] .  ", p=" . $row[policy_p] .  ", sp=" . $row[policy_sp] .  ", pct=" . $row[policy_pct] . "</p></div>";
 	} else {
 		return "Unknown report number!";
@@ -119,6 +121,7 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1) {
 	$sql = "SELECT * FROM rptrecord where serial = $reportnumber";
 	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 	while($row = $query->fetch_assoc()) {
+		$row = array_map('htmlspecialchars', $row);
 		$status="";
 		if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
 			$status="red";
