@@ -12,7 +12,7 @@ Download the required files:
 git clone https://github.com/techsneeze/dmarcts-report-viewer.git
 ```
 
-Once the php files ave been downloaded, you will need to copy `dmarcts-report-viewer-config.php.sample` to `dmarcts-report-viewer-config.php`.
+Once the PHP files have been downloaded, you will need to copy `dmarcts-report-viewer-config.php.sample` to `dmarcts-report-viewer-config.php`.
 
 ```
 cp dmarcts-report-viewer-config.php.sample dmarcts-report-viewer-config.php
