@@ -7,7 +7,17 @@ A PHP viewer for DMARC records that have been parsed by [John Levine's rddmarc s
 
 NOTE: The viewer expects that you have already populated a database with data from [John Levine's rddmarc script](http://www.taugh.com/rddmarc/) or the [dmarcts-report-parser.pl](https://github.com/techsneeze/dmarcts-report-parser) script.
 
-Download the required files:
+To install dependencies...
+
+### on Debian/Unbuntu:
+
+you need a webserver (apache, nginx, ...) with installed php and additionaly:
+
+```
+apt-get install  php-mysql
+```
+
+### Download the required files:
 ```
 git clone https://github.com/techsneeze/dmarcts-report-viewer.git
 ```
@@ -17,6 +27,8 @@ Once the PHP files have been downloaded, you will need to copy `dmarcts-report-v
 ```
 cp dmarcts-report-viewer-config.php.sample dmarcts-report-viewer-config.php
 ```
+
+### Configuration
 
 Next, edit these basic configuration options at the top of the `dmarcts-report-viewer-config.php` file with the appropriate information:
 
