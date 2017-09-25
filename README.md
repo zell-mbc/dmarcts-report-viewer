@@ -9,9 +9,12 @@ NOTE: The viewer expects that you have already populated a database with data fr
 
 To install dependencies...
 
-### on Debian:
+### on Debian/Unbuntu:
+
+you need a webserver (apache, nginx, ...) with installed php and additionaly:
+
 ```
-apt-get install  libdbd-mysql-perl
+apt-get install  php-mysql
 ```
 
 ### Download the required files:
