@@ -175,9 +175,7 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $dom_select, $domains = 
                 . ($host_lookup ? "0" : "1" )
                 . (isset($dom_select) && $dom_select <> "" ? "&d=$dom_select" : "" )
                 ;
-	$url_dswitch = ( $reportid ? "?report=$reportid&hostlookup=" : "?hostlookup=" )
-                . ($host_lookup ? "1" : "0" )
-                ;
+	$url_dswitch = "?hostlookup=" . ($host_lookup ? "1" : "0" ); // drop selected report on domain switch
 
 	$html[] = "<!DOCTYPE html>";
 	$html[] = "<html>";
