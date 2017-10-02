@@ -64,7 +64,7 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1,$dom_select = '') {
 		$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
-		$reportlist[] =  "      <td class='center'><a href='?report=" . $row['serial'] . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" ) . "#rpt". $row['serial'] . "'>". $row['reportid']. "</a></td>";
+		$reportlist[] =  "      <td class='center'><a href='?report=" . $row['serial'] . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" ) . ($dom_select == '' ? '' : "&d=$dom_select") . "#rpt". $row['serial'] . "'>". $row['reportid']. "</a></td>";
 		$reportlist[] =  "      <td class='center'>". number_format($row['rcount']+0,0). "</td>";
 		$reportlist[] =  "    </tr>";
 		$reportsum += $row['rcount'];
