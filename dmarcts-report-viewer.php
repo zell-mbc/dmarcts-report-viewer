@@ -36,11 +36,11 @@ function format_date($date, $format) {
 	return $answer;
 };
 
-function tmpl_reportList($allowed_reports, $host_lookup = 1) {
+function tmpl_reportList($allowed_reports, $host_lookup = 1,$dom_select = '') {
 	$reportlist[] = "";
 	$reportlist[] = "<!-- Start of report list -->";
 
-	$reportlist[] = "<h1>DMARC Reports</h1>";
+	$reportlist[] = "<h1>DMARC Reports" . ($dom_select == '' ? '' : " for " . htmlentities($dom_select)) . "</h1>";
 	$reportlist[] = "<table class='reportlist'>";
 	$reportlist[] = "  <thead>";
 	$reportlist[] = "    <tr>";
@@ -95,7 +95,7 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1) {
 		$row = $allowed_reports[BySerial][$reportnumber];
 		$row = array_map('htmlspecialchars', $row);
 		$reportdata[] = "<a id='rpt".$reportnumber."'></a>";
-		$reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row[policy_adkim] . ", aspf=" . $row[policy_aspf] .  ", p=" . $row[policy_p] .  ", sp=" . $row[policy_sp] .  ", pct=" . $row[policy_pct] . "</p></div>";
+		$reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row['policy_adkim'] . ", aspf=" . $row['policy_aspf'] .  ", p=" . $row['policy_p'] .  ", sp=" . $row['policy_sp'] .  ", pct=" . $row['policy_pct'] . "</p></div>";
 	} else {
 		return "Unknown report number!";
 	}
@@ -169,10 +169,15 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1) {
 	return implode("\n  ",$reportdata);
 }
 
-function tmpl_page ($body, $reportid, $host_lookup = 1) {
+function tmpl_page ($body, $reportid, $host_lookup = 1, $dom_select, $domains = array() ) {
 	$html       = array();
-	$url_switch = ( $reportid ? "?report=$reportid&hostlookup=" : "?hostlookup=" )
-                . ($host_lookup ? "0" : "1" );
+	$url_hswitch = ( $reportid ? "?report=$reportid&hostlookup=" : "?hostlookup=" )
+                . ($host_lookup ? "0" : "1" )
+                . (isset($dom_select) && $dom_select <> "" ? "&d=$dom_select" : "" )
+                ;
+	$url_dswitch = ( $reportid ? "?report=$reportid&hostlookup=" : "?hostlookup=" )
+                . ($host_lookup ? "1" : "0" )
+                ;
 
 	$html[] = "<!DOCTYPE html>";
 	$html[] = "<html>";
@@ -182,7 +187,14 @@ function tmpl_page ($body, $reportid, $host_lookup = 1) {
 	$html[] = "  </head>";
 
 	$html[] = "  <body>";
-  $html[] = "  <div class='options'>Hostname Lookup is " . ($host_lookup ? "on" : "off" ) . " [<a href=\"$url_switch\">" . ($host_lookup ? "off" : "on" ) . "</a>]</div>";
+  $html[] = "  <div class='options'>Hostname Lookup is " . ($host_lookup ? "on" : "off" ) . " [<a href=\"$url_hswitch\">" . ($host_lookup ? "off" : "on" ) . "</a>]</div>";
+  if ( count( $domains ) > 1 ) {
+    $html[] = "<div class='options'>Domains: ";
+    foreach( $domains as $d) {
+      $html[] = "[<a href=\"$url_dswitch&d=$d\">" . $d . "</a>] ";
+    }
+    $html[] = "<a href=\"$url_dswitch\">[all]</a></div>";
+  }
 
 	$html[] = $body;
 
@@ -201,7 +213,7 @@ function tmpl_page ($body, $reportid, $host_lookup = 1) {
 // The file is expected to be in the same folder as this script, and it
 // must exist.
 include "dmarcts-report-viewer-config.php";
-
+$dom_select= '';
 
 if(isset($_GET['report']) && is_numeric($_GET['report'])){
   $reportid=$_GET['report']+0;
@@ -216,6 +228,13 @@ if(isset($_GET['hostlookup']) && is_numeric($_GET['hostlookup'])){
   $hostlookup= isset( $default_lookup ) ? $default_lookup : 1;
 }else{
   die('Invalid hostlookup flag');
+}
+if(isset($_GET['d'])){
+  $dom_select=$_GET['d'];
+}elseif(!isset($_GET['d'])){
+  $dom_select= '';
+}else{
+  die('Invalid domain');
 }
 
 
@@ -232,10 +251,29 @@ define("BySerial", 1);
 define("ByDomain", 2);
 define("ByOrganisation", 3);
 
+// get all domains reported
+$sql="SELECT DISTINCT domain FROM `report` ORDER BY domain";
+$domains= array();
+$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+while($row = $query->fetch_assoc()) {
+  $domains[] = $row['domain'];
+}
+if( $dom_select <> '' && array_search($dom_select, $domains) === FALSE ) {
+	echo "Error: invalid domain " . htmlentities($dom_select) . " \n";
+	exit;
+}
+
+
 // Get allowed reports and cache them - using serial as key
 $allowed_reports = array();
+
 # Include the rcount via left join, so we do not have to make an sql query for every single report.
-$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount FROM `report` LEFT JOIN rptrecord ON report.serial = rptrecord.serial GROUP BY serial ORDER BY mindate,maxdate,org";
+$where = '';
+if( $dom_select <> '' ) {
+  $where = "WHERE domain='" . $mysqli->real_escape_string($dom_select) . "'";
+} 
+$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount FROM `report` LEFT JOIN rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate,maxdate,org";
+
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 while($row = $query->fetch_assoc()) {
 	//todo: check ACL if this row is allowed
@@ -250,9 +288,11 @@ while($row = $query->fetch_assoc()) {
 
 // Generate Page with report list and report data (if a report is selected).
 echo tmpl_page( ""
-	.tmpl_reportList($allowed_reports, $hostlookup)
+	.tmpl_reportList($allowed_reports, $hostlookup, $dom_select)
 	.tmpl_reportData($reportid, $allowed_reports, $hostlookup )
 	, $reportid
 	, $hostlookup
+	, $dom_select
+	, $domains
 );
 ?>
