@@ -37,7 +37,8 @@ function format_date($date, $format) {
 	return $answer;
 };
 
-function tmpl_reportList($allowed_reports, $host_lookup = 1, $dom_select = '') {
+function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_select = '') {
+
 	$reportlist[] = "";
 	$reportlist[] = "<!-- Start of report list -->";
 
