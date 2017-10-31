@@ -120,10 +120,9 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
 	$reportdata[] = "  <tbody>";
 
 	global $mysqli;
-	$sql = "SELECT *, INET6_NTOA(ip6) as ip6s FROM rptrecord where serial = $reportnumber";
+	$sql = "SELECT * FROM rptrecord where serial = $reportnumber";
 	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 	while($row = $query->fetch_assoc()) {
-		$row = array_map('htmlspecialchars', $row);
 		$status="";
 		if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
 			$status="red";
@@ -135,13 +134,16 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
 			$status="yellow";
 		};
 
-		if ( $row['ip'] > 0 ) {
+		if ( $row['ip'] ) {
 			$ip = long2ip($row['ip']);
-		} elseif ( $row['ip6s'] ) {
-			$ip = $row['ip6s'];
+		} elseif ( $row['ip6'] ) {
+			$ip = inet_ntop($row['ip6']);
     } else {
       $ip = "-";
 		}
+		
+		/* escape html characters after exploring binary values, which will be messed up */
+		$row = array_map('htmlspecialchars', $row);
 
 		$reportdata[] = "    <tr class='".$status."'>";
 		$reportdata[] = "      <td>". $ip. "</td>";
