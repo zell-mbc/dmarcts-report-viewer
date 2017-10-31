@@ -37,7 +37,7 @@ function format_date($date, $format) {
 	return $answer;
 };
 
-function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_select = '') {
+function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_select = '', $reportid) {
 
 	$reportlist[] = "";
 	$reportlist[] = "<!-- Start of report list -->";
@@ -61,7 +61,7 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_s
 	foreach ($allowed_reports[BySerial] as $row) {
 		$row = array_map('htmlspecialchars', $row);
 		$date_output_format = "r";
-		$reportlist[] =  "    <tr>";
+		$reportlist[] =  "    <tr" . ( $reportid == $row['serial'] ? " class='selected' " : "" ) . ">";
 		$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";
 		$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
@@ -324,7 +324,7 @@ while($row = $query->fetch_assoc()) {
 
 // Generate Page with report list and report data (if a report is selected).
 echo tmpl_page( ""
-        .tmpl_reportList($allowed_reports, $hostlookup, $sortorder, $dom_select)
+        .tmpl_reportList($allowed_reports, $hostlookup, $sortorder, $dom_select, $reportid)
         .tmpl_reportData($reportid, $allowed_reports, $hostlookup, $sortorder )
 	, $reportid
 	, $hostlookup
