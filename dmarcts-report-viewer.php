@@ -120,7 +120,7 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
 	$reportdata[] = "  <tbody>";
 
 	global $mysqli;
-	$sql = "SELECT * FROM rptrecord where serial = $reportnumber";
+	$sql = "SELECT *, INET6_NTOA(ip6) as ip6s FROM rptrecord where serial = $reportnumber";
 	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 	while($row = $query->fetch_assoc()) {
 		$row = array_map('htmlspecialchars', $row);
@@ -135,11 +135,12 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
 			$status="yellow";
 		};
 
-		if ( $row['ip'] ) {
+		if ( $row['ip'] > 0 ) {
 			$ip = long2ip($row['ip']);
-		}
-		if ( $row['ip6'] ) {
-			$ip = inet_ntop($row['ip6']);
+		} elseif ( $row['ip6s'] ) {
+			$ip = $row['ip6s'];
+    } else {
+      $ip = "-";
 		}
 
 		$reportdata[] = "    <tr class='".$status."'>";
