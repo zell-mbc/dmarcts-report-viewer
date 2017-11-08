@@ -37,7 +37,7 @@ function format_date($date, $format) {
 	return $answer;
 };
 
-function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_select = '') {
+function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_select = '', $reportid) {
 
 	$reportlist[] = "";
 	$reportlist[] = "<!-- Start of report list -->";
@@ -61,7 +61,7 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_s
 	foreach ($allowed_reports[BySerial] as $row) {
 		$row = array_map('htmlspecialchars', $row);
 		$date_output_format = "r";
-		$reportlist[] =  "    <tr>";
+		$reportlist[] =  "    <tr" . ( $reportid == $row['serial'] ? " class='selected' " : "" ) . ">";
 		$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";
 		$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
@@ -123,7 +123,6 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
 	$sql = "SELECT * FROM rptrecord where serial = $reportnumber";
 	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 	while($row = $query->fetch_assoc()) {
-		$row = array_map('htmlspecialchars', $row);
 		$status="";
 		if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
 			$status="red";
@@ -137,10 +136,14 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
 
 		if ( $row['ip'] ) {
 			$ip = long2ip($row['ip']);
-		}
-		if ( $row['ip6'] ) {
+		} elseif ( $row['ip6'] ) {
 			$ip = inet_ntop($row['ip6']);
+    } else {
+      $ip = "-";
 		}
+		
+		/* escape html characters after exploring binary values, which will be messed up */
+		$row = array_map('htmlspecialchars', $row);
 
 		$reportdata[] = "    <tr class='".$status."'>";
 		$reportdata[] = "      <td>". $ip. "</td>";
@@ -324,7 +327,7 @@ while($row = $query->fetch_assoc()) {
 
 // Generate Page with report list and report data (if a report is selected).
 echo tmpl_page( ""
-        .tmpl_reportList($allowed_reports, $hostlookup, $sortorder, $dom_select)
+        .tmpl_reportList($allowed_reports, $hostlookup, $sortorder, $dom_select, $reportid)
         .tmpl_reportData($reportid, $allowed_reports, $hostlookup, $sortorder )
 	, $reportid
 	, $hostlookup
