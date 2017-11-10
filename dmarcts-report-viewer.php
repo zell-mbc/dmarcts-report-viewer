@@ -196,27 +196,62 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
 	$html[] = "  </head>";
 
 	$html[] = "  <body>";
-  $html[] = "  <div class='optionblock'><div class='options'><span class='optionlabel'>Hostname Lookup:</span> <span class='activated'>" . ($host_lookup ? "on" : "off" ) . "</span> <a class='deactivated' href=\"$url_hswitch\">" . ($host_lookup ? "off" : "on" ) . "</a></div>";
-  $html[] = "  <div class='options'><span class='optionlabel'>Sort order:</span> <span class='activated'>" . ($sort_order ? "ascending" : "descending" ) . "</span> <a class='deactivated' href=\"$url_sswitch\">" . ($sort_order ? "descending" : "ascending" ) . "</a></div>";	
+	
+	
+  # optionblock form
+  #--------------------------------------------------------------------------
+	$html[] = "    <div class='optionblock'><form action=\"?\" method=\"post\">";
+	
+	
+  # handle host lookup (on/off should not reset selected report)
+  #--------------------------------------------------------------------------
+  $html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span> <input type=\"radio\" name=\"selHostLookup\" value=\"1\" onchange=\"this.form.submit()\"" . ($host_lookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onchange=\"this.form.submit()\"" . ($host_lookup ? "" : " checked=\"checked\"" ) . "> off</div>";	
+  
+  
+  # handle sort direction
+  #--------------------------------------------------------------------------
+  $html[] = "<div class='options'><span class='optionlabel'>Sort order:</span> <input type=\"radio\" name=\"selOrder\" value=\"1\" onchange=\"this.form.submit()\"" . ($sort_order ? " checked=\"checked\"" : "" ) . "> ascending<input type=\"radio\" name=\"selOrder\" value=\"0\" onchange=\"this.form.submit()\"" . ($sort_order ? "" : " checked=\"checked\"" ) . "> decending</div>";	
+  
+  
+  # handle domains
+  #--------------------------------------------------------------------------
   if ( count( $domains ) > 1 ) {
-    $html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span> <span class='activated'>" . ( "" == $dom_select ? "all" : $dom_select ) . "</span>";
+    $html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span>";
+    $html[] = "<select name=\"selDomain\" id=\"selDomain\" onchange=\"this.form.submit()\">";
     foreach( $domains as $d) {
       if( $d != $dom_select ) {
-        $html[] = "<a class='deactivated' href=\"$url_dswitch&d=$d\">" . $d . "</a> ";
+        $html[] = "<option value=\"$d\">$d</option>";
+      } else {
+        $html[] = "<option selected=\"selected\" value=\"$d\">$d</option>";
       }
     }
-    if( "" != $dom_select ) {
-      $html[] = "<a class='deactivated' href=\"$url_dswitch\">all</a>";
+    if( $dom_select != "" ) {
+      $html[] = "<option>all</option>";
+    } else {
+      $html[] = "<option selected=\"selected\" value=\"all\">all</option>";
     }
+    $html[] = "</select>";
   }
-  $html[] = "</div>";   /* end domain option */
-  
+  $html[] = "</div>";
+
+
+  # handle period (to come)
+  #--------------------------------------------------------------------------
   $html[] = "<div class='options'><span class='optionlabel'>Period:</span> <span class='activated'>[to come]</span></div>";
   
-  $html[] = "</div>";   /* end optionblock */
 
+  # end optionblock
+  #--------------------------------------------------------------------------
+  $html[] = "</form></div>";   
+
+  
+  # add body
+  #--------------------------------------------------------------------------
   $html[] = $body;
-	
+
+  
+  # footter
+  #--------------------------------------------------------------------------
 	$html[] = "  <div class='footer'>Brought to you by <a href='http://www.techsneeze.com'>TechSneeze.com</a> - <a href='mailto:dave@techsneeze.com'>dave@techsneeze.com</a></div>";
 	$html[] = "  </body>";
 	$html[] = "</html>";
@@ -248,26 +283,33 @@ if(isset($_GET['report']) && is_numeric($_GET['report'])){
 }else{
   die('Invalid Report ID');
 }
-if(isset($_GET['hostlookup']) && is_numeric($_GET['hostlookup'])){
+if(isset($_POST['selHostLookup']) && is_numeric($_POST['selHostLookup'])){
+  $hostlookup=$_POST['selHostLookup']+0;
+} elseif(isset($_GET['hostlookup']) && is_numeric($_GET['hostlookup'])){
   $hostlookup=$_GET['hostlookup']+0;
 }elseif(!isset($_GET['hostlookup'])){
   $hostlookup= isset( $default_lookup ) ? $default_lookup : 1;
 }else{
   die('Invalid hostlookup flag');
 }
-if(isset($_GET['sortorder']) && is_numeric($_GET['sortorder'])){
+if(isset($_POST['selOrder']) && is_numeric($_POST['selOrder'])){
+  $sortorder=$_POST['selOrder']+0;
+} elseif(isset($_GET['sortorder']) && is_numeric($_GET['sortorder'])){
   $sortorder=$_GET['sortorder']+0;
 }elseif(!isset($_GET['sortorder'])){
   $sortorder= isset( $default_sort ) ? $default_sort : 1;
 }else{
   die('Invalid sortorder flag');
 }
-if(isset($_GET['d'])){
+if(isset($_POST['selDomain'])){
+  $dom_select=$_POST['selDomain'];
+} elseif(isset($_GET['d'])){
   $dom_select=$_GET['d'];
-}elseif(!isset($_GET['d'])){
-  $dom_select= '';
 }else{
-  die('Invalid domain');
+  $dom_select= '';
+}
+if( $dom_select == "all" ) {
+  $dom_select= '';
 }
 
 
