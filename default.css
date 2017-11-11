@@ -78,19 +78,21 @@ table.reportdata tr.yellow {
   padding: 0.4em;
 	float: right;
 	margin: auto 2em 1em auto;
+  white-space: nowrap;
 }
 
 .optionlabel {
   font-weight: bold;
+  float: left; clear: left; 
+  margin-right: 1em;
 }
 
 .options {
-  font-size: 80%;
-  text-align: left;
+  font-size: 70%;
+	text-align: right;
   border: none;
   width: 97%;
   padding: 0.4em;
-  white-space: nowrap;
 }
 
 .activated {

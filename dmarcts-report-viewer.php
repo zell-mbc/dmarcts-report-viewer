@@ -37,7 +37,7 @@ function format_date($date, $format) {
 	return $answer;
 };
 
-function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_select = '', $reportid) {
+function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_select = '', $org_select = '', $per_select = '', $reportid) {
 
 	$reportlist[] = "";
 	$reportlist[] = "<!-- Start of report list -->";
@@ -66,7 +66,13 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_s
 		$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
-                $reportlist[] =  "      <td class='center'><a href='?report=" . $row['serial'] . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" ) . ( $sort_order ? "&sortorder=1" : "&sortorder=0" ) . ($dom_select == '' ? '' : "&d=$dom_select") . "#rpt". $row['serial'] . "'>". $row['reportid']. "</a></td>";
+    $reportlist[] =  "      <td class='center'><a href='?report=" . $row['serial']
+      . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" ) 
+      . ( $sort_order ? "&sortorder=1" : "&sortorder=0" ) 
+      . ($dom_select == '' ? '' : "&d=" . urlencode($dom_select)) 
+      . ($org_select == '' ? '' : "&o=" . urlencode($org_select)) 
+      . ($per_select == '' ? '' : "&p=" . urlencode($per_select)) 
+      . "#rpt". $row['serial'] . "'>". $row['reportid']. "</a></td>";
 		$reportlist[] =  "      <td class='center'>". number_format($row['rcount']+0,0). "</td>";
 		$reportlist[] =  "    </tr>";
 		$reportsum += $row['rcount'];
@@ -174,7 +180,8 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
 	return implode("\n  ",$reportdata);
 }
 
-function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select, $domains = array(),$cssfile ) {
+function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select, $domains = array(),$cssfile, $org_select, $orgs = array(), $per_select, $periods = array() ) {
+
 	$html       = array();
         $url_hswitch = ( $reportid ? "?report=$reportid&hostlookup=" : "?hostlookup=" )
                 . ($host_lookup ? "0" : "1" )
@@ -196,27 +203,102 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
 	$html[] = "  </head>";
 
 	$html[] = "  <body>";
-  $html[] = "  <div class='optionblock'><div class='options'><span class='optionlabel'>Hostname Lookup:</span> <span class='activated'>" . ($host_lookup ? "on" : "off" ) . "</span> <a class='deactivated' href=\"$url_hswitch\">" . ($host_lookup ? "off" : "on" ) . "</a></div>";
-  $html[] = "  <div class='options'><span class='optionlabel'>Sort order:</span> <span class='activated'>" . ($sort_order ? "ascending" : "descending" ) . "</span> <a class='deactivated' href=\"$url_sswitch\">" . ($sort_order ? "descending" : "ascending" ) . "</a></div>";	
-  if ( count( $domains ) > 1 ) {
-    $html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span> <span class='activated'>" . ( "" == $dom_select ? "all" : $dom_select ) . "</span>";
-    foreach( $domains as $d) {
-      if( $d != $dom_select ) {
-        $html[] = "<a class='deactivated' href=\"$url_dswitch&d=$d\">" . $d . "</a> ";
-      }
-    }
-    if( "" != $dom_select ) {
-      $html[] = "<a class='deactivated' href=\"$url_dswitch\">all</a>";
-    }
-  }
-  $html[] = "</div>";   /* end domain option */
-  
-  $html[] = "<div class='options'><span class='optionlabel'>Period:</span> <span class='activated'>[to come]</span></div>";
-  
-  $html[] = "</div>";   /* end optionblock */
-
-  $html[] = $body;
 	
+	
+  # optionblock form
+  #--------------------------------------------------------------------------
+	$html[] = "    <div class='optionblock'><form action=\"?\" method=\"post\">";
+	
+	
+  # handle host lookup (on/off should not reset selected report)
+  #--------------------------------------------------------------------------
+  $html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span> <input type=\"radio\" name=\"selHostLookup\" value=\"1\" onchange=\"this.form.submit()\"" . ($host_lookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onchange=\"this.form.submit()\"" . ($host_lookup ? "" : " checked=\"checked\"" ) . "> off</div>";	
+  
+  
+  # handle sort direction
+  #--------------------------------------------------------------------------
+  $html[] = "<div class='options'><span class='optionlabel'>Sort order:</span> <input type=\"radio\" name=\"selOrder\" value=\"1\" onchange=\"this.form.submit()\"" . ($sort_order ? " checked=\"checked\"" : "" ) . "> ascending<input type=\"radio\" name=\"selOrder\" value=\"0\" onchange=\"this.form.submit()\"" . ($sort_order ? "" : " checked=\"checked\"" ) . "> decending</div>";	
+  
+  
+  # handle domains
+  #--------------------------------------------------------------------------
+  if ( count( $domains ) > 1 ) {
+    $html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span>";
+    $html[] = "<select name=\"selDomain\" id=\"selDomain\" onchange=\"this.form.submit()\">";
+    if( $dom_select != "" ) {
+      $html[] = "<option value=\"all\">[all]</option>";
+    } else {
+      $html[] = "<option selected=\"selected\" value=\"all\">[all]</option>";
+    }
+    foreach( $domains as $d) {
+      $arg = "";
+      if( $d == $dom_select ) {
+        $arg =" selected=\"selected\"";
+      }
+      $html[] = "<option $arg value=\"$d\">$d</option>";
+    }
+    $html[] = "</select>";
+  }
+  $html[] = "</div>";
+
+
+  # handle orgs
+  #--------------------------------------------------------------------------
+  if ( count( $orgs ) > 0 ) {
+    $html[] = "<div class='options'><span class='optionlabel'>Organisation(s):</span>";
+    $html[] = "<select name=\"selOrganisation\" id=\"selOrganisation\" onchange=\"this.form.submit()\">";
+    if( $org_select != "" ) {
+      $html[] = "<option value=\"all\">[all]</option>";
+    } else {
+      $html[] = "<option selected=\"selected\" value=\"all\">[all]</option>";
+    }
+    foreach( $orgs as $o) {
+      $arg = "";
+      if( $o == $org_select ) {
+        $arg =" selected=\"selected\"";
+      }
+      $html[] = "<option $arg value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
+    }
+    $html[] = "</select>";
+  }
+  $html[] = "</div>";
+  
+  
+  #--------------------------------------------------------------------------
+  # handle period
+  #--------------------------------------------------------------------------
+  if ( count( $periods ) > 0 ) {
+    $html[] = "<div class='options'><span class='optionlabel'>Time:</span>";
+    $html[] = "<select name=\"selPeriod\" id=\"selPeriod\" onchange=\"this.form.submit()\">";
+    if( $org_select != "" ) {
+      $html[] = "<option value=\"all\">[all]</option>";
+    } else {
+      $html[] = "<option selected=\"selected\" value=\"all\">[all]</option>";
+    }
+    foreach( $periods as $p) {
+      $arg = "";
+      if( $p == $per_select ) {
+        $arg =" selected=\"selected\"";
+      }
+      $html[] = "<option $arg value=\"$p\">$p</option>";
+    }
+    $html[] = "</select>";
+  }
+  $html[] = "</div>";
+  
+  
+  # end optionblock
+  #--------------------------------------------------------------------------
+  $html[] = "</form></div>";   
+
+  
+  # add body
+  #--------------------------------------------------------------------------
+  $html[] = $body;
+
+  
+  # footter
+  #--------------------------------------------------------------------------
 	$html[] = "  <div class='footer'>Brought to you by <a href='http://www.techsneeze.com'>TechSneeze.com</a> - <a href='mailto:dave@techsneeze.com'>dave@techsneeze.com</a></div>";
 	$html[] = "  </body>";
 	$html[] = "</html>";
@@ -233,6 +315,9 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
 // must exist.
 include "dmarcts-report-viewer-config.php";
 $dom_select= '';
+$org_select= '';
+$per_select= '';
+$where = '';
 
 if(!isset($dport)) {
   $dbport="3306";
@@ -241,6 +326,8 @@ if(!isset($cssfile)) {
   $cssfile="default.css";
 }
 
+// parameters of by GET / POST - POST has priority
+// --------------------------------------------------------------------------
 if(isset($_GET['report']) && is_numeric($_GET['report'])){
   $reportid=$_GET['report']+0;
 }elseif(!isset($_GET['report'])){
@@ -248,30 +335,59 @@ if(isset($_GET['report']) && is_numeric($_GET['report'])){
 }else{
   die('Invalid Report ID');
 }
-if(isset($_GET['hostlookup']) && is_numeric($_GET['hostlookup'])){
+if(isset($_POST['selHostLookup']) && is_numeric($_POST['selHostLookup'])){
+  $hostlookup=$_POST['selHostLookup']+0;
+} elseif(isset($_GET['hostlookup']) && is_numeric($_GET['hostlookup'])){
   $hostlookup=$_GET['hostlookup']+0;
 }elseif(!isset($_GET['hostlookup'])){
   $hostlookup= isset( $default_lookup ) ? $default_lookup : 1;
 }else{
   die('Invalid hostlookup flag');
 }
-if(isset($_GET['sortorder']) && is_numeric($_GET['sortorder'])){
+if(isset($_POST['selOrder']) && is_numeric($_POST['selOrder'])){
+  $sortorder=$_POST['selOrder']+0;
+} elseif(isset($_GET['sortorder']) && is_numeric($_GET['sortorder'])){
   $sortorder=$_GET['sortorder']+0;
 }elseif(!isset($_GET['sortorder'])){
   $sortorder= isset( $default_sort ) ? $default_sort : 1;
 }else{
   die('Invalid sortorder flag');
 }
-if(isset($_GET['d'])){
+if(isset($_POST['selDomain'])){
+  $dom_select=$_POST['selDomain'];
+} elseif(isset($_GET['d'])){
   $dom_select=$_GET['d'];
-}elseif(!isset($_GET['d'])){
-  $dom_select= '';
 }else{
-  die('Invalid domain');
+  $dom_select= '';
 }
-
+if( $dom_select == "all" ) {
+  $dom_select= '';
+}
+if(isset($_POST['selOrganisation'])){
+  $org_select=$_POST['selOrganisation'];
+} elseif(isset($_GET['o'])){
+  $org_select=$_GET['o'];
+}else{
+  $org_select= '';
+}
+if( $org_select == "all" ) {
+  $org_select= '';
+}
+if(isset($_POST['selPeriod'])){
+  $per_select=$_POST['selPeriod'];
+} elseif(isset($_GET['p'])){
+  $per_select=$_GET['p'];
+}else{
+  $per_select= '';
+}
+if( $per_select == "all" ) {
+  $per_select= '';
+}
+// Debug
+//echo "D=$dom_select <br /> O=$org_select <br />";
 
 // Make a MySQL Connection using mysqli
+// --------------------------------------------------------------------------
 $mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname, $dbport);
 if ($mysqli->connect_errno) {
 	echo "Error: Failed to make a MySQL connection, here is why: \n";
@@ -285,6 +401,7 @@ define("ByDomain", 2);
 define("ByOrganisation", 3);
 
 // get all domains reported
+// --------------------------------------------------------------------------
 $sql="SELECT DISTINCT domain FROM `report` ORDER BY domain";
 $domains= array();
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
@@ -292,26 +409,66 @@ while($row = $query->fetch_assoc()) {
   $domains[] = $row['domain'];
 }
 if( $dom_select <> '' && array_search($dom_select, $domains) === FALSE ) {
-	echo "Error: invalid domain " . htmlentities($dom_select) . " \n";
-	exit;
+  $dom_select = '';
 }
+if( $dom_select <> '' ) {
+  $where .= ( $where <> '' ? " AND" : " WHERE" ) . " domain='" . $mysqli->real_escape_string($dom_select) . "'";
+} 
 
+// get organisations
+// --------------------------------------------------------------------------
+$sql="SELECT DISTINCT org FROM `report`" . ($dom_select == '' ? "" : "WHERE `domain`='" . $mysqli->real_escape_string($dom_select). "'" ) . " ORDER BY org";
+$orgs= array();
+$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+while($row = $query->fetch_assoc()) {
+  $orgs[] = $row['org'];
+}
+if( $org_select <> '' && array_search($org_select, $orgs) === FALSE ) {
+  $org_select = '';
+}
+if( $org_select <> '' ) {
+  $where .= ( $where <> '' ? " AND" : " WHERE" ) . " org='" . $mysqli->real_escape_string($org_select) . "'";
+
+} 
+
+// get period
+// --------------------------------------------------------------------------
+$sql="SELECT DISTINCT DISTINCT year(mindate) as year, month(mindate) as month FROM `report` $where ORDER BY year,month desc";
+$periods= array();
+$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+while($row = $query->fetch_assoc()) {
+  $periods[] = sprintf( "%'.04d-%'.02d", $row['year'], $row['month'] );
+}
+if( $per_select <> '' && array_search($per_select, $periods) === FALSE ) {
+  $per_select = '';
+}
+if( $per_select <> '' ) {
+  $ye = substr( $per_select, 0, 4) + 0;
+  $mo = substr( $per_select, 5, 2) + 0;
+  $where .= ( $where <> '' ? " AND" : " WHERE" ) . " year(mindate)=$ye and month(mindate) =$mo ";
+
+} 
 
 // Get allowed reports and cache them - using serial as key
+// --------------------------------------------------------------------------
 $allowed_reports = array();
 
-# Include the rcount via left join, so we do not have to make an sql query for every single report.
-$where = '';
-if( $dom_select <> '' ) {
-  $where = "WHERE domain='" . $mysqli->real_escape_string($dom_select) . "'";
-} 
+// set sort direction
+// --------------------------------------------------------------------------
 $sort = '';
 if( $sortorder ) {
   $sort = "ASC";
 } else {
   $sort = "DESC";
 }
+
+// Include the rcount via left join, so we do not have to make an sql query 
+// for every single report.
+// --------------------------------------------------------------------------
 $sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount FROM `report` LEFT JOIN rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate $sort,maxdate $sort ,org";
+
+// Debug
+//echo "sql reports = $sql";
 
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 while($row = $query->fetch_assoc()) {
@@ -326,8 +483,9 @@ while($row = $query->fetch_assoc()) {
 }
 
 // Generate Page with report list and report data (if a report is selected).
+// --------------------------------------------------------------------------
 echo tmpl_page( ""
-        .tmpl_reportList($allowed_reports, $hostlookup, $sortorder, $dom_select, $reportid)
+        .tmpl_reportList($allowed_reports, $hostlookup, $sortorder, $dom_select, $org_select, $per_select, $reportid)
         .tmpl_reportData($reportid, $allowed_reports, $hostlookup, $sortorder )
 	, $reportid
 	, $hostlookup
@@ -335,5 +493,9 @@ echo tmpl_page( ""
 	, $dom_select
 	, $domains
 	, $cssfile
+	, $org_select
+	, $orgs
+	, $per_select
+	, $periods
 );
 ?>
