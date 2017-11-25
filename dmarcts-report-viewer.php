@@ -378,7 +378,7 @@ if(isset($_POST['selPeriod'])){
 } elseif(isset($_GET['p'])){
   $per_select=$_GET['p'];
 }else{
-  $per_select= '';
+  $per_select= date( 'Y-m' );
 }
 if( $per_select == "all" ) {
   $per_select= '';
