@@ -433,7 +433,7 @@ if( $org_select <> '' ) {
 
 // get period
 // --------------------------------------------------------------------------
-$sql="SELECT DISTINCT DISTINCT year(mindate) as year, month(mindate) as month FROM `report` $where ORDER BY year,month desc";
+$sql="SELECT DISTINCT DISTINCT year(mindate) as year, month(mindate) as month FROM `report` $where ORDER BY year desc,month desc";
 $periods= array();
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 while($row = $query->fetch_assoc()) {
