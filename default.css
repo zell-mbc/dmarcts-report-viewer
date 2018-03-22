@@ -121,3 +121,27 @@ table.reportdata tr.yellow {
 .center {
 	text-align:center;
 }
+
+.circle_lime:before {
+	content: ' \25CF';
+	font-size: 25px;
+	color: #00FF00;
+}
+
+.circle_red:before {
+	content: ' \25CF';
+	font-size: 25px;
+	color: #FF0000;
+}
+
+.circle_yellow:before {
+	content: ' \25CF';
+	font-size: 25px;
+	color: #FFFF00;
+}
+
+.circle_orange:before {
+	content: ' \25CF';
+	font-size: 25px;
+	color: #FFA500;
+}

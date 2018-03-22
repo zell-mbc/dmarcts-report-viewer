@@ -32,6 +32,20 @@
 //### functions ######################################################
 //####################################################################
 
+function get_status_color($row) {
+	$status = "";
+	if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
+		$status="red";
+	} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")) {
+		$status="orange";
+	} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
+		$status="lime";
+	} else {
+		$status="yellow";
+	}
+	return $status;
+}
+
 function format_date($date, $format) {
 	$answer = date($format, strtotime($date));
 	return $answer;
@@ -46,6 +60,7 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_s
 	$reportlist[] = "<table class='reportlist'>";
 	$reportlist[] = "  <thead>";
 	$reportlist[] = "    <tr>";
+	$reportlist[] = "      <th></th>";
 	$reportlist[] = "      <th>Start Date</th>";
 	$reportlist[] = "      <th>End Date</th>";
 	$reportlist[] = "      <th>Domain</th>";
@@ -62,6 +77,7 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_s
 		$row = array_map('htmlspecialchars', $row);
 		$date_output_format = "r";
 		$reportlist[] =  "    <tr" . ( $reportid == $row['serial'] ? " class='selected' " : "" ) . ">";
+		$reportlist[] =  "      <td class='right'><span class=\"circle_".get_status_color($row)."\"></span></td>";
 		$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";
 		$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
 		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
@@ -129,23 +145,14 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
 	$sql = "SELECT * FROM rptrecord where serial = $reportnumber";
 	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 	while($row = $query->fetch_assoc()) {
-		$status="";
-		if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
-			$status="red";
-		} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")) {
-			$status="orange";
-		} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
-			$status="lime";
-		} else {
-			$status="yellow";
-		};
+		$status = get_status_color($row);
 
 		if ( $row['ip'] ) {
 			$ip = long2ip($row['ip']);
 		} elseif ( $row['ip6'] ) {
 			$ip = inet_ntop($row['ip6']);
-    } else {
-      $ip = "-";
+		} else {
+      		$ip = "-";
 		}
 		
 		/* escape html characters after exploring binary values, which will be messed up */
@@ -154,10 +161,10 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
 		$reportdata[] = "    <tr class='".$status."'>";
 		$reportdata[] = "      <td>". $ip. "</td>";
 		if ( $host_lookup ) {
-      $reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
-    } else {
-      $reportdata[] = "      <td>#off#</td>";
-    }
+			$reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
+		} else {
+			$reportdata[] = "      <td>#off#</td>";
+		}
 		$reportdata[] = "      <td>". $row['rcount']. "</td>";
 		$reportdata[] = "      <td>". $row['disposition']. "</td>";
 		$reportdata[] = "      <td>". $row['reason']. "</td>";
@@ -465,7 +472,7 @@ if( $sortorder ) {
 // Include the rcount via left join, so we do not have to make an sql query 
 // for every single report.
 // --------------------------------------------------------------------------
-$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount FROM `report` LEFT JOIN rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate $sort,maxdate $sort ,org";
+$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimresult) AS dkimresult, MIN(rptrecord.spfresult) AS spfresult FROM `report` LEFT JOIN rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate $sort,maxdate $sort ,org";
 
 // Debug
 //echo "sql reports = $sql";
