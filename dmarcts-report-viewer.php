@@ -472,7 +472,7 @@ if( $sortorder ) {
 // Include the rcount via left join, so we do not have to make an sql query 
 // for every single report.
 // --------------------------------------------------------------------------
-$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimresult) AS dkimresult, MIN(rptrecord.spfresult) AS spfresult FROM `report` LEFT JOIN rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate $sort,maxdate $sort ,org";
+$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimresult) AS dkimresult, MIN(rptrecord.spfresult) AS spfresult FROM report LEFT JOIN (SELECT rcount, COALESCE(dkimresult, 'neutral') AS dkimresult, COALESCE(spfresult, 'neutral') AS spfresult, serial FROM rptrecord) AS rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate $sort, maxdate $sort , org";
 
 // Debug
 //echo "sql reports = $sql";
