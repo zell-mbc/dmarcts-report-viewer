@@ -326,7 +326,7 @@ $org_select= '';
 $per_select= '';
 $where = '';
 
-if(!isset($dport)) {
+if(!isset($dbport)) {
   $dbport="3306";
 }
 if(!isset($cssfile)) {
