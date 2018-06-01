@@ -3,12 +3,15 @@ A PHP viewer for DMARC records that have been parsed by [John Levine's rddmarc s
 * Allow to view pass/fail data for the parsed reports
 * Identify potential DMARC related issues through red/orange/green signals
 
-## Screenshot
+## Screenshots
 
 ![alt text](http://www.techsneeze.com/wp-content/uploads/2018/05/dmarcts-viewer-demo-1x600.png "Screenshot 1")
 
-[Larger version of screenshot](http://www.techsneeze.com/wp-content/uploads/2018/05/dmarcts-viewer-demo-1.png)
+[Larger version of Screenshot 1](http://www.techsneeze.com/wp-content/uploads/2018/05/dmarcts-viewer-demo-1.png)
 
+![alt text](http://www.techsneeze.com/wp-content/uploads/2018/05/dmarcts-viewer-demo-2x600.png "Screenshot 2")
+
+[Larger version of Screenshot 2](http://www.techsneeze.com/wp-content/uploads/2018/05/dmarcts-viewer-demo-2.png)
 
 ## Installation and Configuration
 
