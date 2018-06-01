@@ -7,6 +7,8 @@ A PHP viewer for DMARC records that have been parsed by [John Levine's rddmarc s
 
 ![alt text](http://www.techsneeze.com/wp-content/uploads/2018/05/dmarcts-viewer-demo-1x600.png "Screenshot 1")
 
+[Larger version of screenshot](http://www.techsneeze.com/wp-content/uploads/2018/05/dmarcts-viewer-demo-1.png)
+
 
 ## Installation and Configuration
 
