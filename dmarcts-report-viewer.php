@@ -87,7 +87,7 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_s
       . ( $sort_order ? "&sortorder=1" : "&sortorder=0" ) 
       . ($dom_select == '' ? '' : "&d=" . urlencode($dom_select)) 
       . ($org_select == '' ? '' : "&o=" . urlencode($org_select)) 
-      . ($per_select == '' ? '' : "&p=" . urlencode($per_select)) 
+      . ($per_select == '' ? "&p=all" : "&p=" . urlencode($per_select)) 
       . "#rpt". $row['serial'] . "'>". $row['reportid']. "</a></td>";
 		$reportlist[] =  "      <td class='center'>". number_format($row['rcount']+0,0). "</td>";
 		$reportlist[] =  "    </tr>";
