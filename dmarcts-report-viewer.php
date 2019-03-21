@@ -245,8 +245,8 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
       $html[] = "<option $arg value=\"$d\">$d</option>";
     }
     $html[] = "</select>";
+    $html[] = "</div>";
   }
-  $html[] = "</div>";
 
 
   # handle orgs
@@ -267,8 +267,8 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
       $html[] = "<option $arg value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
     }
     $html[] = "</select>";
+    $html[] = "</div>";
   }
-  $html[] = "</div>";
 
 
   #--------------------------------------------------------------------------
@@ -290,8 +290,8 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
       $html[] = "<option $arg value=\"$p\">$p</option>";
     }
     $html[] = "</select>";
+    $html[] = "</div>";
   }
-  $html[] = "</div>";
 
 
   # end optionblock
