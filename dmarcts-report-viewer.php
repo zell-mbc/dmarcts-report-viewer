@@ -83,11 +83,11 @@ function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_s
         $reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
         $reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
     $reportlist[] =  "      <td class='center'><a href='?report=" . $row['serial']
-      . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" ) 
-      . ( $sort_order ? "&sortorder=1" : "&sortorder=0" ) 
-      . ($dom_select == '' ? '' : "&d=" . urlencode($dom_select)) 
-      . ($org_select == '' ? '' : "&o=" . urlencode($org_select)) 
-      . ($per_select == '' ? "&p=all" : "&p=" . urlencode($per_select)) 
+      . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" )
+      . ( $sort_order ? "&sortorder=1" : "&sortorder=0" )
+      . ($dom_select == '' ? '' : "&d=" . urlencode($dom_select))
+      . ($org_select == '' ? '' : "&o=" . urlencode($org_select))
+      . ($per_select == '' ? "&p=all" : "&p=" . urlencode($per_select))
       . "#rpt". $row['serial'] . "'>". $row['reportid']. "</a></td>";
         $reportlist[] =  "      <td class='center'>". number_format($row['rcount']+0,0). "</td>";
         $reportlist[] =  "    </tr>";
@@ -154,7 +154,7 @@ function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sor
         } else {
             $ip = "-";
         }
-        
+
         /* escape html characters after exploring binary values, which will be messed up */
         $row = array_map('htmlspecialchars', $row);
 
@@ -210,23 +210,23 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
     $html[] = "  </head>";
 
     $html[] = "  <body>";
-    
-    
+
+
   # optionblock form
   #--------------------------------------------------------------------------
     $html[] = "    <div class='optionblock'><form action=\"?\" method=\"post\">";
-    
-    
+
+
   # handle host lookup (on/off should not reset selected report)
   #--------------------------------------------------------------------------
-  $html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span> <input type=\"radio\" name=\"selHostLookup\" value=\"1\" onchange=\"this.form.submit()\"" . ($host_lookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onchange=\"this.form.submit()\"" . ($host_lookup ? "" : " checked=\"checked\"" ) . "> off</div>"; 
-  
-  
+  $html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span> <input type=\"radio\" name=\"selHostLookup\" value=\"1\" onchange=\"this.form.submit()\"" . ($host_lookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onchange=\"this.form.submit()\"" . ($host_lookup ? "" : " checked=\"checked\"" ) . "> off</div>";
+
+
   # handle sort direction
   #--------------------------------------------------------------------------
-  $html[] = "<div class='options'><span class='optionlabel'>Sort order:</span> <input type=\"radio\" name=\"selOrder\" value=\"1\" onchange=\"this.form.submit()\"" . ($sort_order ? " checked=\"checked\"" : "" ) . "> ascending<input type=\"radio\" name=\"selOrder\" value=\"0\" onchange=\"this.form.submit()\"" . ($sort_order ? "" : " checked=\"checked\"" ) . "> decending</div>"; 
-  
-  
+  $html[] = "<div class='options'><span class='optionlabel'>Sort order:</span> <input type=\"radio\" name=\"selOrder\" value=\"1\" onchange=\"this.form.submit()\"" . ($sort_order ? " checked=\"checked\"" : "" ) . "> ascending<input type=\"radio\" name=\"selOrder\" value=\"0\" onchange=\"this.form.submit()\"" . ($sort_order ? "" : " checked=\"checked\"" ) . "> decending</div>";
+
+
   # handle domains
   #--------------------------------------------------------------------------
   if ( count( $domains ) > 1 ) {
@@ -269,8 +269,8 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
     $html[] = "</select>";
   }
   $html[] = "</div>";
-  
-  
+
+
   #--------------------------------------------------------------------------
   # handle period
   #--------------------------------------------------------------------------
@@ -292,18 +292,18 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
     $html[] = "</select>";
   }
   $html[] = "</div>";
-  
-  
+
+
   # end optionblock
   #--------------------------------------------------------------------------
-  $html[] = "</form></div>";   
+  $html[] = "</form></div>";
 
-  
+
   # add body
   #--------------------------------------------------------------------------
   $html[] = $body;
 
-  
+
   # footter
   #--------------------------------------------------------------------------
     $html[] = "  <div class='footer'>Brought to you by <a href='http://www.techsneeze.com'>TechSneeze.com</a> - <a href='mailto:dave@techsneeze.com'>dave@techsneeze.com</a></div>";
@@ -420,7 +420,7 @@ if( $dom_select <> '' && array_search($dom_select, $domains) === FALSE ) {
 }
 if( $dom_select <> '' ) {
   $where .= ( $where <> '' ? " AND" : " WHERE" ) . " domain='" . $mysqli->real_escape_string($dom_select) . "'";
-} 
+}
 
 // get organisations
 // --------------------------------------------------------------------------
@@ -436,7 +436,7 @@ if( $org_select <> '' && array_search($org_select, $orgs) === FALSE ) {
 if( $org_select <> '' ) {
   $where .= ( $where <> '' ? " AND" : " WHERE" ) . " org='" . $mysqli->real_escape_string($org_select) . "'";
 
-} 
+}
 
 // get period
 // --------------------------------------------------------------------------
@@ -454,7 +454,7 @@ if( $per_select <> '' ) {
   $mo = substr( $per_select, 5, 2) + 0;
   $where .= ( $where <> '' ? " AND" : " WHERE" ) . " year(mindate)=$ye and month(mindate) =$mo ";
 
-} 
+}
 
 // Get allowed reports and cache them - using serial as key
 // --------------------------------------------------------------------------
@@ -469,7 +469,7 @@ if( $sortorder ) {
   $sort = "DESC";
 }
 
-// Include the rcount via left join, so we do not have to make an sql query 
+// Include the rcount via left join, so we do not have to make an sql query
 // for every single report.
 // --------------------------------------------------------------------------
 $sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimresult) AS dkimresult, MIN(rptrecord.spfresult) AS spfresult FROM report LEFT JOIN (SELECT rcount, COALESCE(dkimresult, 'neutral') AS dkimresult, COALESCE(spfresult, 'neutral') AS spfresult, serial FROM rptrecord) AS rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate $sort, maxdate $sort , org";
