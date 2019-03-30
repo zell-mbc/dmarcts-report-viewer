@@ -33,163 +33,163 @@
 //####################################################################
 
 function get_status_color($row) {
-	$status = "";
-	if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
-		$status="red";
-	} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")) {
-		$status="orange";
-	} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
-		$status="lime";
-	} else {
-		$status="yellow";
-	}
-	return $status;
+    $status = "";
+    if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
+        $status="red";
+    } elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")) {
+        $status="orange";
+    } elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
+        $status="lime";
+    } else {
+        $status="yellow";
+    }
+    return $status;
 }
 
 function format_date($date, $format) {
-	$answer = date($format, strtotime($date));
-	return $answer;
+    $answer = date($format, strtotime($date));
+    return $answer;
 };
 
 function tmpl_reportList($allowed_reports, $host_lookup = 1, $sort_order, $dom_select = '', $org_select = '', $per_select = '', $reportid) {
 
-	$reportlist[] = "";
-	$reportlist[] = "<!-- Start of report list -->";
+    $reportlist[] = "";
+    $reportlist[] = "<!-- Start of report list -->";
 
-	$reportlist[] = "<h1 class='main'>DMARC Reports" . ($dom_select == '' ? '' : " for " . htmlentities($dom_select)) . "</h1>";
-	$reportlist[] = "<table class='reportlist'>";
-	$reportlist[] = "  <thead>";
-	$reportlist[] = "    <tr>";
-	$reportlist[] = "      <th></th>";
-	$reportlist[] = "      <th>Start Date</th>";
-	$reportlist[] = "      <th>End Date</th>";
-	$reportlist[] = "      <th>Domain</th>";
-	$reportlist[] = "      <th>Reporting Organization</th>";
-	$reportlist[] = "      <th>Report ID</th>";
-	$reportlist[] = "      <th>Messages</th>";
-	$reportlist[] = "    </tr>";
-	$reportlist[] = "  </thead>";
+    $reportlist[] = "<h1 class='main'>DMARC Reports" . ($dom_select == '' ? '' : " for " . htmlentities($dom_select)) . "</h1>";
+    $reportlist[] = "<table class='reportlist'>";
+    $reportlist[] = "  <thead>";
+    $reportlist[] = "    <tr>";
+    $reportlist[] = "      <th></th>";
+    $reportlist[] = "      <th>Start Date</th>";
+    $reportlist[] = "      <th>End Date</th>";
+    $reportlist[] = "      <th>Domain</th>";
+    $reportlist[] = "      <th>Reporting Organization</th>";
+    $reportlist[] = "      <th>Report ID</th>";
+    $reportlist[] = "      <th>Messages</th>";
+    $reportlist[] = "    </tr>";
+    $reportlist[] = "  </thead>";
 
-	$reportlist[] = "  <tbody>";
-	$reportsum    = 0;
+    $reportlist[] = "  <tbody>";
+    $reportsum    = 0;
 
-	foreach ($allowed_reports[BySerial] as $row) {
-		$row = array_map('htmlspecialchars', $row);
-		$date_output_format = "r";
-		$reportlist[] =  "    <tr" . ( $reportid == $row['serial'] ? " class='selected' " : "" ) . ">";
-		$reportlist[] =  "      <td class='right'><span class=\"circle_".get_status_color($row)."\"></span></td>";
-		$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";
-		$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
-		$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
-		$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
+    foreach ($allowed_reports[BySerial] as $row) {
+        $row = array_map('htmlspecialchars', $row);
+        $date_output_format = "r";
+        $reportlist[] =  "    <tr" . ( $reportid == $row['serial'] ? " class='selected' " : "" ) . ">";
+        $reportlist[] =  "      <td class='right'><span class=\"circle_".get_status_color($row)."\"></span></td>";
+        $reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";
+        $reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";
+        $reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";
+        $reportlist[] =  "      <td class='center'>". $row['org']. "</td>";
     $reportlist[] =  "      <td class='center'><a href='?report=" . $row['serial']
-      . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" ) 
-      . ( $sort_order ? "&sortorder=1" : "&sortorder=0" ) 
-      . ($dom_select == '' ? '' : "&d=" . urlencode($dom_select)) 
-      . ($org_select == '' ? '' : "&o=" . urlencode($org_select)) 
-      . ($per_select == '' ? "&p=all" : "&p=" . urlencode($per_select)) 
+      . ( $host_lookup ? "&hostlookup=1" : "&hostlookup=0" )
+      . ( $sort_order ? "&sortorder=1" : "&sortorder=0" )
+      . ($dom_select == '' ? '' : "&d=" . urlencode($dom_select))
+      . ($org_select == '' ? '' : "&o=" . urlencode($org_select))
+      . ($per_select == '' ? "&p=all" : "&p=" . urlencode($per_select))
       . "#rpt". $row['serial'] . "'>". $row['reportid']. "</a></td>";
-		$reportlist[] =  "      <td class='center'>". number_format($row['rcount']+0,0). "</td>";
-		$reportlist[] =  "    </tr>";
-		$reportsum += $row['rcount'];
-	}
-	$reportlist[] = "<tr class='sum'><td></td><td></td><td></td><td></td><td class='right'>Sum:</td><td class='center'>".number_format($reportsum,0)."</td></tr>";
-	$reportlist[] =  "  </tbody>";
+        $reportlist[] =  "      <td class='center'>". number_format($row['rcount']+0,0). "</td>";
+        $reportlist[] =  "    </tr>";
+        $reportsum += $row['rcount'];
+    }
+    $reportlist[] = "<tr class='sum'><td></td><td></td><td></td><td></td><td class='right'>Sum:</td><td class='center'>".number_format($reportsum,0)."</td></tr>";
+    $reportlist[] =  "  </tbody>";
 
-	$reportlist[] =  "</table>";
+    $reportlist[] =  "</table>";
 
-	$reportlist[] = "<!-- End of report list -->";
-	$reportlist[] = "";
+    $reportlist[] = "<!-- End of report list -->";
+    $reportlist[] = "";
 
-	#indent generated html by 2 extra spaces
-	return implode("\n  ",$reportlist);
+    #indent generated html by 2 extra spaces
+    return implode("\n  ",$reportlist);
 }
 
 function tmpl_reportData($reportnumber, $allowed_reports, $host_lookup = 1, $sort_order) {
 
-	if (!$reportnumber) {
-		return "";
-	}
+    if (!$reportnumber) {
+        return "";
+    }
 
-	$reportdata[] = "";
-	$reportdata[] = "<!-- Start of report rata -->";
-	$reportsum    = 0;
+    $reportdata[] = "";
+    $reportdata[] = "<!-- Start of report rata -->";
+    $reportsum    = 0;
 
-	if (isset($allowed_reports[BySerial][$reportnumber])) {
-		$row = $allowed_reports[BySerial][$reportnumber];
-		$row = array_map('htmlspecialchars', $row);
-		$reportdata[] = "<a id='rpt".$reportnumber."'></a>";
-		$reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row['policy_adkim'] . ", aspf=" . $row['policy_aspf'] .  ", p=" . $row['policy_p'] .  ", sp=" . $row['policy_sp'] .  ", pct=" . $row['policy_pct'] . "</p></div>";
-	} else {
-		return "Unknown report number!";
-	}
+    if (isset($allowed_reports[BySerial][$reportnumber])) {
+        $row = $allowed_reports[BySerial][$reportnumber];
+        $row = array_map('htmlspecialchars', $row);
+        $reportdata[] = "<a id='rpt".$reportnumber."'></a>";
+        $reportdata[] = "<div class='center reportdesc'><p> Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row['policy_adkim'] . ", aspf=" . $row['policy_aspf'] .  ", p=" . $row['policy_p'] .  ", sp=" . $row['policy_sp'] .  ", pct=" . $row['policy_pct'] . "</p></div>";
+    } else {
+        return "Unknown report number!";
+    }
 
-	$reportdata[] = "<table class='reportdata'>";
-	$reportdata[] = "  <thead>";
-	$reportdata[] = "    <tr>";
-	$reportdata[] = "      <th>IP Address</th>";
-	$reportdata[] = "      <th>Host Name</th>";
-	$reportdata[] = "      <th>Message Count</th>";
-	$reportdata[] = "      <th>Disposition</th>";
-	$reportdata[] = "      <th>Reason</th>";
-	$reportdata[] = "      <th>DKIM Domain</th>";
-	$reportdata[] = "      <th>Raw DKIM Result</th>";
-	$reportdata[] = "      <th>SPF Domain</th>";
-	$reportdata[] = "      <th>Raw SPF Result</th>";
-	$reportdata[] = "    </tr>";
-	$reportdata[] = "  </thead>";
+    $reportdata[] = "<table class='reportdata'>";
+    $reportdata[] = "  <thead>";
+    $reportdata[] = "    <tr>";
+    $reportdata[] = "      <th>IP Address</th>";
+    $reportdata[] = "      <th>Host Name</th>";
+    $reportdata[] = "      <th>Message Count</th>";
+    $reportdata[] = "      <th>Disposition</th>";
+    $reportdata[] = "      <th>Reason</th>";
+    $reportdata[] = "      <th>DKIM Domain</th>";
+    $reportdata[] = "      <th>Raw DKIM Result</th>";
+    $reportdata[] = "      <th>SPF Domain</th>";
+    $reportdata[] = "      <th>Raw SPF Result</th>";
+    $reportdata[] = "    </tr>";
+    $reportdata[] = "  </thead>";
 
-	$reportdata[] = "  <tbody>";
+    $reportdata[] = "  <tbody>";
 
-	global $mysqli;
-	$sql = "SELECT * FROM rptrecord where serial = $reportnumber";
-	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
-	while($row = $query->fetch_assoc()) {
-		$status = get_status_color($row);
+    global $mysqli;
+    $sql = "SELECT * FROM rptrecord where serial = $reportnumber";
+    $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+    while($row = $query->fetch_assoc()) {
+        $status = get_status_color($row);
 
-		if ( $row['ip'] ) {
-			$ip = long2ip($row['ip']);
-		} elseif ( $row['ip6'] ) {
-			$ip = inet_ntop($row['ip6']);
-		} else {
-      		$ip = "-";
-		}
-		
-		/* escape html characters after exploring binary values, which will be messed up */
-		$row = array_map('htmlspecialchars', $row);
+        if ( $row['ip'] ) {
+            $ip = long2ip($row['ip']);
+        } elseif ( $row['ip6'] ) {
+            $ip = inet_ntop($row['ip6']);
+        } else {
+            $ip = "-";
+        }
 
-		$reportdata[] = "    <tr class='".$status."'>";
-		$reportdata[] = "      <td>". $ip. "</td>";
-		if ( $host_lookup ) {
-			$reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
-		} else {
-			$reportdata[] = "      <td>#off#</td>";
-		}
-		$reportdata[] = "      <td>". $row['rcount']. "</td>";
-		$reportdata[] = "      <td>". $row['disposition']. "</td>";
-		$reportdata[] = "      <td>". $row['reason']. "</td>";
-		$reportdata[] = "      <td>". $row['dkimdomain']. "</td>";
-		$reportdata[] = "      <td>". $row['dkimresult']. "</td>";
-		$reportdata[] = "      <td>". $row['spfdomain']. "</td>";
-		$reportdata[] = "      <td>". $row['spfresult']. "</td>";
-		$reportdata[] = "    </tr>";
+        /* escape html characters after exploring binary values, which will be messed up */
+        $row = array_map('htmlspecialchars', $row);
 
-		$reportsum += $row['rcount'];
-	}
-	$reportdata[] = "<tr><td></td><td></td><td>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
-	$reportdata[] = "  </tbody>";
-	$reportdata[] = "</table>";
+        $reportdata[] = "    <tr class='".$status."'>";
+        $reportdata[] = "      <td>". $ip. "</td>";
+        if ( $host_lookup ) {
+            $reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
+        } else {
+            $reportdata[] = "      <td>#off#</td>";
+        }
+        $reportdata[] = "      <td>". $row['rcount']. "</td>";
+        $reportdata[] = "      <td>". $row['disposition']. "</td>";
+        $reportdata[] = "      <td>". $row['reason']. "</td>";
+        $reportdata[] = "      <td>". $row['dkimdomain']. "</td>";
+        $reportdata[] = "      <td>". $row['dkimresult']. "</td>";
+        $reportdata[] = "      <td>". $row['spfdomain']. "</td>";
+        $reportdata[] = "      <td>". $row['spfresult']. "</td>";
+        $reportdata[] = "    </tr>";
 
-	$reportdata[] = "<!-- End of report rata -->";
-	$reportdata[] = "";
+        $reportsum += $row['rcount'];
+    }
+    $reportdata[] = "<tr><td></td><td></td><td>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
+    $reportdata[] = "  </tbody>";
+    $reportdata[] = "</table>";
 
-	#indent generated html by 2 extra spaces
-	return implode("\n  ",$reportdata);
+    $reportdata[] = "<!-- End of report rata -->";
+    $reportdata[] = "";
+
+    #indent generated html by 2 extra spaces
+    return implode("\n  ",$reportdata);
 }
 
 function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select, $domains = array(),$cssfile, $org_select, $orgs = array(), $per_select, $periods = array() ) {
 
-	$html       = array();
+    $html       = array();
         $url_hswitch = ( $reportid ? "?report=$reportid&hostlookup=" : "?hostlookup=" )
                 . ($host_lookup ? "0" : "1" )
                 . ( "&sortorder=" ) . ($sort_order)
@@ -202,31 +202,31 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
                 . (isset($dom_select) && $dom_select <> "" ? "&d=$dom_select" : "" )
                 ;
 
-	$html[] = "<!DOCTYPE html>";
-	$html[] = "<html>";
-	$html[] = "  <head>";
-	$html[] = "    <title>DMARC Report Viewer</title>";
-	$html[] = "    <link rel='stylesheet' href='$cssfile'>";
-	$html[] = "  </head>";
+    $html[] = "<!DOCTYPE html>";
+    $html[] = "<html>";
+    $html[] = "  <head>";
+    $html[] = "    <title>DMARC Report Viewer</title>";
+    $html[] = "    <link rel='stylesheet' href='$cssfile'>";
+    $html[] = "  </head>";
 
-	$html[] = "  <body>";
-	
-	
+    $html[] = "  <body>";
+
+
   # optionblock form
   #--------------------------------------------------------------------------
-	$html[] = "    <div class='optionblock'><form action=\"?\" method=\"post\">";
-	
-	
+    $html[] = "    <div class='optionblock'><form action=\"?\" method=\"post\">";
+
+
   # handle host lookup (on/off should not reset selected report)
   #--------------------------------------------------------------------------
-  $html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span> <input type=\"radio\" name=\"selHostLookup\" value=\"1\" onchange=\"this.form.submit()\"" . ($host_lookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onchange=\"this.form.submit()\"" . ($host_lookup ? "" : " checked=\"checked\"" ) . "> off</div>";	
-  
-  
+  $html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span> <input type=\"radio\" name=\"selHostLookup\" value=\"1\" onchange=\"this.form.submit()\"" . ($host_lookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onchange=\"this.form.submit()\"" . ($host_lookup ? "" : " checked=\"checked\"" ) . "> off</div>";
+
+
   # handle sort direction
   #--------------------------------------------------------------------------
-  $html[] = "<div class='options'><span class='optionlabel'>Sort order:</span> <input type=\"radio\" name=\"selOrder\" value=\"1\" onchange=\"this.form.submit()\"" . ($sort_order ? " checked=\"checked\"" : "" ) . "> ascending<input type=\"radio\" name=\"selOrder\" value=\"0\" onchange=\"this.form.submit()\"" . ($sort_order ? "" : " checked=\"checked\"" ) . "> decending</div>";	
-  
-  
+  $html[] = "<div class='options'><span class='optionlabel'>Sort order:</span> <input type=\"radio\" name=\"selOrder\" value=\"1\" onchange=\"this.form.submit()\"" . ($sort_order ? " checked=\"checked\"" : "" ) . "> ascending<input type=\"radio\" name=\"selOrder\" value=\"0\" onchange=\"this.form.submit()\"" . ($sort_order ? "" : " checked=\"checked\"" ) . "> decending</div>";
+
+
   # handle domains
   #--------------------------------------------------------------------------
   if ( count( $domains ) > 1 ) {
@@ -245,8 +245,8 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
       $html[] = "<option $arg value=\"$d\">$d</option>";
     }
     $html[] = "</select>";
+    $html[] = "</div>";
   }
-  $html[] = "</div>";
 
 
   # handle orgs
@@ -267,10 +267,10 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
       $html[] = "<option $arg value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
     }
     $html[] = "</select>";
+    $html[] = "</div>";
   }
-  $html[] = "</div>";
-  
-  
+
+
   #--------------------------------------------------------------------------
   # handle period
   #--------------------------------------------------------------------------
@@ -290,27 +290,27 @@ function tmpl_page ($body, $reportid, $host_lookup = 1, $sort_order, $dom_select
       $html[] = "<option $arg value=\"$p\">$p</option>";
     }
     $html[] = "</select>";
+    $html[] = "</div>";
   }
-  $html[] = "</div>";
-  
-  
+
+
   # end optionblock
   #--------------------------------------------------------------------------
-  $html[] = "</form></div>";   
+  $html[] = "</form></div>";
 
-  
+
   # add body
   #--------------------------------------------------------------------------
   $html[] = $body;
 
-  
+
   # footter
   #--------------------------------------------------------------------------
-	$html[] = "  <div class='footer'>Brought to you by <a href='http://www.techsneeze.com'>TechSneeze.com</a> - <a href='mailto:dave@techsneeze.com'>dave@techsneeze.com</a></div>";
-	$html[] = "  </body>";
-	$html[] = "</html>";
+    $html[] = "  <div class='footer'>Brought to you by <a href='http://www.techsneeze.com'>TechSneeze.com</a> - <a href='mailto:dave@techsneeze.com'>dave@techsneeze.com</a></div>";
+    $html[] = "  </body>";
+    $html[] = "</html>";
 
-	return implode("\n",$html);
+    return implode("\n",$html);
 }
 
 
@@ -397,10 +397,10 @@ if( $per_select == "all" ) {
 // --------------------------------------------------------------------------
 $mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname, $dbport);
 if ($mysqli->connect_errno) {
-	echo "Error: Failed to make a MySQL connection, here is why: \n";
-	echo "Errno: " . $mysqli->connect_errno . "\n";
-	echo "Error: " . $mysqli->connect_error . "\n";
-	exit;
+    echo "Error: Failed to make a MySQL connection, here is why: \n";
+    echo "Errno: " . $mysqli->connect_errno . "\n";
+    echo "Error: " . $mysqli->connect_error . "\n";
+    exit;
 }
 
 define("BySerial", 1);
@@ -420,7 +420,7 @@ if( $dom_select <> '' && array_search($dom_select, $domains) === FALSE ) {
 }
 if( $dom_select <> '' ) {
   $where .= ( $where <> '' ? " AND" : " WHERE" ) . " domain='" . $mysqli->real_escape_string($dom_select) . "'";
-} 
+}
 
 // get organisations
 // --------------------------------------------------------------------------
@@ -436,7 +436,7 @@ if( $org_select <> '' && array_search($org_select, $orgs) === FALSE ) {
 if( $org_select <> '' ) {
   $where .= ( $where <> '' ? " AND" : " WHERE" ) . " org='" . $mysqli->real_escape_string($org_select) . "'";
 
-} 
+}
 
 // get period
 // --------------------------------------------------------------------------
@@ -454,7 +454,7 @@ if( $per_select <> '' ) {
   $mo = substr( $per_select, 5, 2) + 0;
   $where .= ( $where <> '' ? " AND" : " WHERE" ) . " year(mindate)=$ye and month(mindate) =$mo ";
 
-} 
+}
 
 // Get allowed reports and cache them - using serial as key
 // --------------------------------------------------------------------------
@@ -469,7 +469,7 @@ if( $sortorder ) {
   $sort = "DESC";
 }
 
-// Include the rcount via left join, so we do not have to make an sql query 
+// Include the rcount via left join, so we do not have to make an sql query
 // for every single report.
 // --------------------------------------------------------------------------
 $sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimresult) AS dkimresult, MIN(rptrecord.spfresult) AS spfresult FROM report LEFT JOIN (SELECT rcount, COALESCE(dkimresult, 'neutral') AS dkimresult, COALESCE(spfresult, 'neutral') AS spfresult, serial FROM rptrecord) AS rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate $sort, maxdate $sort , org";
@@ -479,14 +479,14 @@ $sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimres
 
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 while($row = $query->fetch_assoc()) {
-	//todo: check ACL if this row is allowed
-	if (true) {
-		//add data by serial
-		$allowed_reports[BySerial][$row['serial']] = $row;
-		//make a list of serials by domain and by organisation
-		//$allowed_reports[ByDomain][$row['domain']][] = $row['serial'];
-		//$allowed_reports[ByOrganisation][$row['org']][] = $row['serial'];
-	}
+    //todo: check ACL if this row is allowed
+    if (true) {
+        //add data by serial
+        $allowed_reports[BySerial][$row['serial']] = $row;
+        //make a list of serials by domain and by organisation
+        //$allowed_reports[ByDomain][$row['domain']][] = $row['serial'];
+        //$allowed_reports[ByOrganisation][$row['org']][] = $row['serial'];
+    }
 }
 
 // Generate Page with report list and report data (if a report is selected).
@@ -494,15 +494,15 @@ while($row = $query->fetch_assoc()) {
 echo tmpl_page( ""
         .tmpl_reportList($allowed_reports, $hostlookup, $sortorder, $dom_select, $org_select, $per_select, $reportid)
         .tmpl_reportData($reportid, $allowed_reports, $hostlookup, $sortorder )
-	, $reportid
-	, $hostlookup
-	, $sortorder
-	, $dom_select
-	, $domains
-	, $cssfile
-	, $org_select
-	, $orgs
-	, $per_select
-	, $periods
+    , $reportid
+    , $hostlookup
+    , $sortorder
+    , $dom_select
+    , $domains
+    , $cssfile
+    , $org_select
+    , $orgs
+    , $per_select
+    , $periods
 );
 ?>
