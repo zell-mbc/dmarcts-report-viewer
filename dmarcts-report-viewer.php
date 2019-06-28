@@ -415,7 +415,7 @@ $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #"
 while($row = $query->fetch_assoc()) {
   $domains[] = $row['domain'];
 }
-if( $dom_select <> '' && array_search($dom_select, $domains) === FALSE ) {
+if( $dom_select <> '' && array_search($dom_select, $domains) === false ) {
   $dom_select = '';
 }
 if( $dom_select <> '' ) {
@@ -430,7 +430,7 @@ $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #"
 while($row = $query->fetch_assoc()) {
   $orgs[] = $row['org'];
 }
-if( $org_select <> '' && array_search($org_select, $orgs) === FALSE ) {
+if( $org_select <> '' && array_search($org_select, $orgs) === false ) {
   $org_select = '';
 }
 if( $org_select <> '' ) {
@@ -446,7 +446,7 @@ $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #"
 while($row = $query->fetch_assoc()) {
   $periods[] = sprintf( "%'.04d-%'.02d", $row['year'], $row['month'] );
 }
-if( $per_select <> '' && array_search($per_select, $periods) === FALSE ) {
+if( $per_select <> '' && array_search($per_select, $periods) === false ) {
   $per_select = '';
 }
 if( $per_select <> '' ) {
