@@ -34,7 +34,7 @@
 //### functions ######################################################
 //####################################################################
 
-function html ($host_lookup = 1, $cssfile, $domains = array(), $orgs = array(), $periods = array() ) {
+function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = array(), $periods = array() ) {
 
 	$html       = array();
 
@@ -57,7 +57,7 @@ function html ($host_lookup = 1, $cssfile, $domains = array(), $orgs = array(), 
 
 	//	Host lookup option
 	//	--------------------------------------------------------------------------
-	$html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span> <input type=\"radio\" name=\"selHostLookup\" value=\"1\" onclick=\"showReport(current_report)\"" . ($host_lookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onclick=\"showReport(current_report)\"" . ($host_lookup ? "" : " checked=\"checked\"" ) . "> off</div>";
+	$html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span> <input type=\"radio\" name=\"selHostLookup\" value=\"1\" onclick=\"showReport(current_report)\"" . ($default_hostlookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onclick=\"showReport(current_report)\"" . ($default_hostlookup ? "" : " checked=\"checked\"" ) . "> off</div>";
 
 
 	// 	DMARC select
@@ -215,7 +215,7 @@ while($row = $query->fetch_assoc()) {
 // Generate Page with report list and report data (if a report is selected).
 // --------------------------------------------------------------------------
 echo html( 
-	$hostlookup, 
+	$default_hostlookup, 
 	$cssfile, 
 	$domains, 
 	$orgs, 
