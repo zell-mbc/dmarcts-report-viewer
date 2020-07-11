@@ -44,6 +44,9 @@ function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = ar
 	$html[] = "    <title>DMARC Report Viewer</title>";
 	$html[] = "    <link rel='stylesheet' href='$cssfile'>";
 	$html[] = "    <script src='dmarcts-report-viewer.js'></script>";
+	$html[] = "    <meta charset=\"UTF-8\" />";
+	$html[] = "    <meta name='google' content='notranslate' />";
+	$html[] = "    <meta http-equiv=\"Content-Language\" content=\"en_US\" />";
 	$html[] = "  </head>";
 
 	$html[] = "  <body id='body' onload=showReportlist('reportlistTbl');>";
@@ -80,7 +83,7 @@ function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = ar
 		$html[] = "<select name=\"selPeriod\" id=\"selPeriod\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option value=\"all\">[all]</option>";
 
-		for ($p = 0; $p <= sizeof($periods); $p++) {
+		for ($p = 0; $p < sizeof($periods); $p++) {
 			$arg = "";
 			if( $p == 0 ) {
 				$arg =" selected=\"selected\"";
