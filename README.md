@@ -13,19 +13,19 @@ A PHP viewer for DMARC records that have been parsed by [John Levine's rddmarc s
 
 ## Screenshots
 ### Screenshot: Initial Report Listing
-![alt text](https://hazelden.ca/dmarcts-report-viewer/dmarcts-report-viewer.InitialReportListing.thumb.png "Screenshot: Initial Report Listing")
+![alt text](http://www.techsneeze.com/wp-content/uploads/2020/07/dmarcts-report-viewer.InitialReportListing-300x252.png "Screenshot: Initial Report Listing")
 
-[Larger version](https://hazelden.ca/dmarcts-report-viewer/dmarcts-report-viewer.InitialReportListing.png)
+[Larger version](http://www.techsneeze.com/wp-content/uploads/2020/07/dmarcts-report-viewer.InitialReportListing.png)
 
 ### Screenshot: Report Detail
-![alt text](https://hazelden.ca/dmarcts-report-viewer/dmarcts-report-viewer.ReportDetail.thumb.png "Screenshot: Report Detail")
+![alt text](http://www.techsneeze.com/wp-content/uploads/2020/07/dmarcts-report-viewer.ReportDetail-300x252.png "Screenshot: Report Detail")
 
-[Larger version](https://hazelden.ca/dmarcts-report-viewer/dmarcts-report-viewer.ReportDetail.png)
+[Larger version](http://www.techsneeze.com/wp-content/uploads/2020/07/dmarcts-report-viewer.ReportDetail.png)
 
 ### Screenshot: Report Detail with Raw XML
-![alt text](https://hazelden.ca/dmarcts-report-viewer/dmarcts-report-viewer.ReportDetailWithXML.thumb.png "Screenshot: Report Detail with Raw XML")
+![alt text](http://www.techsneeze.com/wp-content/uploads/2020/07/dmarcts-report-viewer.ReportDetailWithXML-300x252.png "Screenshot: Report Detail with Raw XML")
 
-[Larger version](https://hazelden.ca/dmarcts-report-viewer/dmarcts-report-viewer.ReportDetailWithXML.png)
+[Larger version](http://www.techsneeze.com/wp-content/uploads/2020/07/dmarcts-report-viewer.ReportDetailWithXML.png)
 
 ## Installation and Configuration
 
@@ -121,7 +121,7 @@ The Report Detail table displays the details of the selected DMARC report, initi
 Clicking on a column heading will toggle the sort direction of the Report Detail table by that column.
 
 ### Raw Report XML
-Clicking on the XML icon ![alt text](https://hazelden.ca/dmarcts-report-viewer/xml.png "XML Icon") will display the raw XML of the currently displayed report. Clicking on the HTML icon ![alt text](https://hazelden.ca/dmarcts-report-viewer/html.png "HTML Icon") will hide the raw XML report.
+Clicking on the XML icon ![alt text](http://www.techsneeze.com/wp-content/uploads/2020/07/xml.png "XML Icon") will display the raw XML of the currently displayed report. Clicking on the HTML icon ![alt text](http://www.techsneeze.com/wp-content/uploads/2020/07/html.png "HTML Icon") will hide the raw XML report.
 
 
 More info can currently be found at : [TechSneeze.com](http://www.techsneeze.com/dmarc-report/)
