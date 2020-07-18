@@ -97,7 +97,7 @@ function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = ar
 
 	//	Domains select
 	//	--------------------------------------------------------------------------
-	if ( count( $domains ) > 1 ) {
+	if ( count( $domains ) >= 1 ) {
 		$html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span>";
 		$html[] = "<select name=\"selDomain\" id=\"selDomain\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option selected=\"selected\" value=\"all\">[all]</option>";
