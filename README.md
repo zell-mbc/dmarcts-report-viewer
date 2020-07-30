@@ -62,13 +62,11 @@ $dbname="<dmarc-database-name>";
 $dbuser="<dmarc-database-username>";
 $dbpass="<password-for-dmarc-database-username>";
 $dbport="3306";
+
 $cssfile="default.css";
 
-$default_lookup = 1;  // Hostname resolution: 1=on 0=off (Turning off host lookup greatly speeds 
-                      // up the program in the case of mail servers that have ceased to exist)
-
-$default_sort = 1;    // Report listing Start Date: 1=ASCdending 0=DESCending (ASCending is default 
-                      // behaviour )
+$default_hostlookup = 1;  // Hostname resolution: 1=on 0=off (Turning off host lookup greatly speeds up the program in the case of mail servers that have ceased to exist)
+$default_sort = 1;  // Report listing Start Date: 1=ASCdending 0=DESCending (ASCending is default behaviour )
 ```
 #### dmarcts-report-viewer-js
 Finally, edit these basic configuration options near the top of the `dmarcts-report-viewer.js` file with your preferences:
