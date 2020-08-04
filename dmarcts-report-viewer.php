@@ -103,7 +103,7 @@ function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = ar
 		$html[] = "<option selected=\"selected\" value=\"all\">[all]</option>";
 
 		foreach( $domains as $d) {
-			$html[] = "<option $arg value=\"$d\">$d</option>";
+			$html[] = "<option value=\"$d\">$d</option>";
 		}
 
 		$html[] = "</select>";
@@ -119,7 +119,7 @@ function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = ar
 		$html[] = "<option selected=\"selected\" value=\"all\">[all]</option>";
 
 		foreach( $orgs as $o) {
-			$html[] = "<option $arg value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
+			$html[] = "<option value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
 		}
 
 		$html[] = "</select>";
