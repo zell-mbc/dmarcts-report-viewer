@@ -207,7 +207,7 @@ while($row = $query->fetch_assoc()) {
 
 // Get all periods
 // --------------------------------------------------------------------------
-$sql="SELECT DISTINCT DISTINCT year(mindate) as year, month(mindate) as month FROM `report` ORDER BY year desc, month desc";
+$sql="(SELECT year(mindate) as year, month(mindate) as month FROM `report`) UNION (SELECT year(maxdate) as year, month(maxdate) as month FROM `report`) ORDER BY year desc, month desc";
 
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 
