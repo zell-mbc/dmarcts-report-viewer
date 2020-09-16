@@ -51,6 +51,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 
 	if (isset($reports[$reportnumber])) {
 		$row = $reports[$reportnumber];
+		$row['raw_xml'] = formatXML($row['raw_xml']);
 		$row = array_map('htmlspecialchars', $row);
 //         $reportdata[] = "<a id='rpt".$reportnumber."'></a>";
 
@@ -137,6 +138,20 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 
 	#indent generated html by 2 extra spaces
 	return implode("\n  ",$reportdata);
+}
+
+function formatXML($xml) {
+	$dom = new DOMDocument();
+
+	// Initial block (must before load xml string)
+	$dom->preserveWhiteSpace = false;
+	$dom->formatOutput = true;
+	// End initial block
+
+	$dom->loadXML($xml);
+	$out = $dom->saveXML();
+
+	return $out;
 }
 
 //####################################################################
