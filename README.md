@@ -35,7 +35,7 @@ A PHP viewer for DMARC records that have been parsed by [John Levine's rddmarc s
 
 * A working webserver (apache, nginx, ...) with PHP
 
-* Installed `php-mysql`
+* Installed `php-mysql` and `php-dom`
 
 ### Download dmarcts-report-viewer:
 ```
