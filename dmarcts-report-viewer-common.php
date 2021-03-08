@@ -29,8 +29,34 @@
 // for your database authentication and location.
 //
 // Edit the configuration variables in dmarcts-report-viewer.js with your preferences.
-// 
-// 
+
+//####################################################################
+//### variables ######################################################
+//####################################################################
+
+$dmarc_result = array(
+	'DKIM_AND_SPF_PASS' => array(
+		'text' => 'DKIM and SPF Pass',
+		'color' => 'lime',
+		'status_num' => 1,
+	),
+	'DKIM_OR_SPF_FAIL' => array(
+		'text' => 'DKIM or SPF Fail',
+		'color' => 'orange',
+		'status_num' => 3,
+	),
+	'DKIM_AND_SPF_FAIL' => array(
+		'text' => 'DKIM and SPF Fail',
+		'color' => 'red',
+		'status_num' => 4,
+	),
+	'OTHER_CONDITION' => array(
+		'text' => 'Other condition',
+		'color' => 'yellow',
+		'status_num' => 2,
+	),
+);
+
 //####################################################################
 //### functions ######################################################
 //####################################################################
@@ -43,21 +69,22 @@ function main() {
 
 
 function get_status_color($row) {
+	global $dmarc_result;
 	$status = "";
 	$status_num = "";
-    if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
-	    $status="red";
-		$status_num="4";
-    } elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")) {
-	    $status="orange";
-	    $status_num="3";
-    } elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
-	    $status="lime";
-	    $status_num="1";
-    } else {
-	    $status="yellow";
-	    $status_num="2";
-    }
+	if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
+		$status     = $dmarc_result['DKIM_AND_SPF_FAIL']['color'];
+		$status_num = $dmarc_result['DKIM_AND_SPF_FAIL']['status_num'];
+	} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")) {
+		$status     = $dmarc_result['DKIM_OR_SPF_FAIL']['color'];
+		$status_num = $dmarc_result['DKIM_OR_SPF_FAIL']['status_num'];
+	} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
+		$status     = $dmarc_result['DKIM_AND_SPF_PASS']['color'];
+		$status_num = $dmarc_result['DKIM_AND_SPF_PASS']['status_num'];
+	} else {
+		$status     = $dmarc_result['OTHER_CONDITION']['color'];
+		$status_num = $dmarc_result['OTHER_CONDITION']['status_num'];
+	}
 #	$status .= "\"><span style='display:none;'>" . $status_content . "</span></span>";
 #	$status_num .= "\"><span style='display:none;'>" . $status_content . "</span></span>";
     return array($status, $status_num);
