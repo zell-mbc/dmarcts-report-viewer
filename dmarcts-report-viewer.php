@@ -34,7 +34,9 @@
 //### functions ######################################################
 //####################################################################
 
-function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = array(), $periods = array() ) {
+function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_domain = undef, $default_reporter = undef, $cssfile, $domains = array(), $orgs = array(), $periods = array() ) {
+
+	global $dmarc_result;
 
 	$html       = array();
 
@@ -67,11 +69,14 @@ function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = ar
 	// 	--------------------------------------------------------------------------
 		$html[] = "<div class='options'><span class='optionlabel'>DMARC Result:</span>";
 		$html[] = "<select name=\"selDMARC\" id=\"selDMARC\" onchange=\"showReportlist('reportlistTbl')\">";
-		$html[] = "<option selected=\"selected\" value=\"all\">[all]</option>";
-		$html[] = "<option value=\"1\">DKIM and SPF Pass</option>";
-		$html[] = "<option value=\"3\">DKIM or SPF Fail</option>";
-		$html[] = "<option value=\"4\">DKIM and SPF Fail</option>";
-		$html[] = "<option value=\"2\">Other condition</option>";
+		$html[] = "<option " . ( $default_dmarc_result ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
+		foreach($dmarc_result as $key => $value) {
+			$html[] = sprintf("<option %s value=\"%d\">%s</option>",
+					$default_dmarc_result == $key ? "selected=\"selected\"" : "",
+					$value['status_num'],
+					$value['text'],
+				);
+		}
 		$html[] = "</select>";
 		$html[] = "</div>";
 
@@ -100,10 +105,10 @@ function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = ar
 	if ( count( $domains ) >= 1 ) {
 		$html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span>";
 		$html[] = "<select name=\"selDomain\" id=\"selDomain\" onchange=\"showReportlist('reportlistTbl')\">";
-		$html[] = "<option selected=\"selected\" value=\"all\">[all]</option>";
+		$html[] = "<option " . ( $default_domain ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 
 		foreach( $domains as $d) {
-			$html[] = "<option value=\"$d\">$d</option>";
+			$html[] = "<option " . ( $default_domain == $d ? "selected=\"selected\" " : "" ) . "value=\"$d\">$d</option>";
 		}
 
 		$html[] = "</select>";
@@ -116,10 +121,10 @@ function html ($default_hostlookup = 1, $cssfile, $domains = array(), $orgs = ar
 	if ( count( $orgs ) > 0 ) {
 		$html[] = "<div class='options'><span class='optionlabel'>Reporter(s):</span>";
 		$html[] = "<select name=\"selOrganisation\" id=\"selOrganisation\" onchange=\"showReportlist('reportlistTbl')\">";
-		$html[] = "<option selected=\"selected\" value=\"all\">[all]</option>";
+		$html[] = "<option " . ( $default_reporter ? "" : "selected=\"selected\" " ) . "selected=\"selected\" value=\"all\">[all]</option>";
 
 		foreach( $orgs as $o) {
-			$html[] = "<option value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
+			$html[] = "<option " . ( $default_reporter == $o ? "selected=\"selected\" " : "" ) . "value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
 		}
 
 		$html[] = "</select>";
@@ -219,6 +224,9 @@ while($row = $query->fetch_assoc()) {
 // --------------------------------------------------------------------------
 echo html( 
 	$default_hostlookup, 
+	$default_dmarc_result,
+	$default_domain,
+	$default_reporter,
 	$cssfile, 
 	$domains, 
 	$orgs, 
