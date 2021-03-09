@@ -211,6 +211,7 @@ function showReport(str) {
 	}
 	
 	GETstring += "&p=" + document.getElementById('selPeriod').value;
+	GETstring += "&dmarc=" + document.getElementById('selDMARC').options[document.getElementById('selDMARC').selectedIndex].value;
 
 	xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = 

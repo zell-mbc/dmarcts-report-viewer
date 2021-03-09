@@ -37,6 +37,8 @@
 
 function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 
+	global $dmarc_where;
+
 	$title_message = "Click to toggle sort direction by this column";
 	
 	if (!$reportnumber) {
@@ -90,7 +92,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	$reportdata[] = "  <tbody>";
 
 	global $mysqli;
-	$sql = "SELECT * FROM rptrecord where serial = $reportnumber ORDER BY ip ASC";
+	$sql = "SELECT * FROM rptrecord where serial = $reportnumber" . ( $dmarc_where ? " AND $dmarc_where" : "" ) . " ORDER BY ip ASC";
 // Debug
 // echo "<br><b>sql reportdata =</b> $sql<br>";
 
@@ -189,6 +191,16 @@ if(isset($_GET['sortorder']) && is_numeric($_GET['sortorder'])){
 	die('Invalid sortorder flag');
 }
 
+if(isset($_GET['dmarc'])){
+	$dmarc_select=$_GET['dmarc'];
+}else{
+	$dmarc_select= '';
+}
+
+if( $dmarc_select == "all" ) {
+	$dmarc_select= '';
+}
+
 // Debug
 //echo "<br />D=$dom_select <br /> O=$org_select <br />";
 
@@ -215,6 +227,26 @@ if( $sortorder ) {
 	$sort = "ASC";
 } else {
 	$sort = "DESC";
+}
+
+// DMARC
+// dkimresult spfresult
+// --------------------------------------------------------------------------
+switch ($dmarc_select) {
+	case 1: // DKIM and SPF Pass: Green
+		$dmarc_where = "(rptrecord.dkimresult='pass' AND rptrecord.spfresult='pass')";
+		break;
+	case 3: // DKIM or SPF Fail: Orange
+		$dmarc_where = "(rptrecord.dkimresult='fail' OR rptrecord.spfresult='fail')";
+		break;
+	case 4: // DKIM and SPF Fail: Red
+		$dmarc_where = "(rptrecord.dkimresult='fail' AND rptrecord.spfresult='fail')";
+		break;
+	case 2: // Other condition: Yellow
+		$dmarc_where = "NOT ((rptrecord.dkimresult='pass' AND rptrecord.spfresult='pass') OR (rptrecord.dkimresult='fail' OR rptrecord.spfresult='fail') OR (rptrecord.dkimresult='fail' AND rptrecord.spfresult='fail'))"; // In other words, "NOT" all three other conditions
+		break;
+	default:
+		break;
 }
 
 // Include the rcount via left join, so we do not have to make an sql query
