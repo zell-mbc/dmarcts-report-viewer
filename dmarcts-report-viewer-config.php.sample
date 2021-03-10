@@ -32,4 +32,7 @@ $default_sort = 1;  // Report listing Start Date: 1=ASCdending 0=DESCending (ASC
 // - OTHER_CONDITION
 // $default_dmarc_result = 'DKIM_AND_SPF_FAIL';
 
+// show only records of a report that match the 'DMARC Result' drop-down?
+// $dmarc_results_matching_only = 0;
+
 ?>
