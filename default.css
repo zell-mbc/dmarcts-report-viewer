@@ -1,8 +1,56 @@
+/*
+default.css - The default theme css file for dmarcts-report-viewer, a PHP based viewer of parsed DMARC reports.
+Copyright (C) 2016 TechSneeze.com, John Bieling and John P. New
+with additional extensions (sort order) of Klaus Tachtler.
+
+Available at:
+https://github.com/techsneeze/dmarcts-report-viewer
+
+This file is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+
+This file is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/* All colors are controlled by the following section */
+:root {
+  --background: white;
+  --text: black;
+  --text_over_colorbg: #000000;
+  --header: silver;
+  --link: #0000EE;
+  --link_visited: #551A8B;
+  --hover: whitesmoke;
+  --shadow: grey;
+  --selected: gainsboro;
+  --green: #00FF00;
+  --yellow: #FFFF00;
+  --orange: #FFA500;
+  --red: #FF0000;
+}
+
 body {
-	background-color: white;
+	color: var(--text);
+	background-color: var(--background);
 }
 
 h1 {
+}
+
+a {
+  color: var(--link);
+}
+
+a:visted {
+  color: var(--link_visited);
 }
 
 .title {
@@ -24,32 +72,28 @@ table.reportlist td {
 }
 
 table.reportlist th {
-        padding:3px;
+	padding:3px;
 	position: -webkit-sticky; /* Safari */
 	position: sticky;
 	top: 0;
-	background-color: silver;
+	background-color: var(--header);
 	cursor: pointer;
 }
 
-/*
-table.reportlist thead {
-	border-top: 1px solid grey;
-	border-bottom: 1px solid grey;
-}
-*/
-
 table.reportlist tr:hover {
-	background-color: whitesmoke;
+	background-color: var(--hover);
 }
+
 table.reportlist tbody tr:first-child td {
 	padding-top: 10px;
 }
+
 table.reportlist tr.sum {
-	border-top: 1px solid grey;
+	border-top: 1px solid var(--shadow);
 }
+
 table.reportlist tr.selected {
-	background-color: gainsboro;
+	background-color: var(--selected);
 }
 
 table.reportlist td.hidden, table.reportlist th.hidden {
@@ -57,9 +101,7 @@ table.reportlist td.hidden, table.reportlist th.hidden {
 }
 
 table.reportlist tr {
-        cursor: pointer;
-/*		text-decoration: underline;
-		color: blue;*/
+	cursor: pointer;
 }
 
 .reportdesc {
@@ -67,178 +109,135 @@ table.reportlist tr {
 	font-weight: bold;
 	padding: 1em 0;
 	margin: 0 auto;
-	
 }
 
 .reportdesc_container {
-/* 	display:inline-block; */
-	border-top: 2px solid grey;
+	border-top: 2px solid var(--shadow);
 	margin: 0 auto;
-	
 }
 
 table.reportdata {
 	margin: 0 auto;
-	border-collapse: collapse;
 }
 
 table.reportdata tr td {
+	color: var(--text_over_colorbg);
 	text-align: center;
 	padding: 3px;
-	border: 2px solid white;
-	border-collapse: collapse;
 }
 
 table.reportdata tr th {
 	text-align: center;
 	padding: 3px;
-	border-collapse: collapse;
-	border: 2px solid white;
-	border-top: 0px solid black;
 	position: -webkit-sticky; /* Safari */
 	position: sticky;
 	top: 0px;
-	background-color: lightgray;
+	background-color: var(--header);
 	cursor:pointer;
 }
 
+table.reportdata td.sum {
+	color: var(--text);
+}
+
+table.reportdata td.right {
+	text-align: right;
+}
+
 table.reportdata tr.red {
-	background-color: #FF0000;
+	background-color: var(--red);
 }
 
 table.reportdata tr.orange {
-	background-color: #FFA500;
+	background-color: var(--orange);
 }
 
 table.reportdata tr.lime {
-	background-color: #00FF00;
+	background-color: var(--green);
 }
 
 table.reportdata tr.yellow {
-	background-color: #FFFF00;
+	background-color: var(--yellow);
 }
 
 .footer {
 	font-size: 70%;
 	text-align: center;
-	border-top: 2px solid grey;
+	border-top: 2px solid var(--shadow);
 	width: 100%;
 	margin: 10px auto 0px auto;
 	padding-top: 10px;
 	position: fixed;
 	bottom: 0;
-
+	background-color: var(--background);
 }
 
 .optionblock {
-/*
-	background: lightgrey;
-	padding: 0.4em;
-	float: right;
-	margin: auto 2em 1em auto;
-*/
-      	white-space: nowrap;
+	white-space: nowrap;
 	overflow: auto;
 	font-size: 80%;
 	padding: .5em;
-    background-color: silver;
-    margin: auto;
-/*     width: 95%; */
-    text-align: center;
+	background-color: var(--header);
+	margin: auto;
+	text-align: center;
 }
 
 .optionlabel {
-  font-weight: bold;
-/*  
-	float: left; clear: left; 
-	margin-right: 1em;
-*/
+	font-weight: bold;
 }
 
 .options {
 	margin-right: .5em;
-  /*
-	font-size: 70%;
-	text-align: right;
-	border: none;
-	width: 97%;
-	padding: 0.4em;
-  */
-  display: inline-block;
-  border-right: 1px solid black;
-    padding-right: 1em;
-}
-
-.activated {
-	border: 0px solid black;
-	color: black;
-	background: lightgreen;
-	padding: 0.2em;
-	padding-right: 0.4em;
-	padding-left: 0.4em;
-	text-decoration: none;
-}
-
-.deactivated {
-	border: 1px solid black;
-	color: black;
-	background: orange;
-	padding: 0.2em;
-	padding-right: 0.4em;
-	padding-left: 0.4em;
-	text-decoration: none;
-}
-.deactivated:hover {
-	background-color: yellow;
+	display: inline-block;
+	border-right: 1px solid var(--text);
+	padding-right: 1em;
+	cursor: default;
 }
 
 .center {
-	text-align:center;
+	text-align: center;
 }
 
 .right {
-	text-align:right;
+	text-align: right;
 }
 
 .circle_black:before {
 	content: ' \25CF';
 	font-size: 25px;
-	color: #000000;
+	color: var(--text);
 }
 
 .circle_lime:before {
 	content: ' \25CF';
 	font-size: 25px;
-	color: #00FF00;
+	color: var(--green);
 }
 
 .circle_red:before {
 	content: ' \25CF';
 	font-size: 25px;
-	color: #FF0000;
+	color: var(--red);
 }
 
 .circle_yellow:before {
 	content: ' \25CF';
 	font-size: 25px;
-	color: #FFFF00;
+	color: var(--yellow);
 }
 
 .circle_orange:before {
 	content: ' \25CF';
 	font-size: 25px;
-	color: #FFA500;
+	color: var(--orange);
 }
 
 .asc_triangle:after {
 	content: ' \25B2';
 	font-size: 15px;
-/*	color: #000000; */
 }
 
 .desc_triangle:after {
 	content: ' \25BC';
 	font-size: 15px;
-/*	color: #000000; */
 }
-
