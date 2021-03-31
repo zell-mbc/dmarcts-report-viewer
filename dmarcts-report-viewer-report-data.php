@@ -130,7 +130,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 		$reportsum += $row['rcount'];
 	}
 	$reportdata[] = "  </tbody>";
-	$reportdata[] = "<tr><td></td><td class='right'>Sum:</td><td>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
+	$reportdata[] = "<tr><td></td><td class='right sum'>Sum:</td><td class='sum'>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
 	$reportdata[] = "</table>";
 
 	$reportdata[] = "</div>"; 
