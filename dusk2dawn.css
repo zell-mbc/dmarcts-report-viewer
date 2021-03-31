@@ -1,0 +1,242 @@
+/*
+dusk2dawn.css - Dusk2Dawn, a dark theme css file for dmarcts-report-viewer, a PHP based viewer of parsed DMARC reports.
+Copyright (C) 2021 John P. New
+
+Available at:
+https://github.com/techsneeze/dmarcts-report-viewer
+
+This file is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+
+This file is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/* All colors are controlled by the following section */
+:root {
+  --background: #292c2f;
+  --text: #ffffff;
+  --text_over_colorbg: #000000;
+  --header: #4f555b;
+  --link: #ff69b4;
+  --link_visited: #ff69b4;
+  --hover: #9aa1a8;
+  --shadow: #e1e9f0;
+  --selected: #767c83;
+  --green: #85ff6a;
+  --yellow: #ffff64;
+  --orange: #ffb826;
+  --red: #ff7f50;
+}
+
+body {
+	color: var(--text);
+	background-color: var(--background);
+}
+
+h1 {
+}
+
+a {
+  color: var(--link);
+}
+
+a:visted {
+  color: var(--link_visited);
+}
+
+.title {
+	font-size: 140%;
+	font-weight: bold;
+	text-align: center;
+	padding: 5px 0px;
+}
+
+table.reportlist {
+	margin: auto;
+	border-collapse: collapse;
+	clear: both;
+	cursor: inherit;
+}
+
+table.reportlist td {
+	padding:0px 10px;
+}
+
+table.reportlist th {
+	padding:3px;
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	top: 0;
+	background-color: var(--header);
+	cursor: pointer;
+}
+
+table.reportlist tr:hover {
+	background-color: var(--hover);
+}
+
+table.reportlist tbody tr:first-child td {
+	padding-top: 10px;
+}
+
+table.reportlist tr.sum {
+	border-top: 1px solid var(--shadow);
+}
+
+table.reportlist tr.selected {
+	background-color: var(--selected);
+}
+
+table.reportlist td.hidden, table.reportlist th.hidden {
+	display: none;
+}
+
+table.reportlist tr {
+	cursor: pointer;
+}
+
+.reportdesc {
+	display:inline-block;
+	font-weight: bold;
+	padding: 1em 0;
+	margin: 0 auto;
+}
+
+.reportdesc_container {
+	border-top: 2px solid var(--shadow);
+	margin: 0 auto;
+}
+
+table.reportdata {
+	margin: 0 auto;
+}
+
+table.reportdata tr td {
+	color: var(--text_over_colorbg);
+	text-align: center;
+	padding: 3px;
+}
+
+table.reportdata tr th {
+	text-align: center;
+	padding: 3px;
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	top: 0px;
+	background-color: var(--header);
+	cursor:pointer;
+}
+
+table.reportdata td.sum {
+	color: var(--text);
+}
+
+table.reportdata td.right {
+	text-align: right;
+}
+
+table.reportdata tr.red {
+	background-color: var(--red);
+}
+
+table.reportdata tr.orange {
+	background-color: var(--orange);
+}
+
+table.reportdata tr.lime {
+	background-color: var(--green);
+}
+
+table.reportdata tr.yellow {
+	background-color: var(--yellow);
+}
+
+.footer {
+	font-size: 70%;
+	text-align: center;
+	border-top: 2px solid var(--shadow);
+	width: 100%;
+	margin: 10px auto 0px auto;
+	padding-top: 10px;
+	position: fixed;
+	bottom: 0;
+	background-color: var(--background);
+}
+
+.optionblock {
+	white-space: nowrap;
+	overflow: auto;
+	font-size: 80%;
+	padding: .5em;
+	background-color: var(--header);
+	margin: auto;
+	text-align: center;
+}
+
+.optionlabel {
+	font-weight: bold;
+}
+
+.options {
+	margin-right: .5em;
+	display: inline-block;
+	border-right: 1px solid var(--text);
+	padding-right: 1em;
+	cursor: default;
+}
+
+.center {
+	text-align: center;
+}
+
+.right {
+	text-align: right;
+}
+
+.circle_black:before {
+	content: ' \25CF';
+	font-size: 25px;
+	color: var(--text);
+}
+
+.circle_lime:before {
+	content: ' \25CF';
+	font-size: 25px;
+	color: var(--green);
+}
+
+.circle_red:before {
+	content: ' \25CF';
+	font-size: 25px;
+	color: var(--red);
+}
+
+.circle_yellow:before {
+	content: ' \25CF';
+	font-size: 25px;
+	color: var(--yellow);
+}
+
+.circle_orange:before {
+	content: ' \25CF';
+	font-size: 25px;
+	color: var(--orange);
+}
+
+.asc_triangle:after {
+	content: ' \25B2';
+	font-size: 15px;
+}
+
+.desc_triangle:after {
+	content: ' \25BC';
+	font-size: 15px;
+}
