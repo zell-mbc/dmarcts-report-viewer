@@ -44,6 +44,10 @@ function tmpl_reportList($reports, $sort) {
 	} else {
 		$title_message = "Click to toggle sort direction by this column";
 	// echo $sort;
+		//	Resizer handles
+		//	--------------------------------------------------------------------------
+		$reportlist[] = "<div id='resizer_horizontal' class='resizer resizer_horizontal'></div>";
+		$reportlist[] = "<div id='resizer_vertical' class='resizer resizer_vertical'></div>";
 		$reportlist[] = "<table id='reportlistTbl' class='reportlist'>";
 		$reportlist[] = "  <thead>";
 		$reportlist[] = "    <tr>";
@@ -99,6 +103,7 @@ $org_select= '';
 $per_select= '';
 $dmarc_select= '';
 $where = '';
+
 
 // Parameters of GET
 // --------------------------------------------------------------------------

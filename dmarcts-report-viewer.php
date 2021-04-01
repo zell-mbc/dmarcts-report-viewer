@@ -29,7 +29,7 @@
 // for your database authentication and location.
 //
 // Edit the configuration variables in dmarcts-report-viewer.js with your preferences.
-// 
+//
 //####################################################################
 //### functions ######################################################
 //####################################################################
@@ -51,9 +51,10 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	$html[] = "    <meta http-equiv=\"Content-Language\" content=\"en_US\" />";
 	$html[] = "  </head>";
 
-	$html[] = "  <body id='body' onload=showReportlist('reportlistTbl');>";
-// 	$html[] = "  <body id='body' onload=showReportlist('reportlistTbl');makeResizableDiv();>";
-
+	$html[] = "  <body id='body' onload=showReportlist('reportlistTbl');set_heights(); onresize=showResizers();>";
+	$html[] = "<div id='screen_overlay' onclick=\"hideMenu();\" style=\"top: 0;left: 0;height: 100%;width: 100%;position: absolute;display: none;z-index: 1;\">
+    ";
+	$html[] = "</div>";
 
 	//	Optionblock form
 	//	--------------------------------------------------------------------------
@@ -99,6 +100,7 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 		$html[] = "</select>";
 		$html[] = "</div>";
 	}
+
 
 	//	Domains select
 	//	--------------------------------------------------------------------------
@@ -152,12 +154,12 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	//	--------------------------------------------------------------------------
 	$html[] = "<!-- Start of report list -->";
 	$html[] = "<div id='title' class='title'>DMARC Reports</div>";
-	$html[] = "<div id='report_list' style='overflow-y:auto; resize: vertical;'>";
+	$html[] = "<div id='report_list' style='overflow-y:auto;'>";
 	$html[] = "</div>";
 	$html[] = "<!-- End of report list -->";
 
 	$html[] = "<!-- Start of report data -->";
-	$html[] = "<div id='report_data' style='text-align:center;'>";
+	$html[] = "<div id='report_data' style='overflow-y: hidden;text-align:center;'>";
 	$html[] = "</div>";
 	$html[] = "<!-- End of report data -->";
 
@@ -222,14 +224,14 @@ while($row = $query->fetch_assoc()) {
 
 // Generate Page with report list and report data (if a report is selected).
 // --------------------------------------------------------------------------
-echo html( 
-	$default_hostlookup, 
+echo html(
+	$default_hostlookup,
 	$default_dmarc_result,
 	$default_domain,
 	$default_reporter,
-	$cssfile, 
-	$domains, 
-	$orgs, 
+	$cssfile,
+	$domains,
+	$orgs,
 	$periods
 );
 ?>
