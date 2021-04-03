@@ -60,11 +60,21 @@ a:visted {
 	padding: 5px 0px;
 }
 
+#screen_overlay {
+	top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    display: block;
+    z-index: 1;
+}
+
 table.reportlist {
 	margin: auto;
 	border-collapse: collapse;
 	clear: both;
-	cursor: inherit;
+	cursor: pointer;
 }
 
 table.reportlist td {
@@ -77,7 +87,6 @@ table.reportlist th {
 	position: sticky;
 	top: 0;
 	background-color: var(--header);
-	cursor: pointer;
 }
 
 table.reportlist tr:hover {
@@ -100,10 +109,6 @@ table.reportlist td.hidden, table.reportlist th.hidden {
 	display: none;
 }
 
-table.reportlist tr {
-	cursor: pointer;
-}
-
 .reportdesc {
 	display:inline-block;
 	font-weight: bold;
@@ -118,6 +123,7 @@ table.reportlist tr {
 
 table.reportdata {
 	margin: 0 auto;
+	cursor:pointer;
 }
 
 table.reportdata tr td {
@@ -133,7 +139,6 @@ table.reportdata tr th {
 	position: sticky;
 	top: 0px;
 	background-color: var(--header);
-	cursor:pointer;
 }
 
 table.reportdata td.sum {
@@ -240,4 +245,26 @@ table.reportdata tr.yellow {
 .desc_triangle:after {
 	content: ' \25BC';
 	font-size: 15px;
+}
+
+.resizer {
+	display: none;
+	position: absolute;
+	border-radius: 7px;
+	background: var(--background);
+	border: 2px solid  var(--shadow);
+	top: 8px;
+	left: 50%;
+}
+
+.resizer_horizontal {
+	width: 30px;
+	height: 10px;
+	cursor: ns-resize;
+}
+
+.resizer_vertical {
+	width: 10px;
+	height: 30px;
+	cursor: ew-resize;
 }
