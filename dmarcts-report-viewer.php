@@ -75,7 +75,7 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 			$html[] = sprintf("<option %s value=\"%d\">%s</option>",
 					$default_dmarc_result == $key ? "selected=\"selected\"" : "",
 					$value['status_num'],
-					$value['text'],
+					$value['text']
 				);
 		}
 		$html[] = "</select>";
