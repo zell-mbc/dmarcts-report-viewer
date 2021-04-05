@@ -168,7 +168,15 @@ table.reportdata tr.red {
 	background-color: var(--red);
 }
 
+table.reportdata td.red {
+	background-color: var(--red);
+}
+
 table.reportdata tr.orange {
+	background-color: var(--orange);
+}
+
+table.reportdata td.orange {
 	background-color: var(--orange);
 }
 
@@ -176,10 +184,15 @@ table.reportdata tr.green {
 	background-color: var(--green);
 }
 
+table.reportdata td.green {
 	background-color: var(--green);
 }
 
 table.reportdata tr.yellow {
+	background-color: var(--yellow);
+}
+
+table.reportdata td.yellow {
 	background-color: var(--yellow);
 }
 
