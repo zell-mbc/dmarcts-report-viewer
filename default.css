@@ -170,7 +170,7 @@ table.reportdata tr.yellow {
 	text-align: center;
 	border-top: 2px solid var(--shadow);
 	width: 100%;
-	margin: 10px auto 0px auto;
+	margin: 10px auto 10px auto;
 	padding-top: 10px;
 	position: fixed;
 	bottom: 0;
