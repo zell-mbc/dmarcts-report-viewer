@@ -100,6 +100,43 @@ function get_dmarc_result($row) {
 	return array('color' => $color, 'status_sort_key' => $color_sort_key, 'result' => $result_text);
 }
 
+// This function sets variables for the All Results portion (right half-circle) in the Report List table
+function get_report_status($row) {
+
+	global $dmarc_result;
+	$color = "";
+	$color_sort_key = "";
+	$result_text = "";
+
+	$dmarc_status_min = min($row['dkim_align_min'],$row['spf_align_min'],$row['dkim_result_min'],$row['spf_result_min'],$row['dmarc_result_min']);
+
+	if ($row['dkim_align_min'] == 0 && $row['spf_align_min'] == 0 && $row['dkim_result_min'] == 0 && $row['spf_result_min'] == 0 && $row['dmarc_result_min'] == 0) {
+		$color = $dmarc_result['DMARC_FAIL']['color'];
+		$color_sort_key = $dmarc_result['DMARC_FAIL']['status_sort_key'];
+		$result_text = $dmarc_result['DMARC_FAIL']['status_text'];
+	} else {
+		switch ($dmarc_status_min) {
+			case 0:
+				$color = $dmarc_result['DMARC_PASS_AND_FAIL']['color'];
+				$color_sort_key = $dmarc_result['DMARC_PASS_AND_FAIL']['status_sort_key'];
+				$result_text = $dmarc_result['DMARC_PASS_AND_FAIL']['status_text'];
+				break;
+			case 1:
+				$color = $dmarc_result['DMARC_OTHER_CONDITION']['color'];
+				$color_sort_key = $dmarc_result['DMARC_OTHER_CONDITION']['status_sort_key'];
+				$result_text = $dmarc_result['DMARC_OTHER_CONDITION']['status_text'];
+				break;
+			case 2:
+				$color = $dmarc_result['DMARC_PASS']['color'];
+				$color_sort_key = $dmarc_result['DMARC_PASS']['status_sort_key'];
+				$result_text = $dmarc_result['DMARC_PASS']['status_text'];
+				break;
+			default:
+				break;
+		}
+	}
+
+	return array('color' => $color, 'status_sort_key' => $color_sort_key, 'status_text' => $result_text);
 }
 
 
