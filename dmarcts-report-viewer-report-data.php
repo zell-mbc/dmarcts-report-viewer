@@ -123,7 +123,7 @@ SELECT
 	AS dmarc_result_max
 FROM
     rptrecord
-WHERE serial = " . $reportnumber;
+WHERE serial = " . $reportnumber . ( $dmarc_where ? " AND $dmarc_where" : "" ) . " ORDER BY ip ASC";
 
 // Debug
 // echo "<br><b>sql reportdata =</b> $sql<br>";
