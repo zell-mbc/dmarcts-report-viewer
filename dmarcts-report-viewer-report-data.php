@@ -55,7 +55,6 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 		$row = $reports[$reportnumber];
 		$row['raw_xml'] = formatXML($row['raw_xml']);
 		$row = array_map('htmlspecialchars', $row);
-//         $reportdata[] = "<a id='rpt".$reportnumber."'></a>";
 
 		$reportdata[] = "<div id='report_desc_container' class='center reportdesc_container'>";
 		$reportdata[] = "<div id='report_desc' class='center reportdesc'>Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row['policy_adkim'] . ", aspf=" . $row['policy_aspf'] .  ", p=" . $row['policy_p'] .  ", sp=" . $row['policy_sp'] .  ", pct=" . $row['policy_pct'] . "</div>";
@@ -87,7 +86,6 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	$reportdata[] = "      <th title='" . $title_message . "'>SPF<br />Result</th>";
 	$reportdata[] = "    </tr>";
 	$reportdata[] = "  </thead>";
-
 	$reportdata[] = "  <tbody>";
 
 	global $mysqli;
@@ -252,7 +250,31 @@ switch ($dmarc_select) {
 // for every single report.
 // --------------------------------------------------------------------------
 
-$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimresult) AS dkimresult, MIN(rptrecord.spfresult) AS spfresult FROM report LEFT JOIN (SELECT rcount, COALESCE(dkimresult, 'neutral') AS dkimresult, COALESCE(spfresult, 'neutral') AS spfresult, serial FROM rptrecord) AS rptrecord ON report.serial = rptrecord.serial WHERE report.serial = " . $mysqli->real_escape_string($reportid) . " GROUP BY serial ORDER BY mindate $sort, maxdate $sort , org";
+$sql = "
+SELECT
+	report.*,
+	sum(rptrecord.rcount) AS rcount,
+	MIN(rptrecord.dkimresult) AS dkimresult,
+	MIN(rptrecord.spfresult) AS spfresult
+FROM
+	report
+LEFT JOIN
+	(
+	SELECT
+		rcount,
+		COALESCE(dkimresult, 'neutral') AS dkimresult,
+		COALESCE(spfresult, 'neutral') AS spfresult,
+		serial
+	FROM
+		rptrecord
+	)
+	AS rptrecord
+ON
+	report.serial = rptrecord.serial
+WHERE report.serial = " . $mysqli->real_escape_string($reportid) . "
+GROUP BY serial
+ORDER BY mindate $sort, maxdate $sort , org";
+
 
 // Debug
 // echo "<br /><b>Data Report sql:</b> $sql<br />";

@@ -122,7 +122,7 @@ function showReportlist(str) { // str is the name of the <div> to be filled
 							document.getElementById('resizer_vertical').style.display = 'none';
 				}
 			}
-		}
+		};
 
 	xhttp.open("GET", "dmarcts-report-viewer-report-list.php" + GETstring, true);
 	xhttp.send();
@@ -273,7 +273,7 @@ function showReport(str) {
 					showXML("open_xml");
 				}
 			}
-		}
+		};
 
 	xhttp.open("GET", "dmarcts-report-viewer-report-data.php?" + GETstring, true);
 	xhttp.send();

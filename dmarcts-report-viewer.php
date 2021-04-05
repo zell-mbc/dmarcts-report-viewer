@@ -194,7 +194,12 @@ if ($mysqli->connect_errno) {
 
 // Get all domains reported
 // --------------------------------------------------------------------------
-$sql="SELECT DISTINCT domain FROM `report` ORDER BY domain";
+$sql="
+SELECT
+	DISTINCT domain
+FROM
+	report
+ORDER BY domain";
 
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 
@@ -204,7 +209,12 @@ while($row = $query->fetch_assoc()) {
 
 // Get all organisations
 // --------------------------------------------------------------------------
-$sql="SELECT DISTINCT org FROM `report` ORDER BY org";
+$sql="
+SELECT
+	DISTINCT org
+FROM
+	report
+ORDER BY org";
 
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 
@@ -214,7 +224,23 @@ while($row = $query->fetch_assoc()) {
 
 // Get all periods
 // --------------------------------------------------------------------------
-$sql="(SELECT year(mindate) as year, month(mindate) as month FROM `report`) UNION (SELECT year(maxdate) as year, month(maxdate) as month FROM `report`) ORDER BY year desc, month desc";
+$sql="
+(
+	SELECT
+		year(mindate) as year,
+		month(mindate) as month
+	FROM
+		report
+)
+UNION
+(
+	SELECT
+		year(maxdate) as year,
+		month(maxdate) as month
+	FROM
+		report
+)
+ORDER BY year desc, month desc";
 
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 

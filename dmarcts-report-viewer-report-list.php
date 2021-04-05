@@ -29,8 +29,8 @@
 // for your database authentication and location.
 //
 // Edit the configuration variables in dmarcts-report-viewer.js with your preferences.
-// 
-// 
+//
+//
 //####################################################################
 //### functions ######################################################
 //####################################################################
@@ -103,7 +103,6 @@ $org_select= '';
 $per_select= '';
 $dmarc_select= '';
 $where = '';
-
 
 // Parameters of GET
 // --------------------------------------------------------------------------
