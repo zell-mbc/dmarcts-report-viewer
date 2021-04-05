@@ -165,10 +165,6 @@ if(isset($_GET['dmarc'])){
 	$dmarc_select= '';
 }
 
-if( $dmarc_select == "all" ) {
-	$dmarc_select= '';
-}
-
 // Debug
 // echo "<br />D=$dom_select <br /> O=$org_select <br />";
 // echo "<br />DMARC=$dmarc_select<br />";
@@ -200,23 +196,24 @@ if( $sortorder ) {
 
 // Build SQL WHERE clause
 
-// DMARC
-// dkimresult spfresult
+// DMARC Result
 // --------------------------------------------------------------------------
 switch ($dmarc_select) {
-	case 1: // DKIM and SPF Pass: Green
-		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " (dkimresult='pass' AND spfresult='pass')";
+	case "all": // Everything
 		break;
-	case 3: // DKIM or SPF Fail: Orange
-		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " (dkimresult='fail' OR spfresult='fail')";
+	case 0: // DMARC Fail
+		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " dmarc_result_min = 0 AND dmarc_result_max = 0";
 		break;
-	case 4: // DKIM and SPF Fail: Red
-		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " (dkimresult='fail' AND spfresult='fail')";
+	case 1: // DMARC Pass and Fail
+		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " dmarc_result_min = 0 AND (dmarc_result_max = 1 OR dmarc_result_max = 2)";
 		break;
 	case 2: // Other condition: Yellow
-		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " NOT ((dkimresult='pass' AND spfresult='pass') OR (dkimresult='fail' OR spfresult='fail') OR (dkimresult='fail' AND spfresult='fail'))"; // In other words, "NOT" all three other conditions
+		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " dmarc_result_min >= 3 AND dmarc_result_max >= 3";
 		break;
-	default: 
+	case 3: // DMARC Pass
+		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " (dmarc_result_min = 1 OR dmarc_result_min = 2) AND (dmarc_result_max <= 2)";
+		break;
+	default:
 		break;
 }
 
