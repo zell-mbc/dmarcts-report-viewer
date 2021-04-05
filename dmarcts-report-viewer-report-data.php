@@ -48,7 +48,8 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	$reportdata[] = "";
 	$reportdata[] = "<script type=\"text/javascript\">sorttable();</script>";
 
-//     $reportdata[] = "<!-- Start of report data -->";
+	$reportdata[] = "<!-- Start of report data -->";
+
 	$reportsum    = 0;
 
 	if (isset($reports[$reportnumber])) {
@@ -81,9 +82,12 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	$reportdata[] = "      <th title='" . $title_message . "'>Disposition</th>";
 	$reportdata[] = "      <th title='" . $title_message . "'>Reason</th>";
 	$reportdata[] = "      <th title='" . $title_message . "'>DKIM<br />Domain</th>";
-	$reportdata[] = "      <th title='" . $title_message . "'>DKIM<br />Result</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>DKIM<br />Auth</th>";
 	$reportdata[] = "      <th title='" . $title_message . "'>SPF<br />Domain</th>";
-	$reportdata[] = "      <th title='" . $title_message . "'>SPF<br />Result</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>SPF<br />Auth</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>DKIM<br />Align</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>SPF<br />Align</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>DMARC</th>";
 	$reportdata[] = "    </tr>";
 	$reportdata[] = "  </thead>";
 	$reportdata[] = "  <tbody>";
@@ -126,8 +130,6 @@ WHERE serial = " . $reportnumber;
 
 	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 	while($row = $query->fetch_assoc()) {
-		$status = get_status_color($row);
-
 		if ( $row['ip'] ) {
 			$ip = long2ip($row['ip']);
 		} elseif ( $row['ip6'] ) {
@@ -139,7 +141,7 @@ WHERE serial = " . $reportnumber;
 		/* escape html characters after exploring binary values, which will be messed up */
 		$row = array_map('htmlspecialchars', $row);
 
-		$reportdata[] = "    <tr class='".get_status_color($row)[0]."'>";
+		$reportdata[] = "    <tr class='" . get_dmarc_result($row)['color'] . "' title='DMARC Result: " . get_dmarc_result($row)['result'] . "'>";
 		$reportdata[] = "      <td>". $ip. "</td>";
 		if ( $host_lookup ) {
 			$reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
@@ -150,15 +152,18 @@ WHERE serial = " . $reportnumber;
 		$reportdata[] = "      <td>". $row['disposition']. "</td>";
 		$reportdata[] = "      <td>". $row['reason']. "</td>";
 		$reportdata[] = "      <td>". $row['dkimdomain']. "</td>";
-		$reportdata[] = "      <td>". $row['dkimresult']. "</td>";
+		$reportdata[] = "      <td class='" . get_status_color($row['dkimresult'])['color'] . "'>". $row['dkimresult']. "</td>";
 		$reportdata[] = "      <td>". $row['spfdomain']. "</td>";
-		$reportdata[] = "      <td>". $row['spfresult']. "</td>";
+		$reportdata[] = "      <td class='" . get_status_color($row['spfresult'])['color'] . "'>". $row['spfresult']. "</td>";
+		$reportdata[] = "      <td class='" . get_status_color($row['dkim_align'])['color'] . "'>". $row['dkim_align']. "</td>";
+		$reportdata[] = "      <td class='" . get_status_color($row['spf_align'])['color'] . "'>". $row['spf_align']. "</td>";
+		$reportdata[] = "      <td>" . get_dmarc_result($row)['result'] . "</td>";
 		$reportdata[] = "    </tr>";
 
 		$reportsum += $row['rcount'];
 	}
 	$reportdata[] = "  </tbody>";
-	$reportdata[] = "<tr><td></td><td class='right sum'>Sum:</td><td class='sum'>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
+	$reportdata[] = "<tr><td></td><td class='right sum'>Sum:</td><td class='sum'>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
 	$reportdata[] = "</table>";
 
 	$reportdata[] = "</div>";
