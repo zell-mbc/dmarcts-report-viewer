@@ -70,6 +70,35 @@ $dmarc_result = array(
 function main() {
 
 	include "dmarcts-report-viewer-config.php";
+}
+
+// This function sets variables for the DMARC Result portion (left half-circle) in the Report List
+function get_dmarc_result($row) {
+
+	global $dmarc_result;
+	$color = "";
+	$color_sort_key = "";
+	$result_text = "";
+
+	if (($row['dmarc_result_min'] == 0) && ($row['dmarc_result_max'] == 0)) {
+		$color     = $dmarc_result['DMARC_FAIL']['color'];
+		$color_sort_key = $dmarc_result['DMARC_FAIL']['status_sort_key'];
+		$result_text = $dmarc_result['DMARC_FAIL']['text'];
+	} elseif (($row['dmarc_result_min'] == 0) && ($row['dmarc_result_max'] == 1 || $row['dmarc_result_max'] == 2)) {
+		$color     = $dmarc_result['DMARC_PASS_AND_FAIL']['color'];
+		$color_sort_key = $dmarc_result['DMARC_PASS_AND_FAIL']['status_sort_key'];
+		$result_text = $dmarc_result['DMARC_PASS_AND_FAIL']['text'];
+	} elseif (($row['dmarc_result_min'] == 1 || $row['dmarc_result_min'] == 2) && ($row['dmarc_result_max'] == 1 || $row['dmarc_result_max'] == 2)) {
+		$color     = $dmarc_result['DMARC_PASS']['color'];
+		$color_sort_key = $dmarc_result['DMARC_PASS']['status_sort_key'];
+		$result_text = $dmarc_result['DMARC_PASS']['text'];
+	} else {
+		$color     = $dmarc_result['DMARC_OTHER_CONDITION']['color'];
+		$color_sort_key = $dmarc_result['DMARC_OTHER_CONDITION']['status_sort_key'];
+		$result_text = $dmarc_result['DMARC_OTHER_CONDITION']['text'];
+	}
+	return array('color' => $color, 'status_sort_key' => $color_sort_key, 'result' => $result_text);
+}
 
 }
 
