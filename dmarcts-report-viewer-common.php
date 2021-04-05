@@ -139,30 +139,29 @@ function get_report_status($row) {
 	return array('color' => $color, 'status_sort_key' => $color_sort_key, 'status_text' => $result_text);
 }
 
+// This function sets variables for individual cells in the Report Data table
+function get_status_color($result) {
 
-function get_status_color($row) {
 	global $dmarc_result;
-	$status = "";
-	$status_num = "";
-	if (($row['dkimresult'] == "fail") && ($row['spfresult'] == "fail")) {
-		$status     = $dmarc_result['DKIM_AND_SPF_FAIL']['color'];
-		$status_num = $dmarc_result['DKIM_AND_SPF_FAIL']['status_num'];
-	} elseif (($row['dkimresult'] == "fail") || ($row['spfresult'] == "fail")) {
-		$status     = $dmarc_result['DKIM_OR_SPF_FAIL']['color'];
-		$status_num = $dmarc_result['DKIM_OR_SPF_FAIL']['status_num'];
-	} elseif (($row['dkimresult'] == "pass") && ($row['spfresult'] == "pass")) {
-		$status     = $dmarc_result['DKIM_AND_SPF_PASS']['color'];
-		$status_num = $dmarc_result['DKIM_AND_SPF_PASS']['status_num'];
+	$color = "";
+	$color_sort_key = "";
+
+	if ($result == "fail") {
+		$color = $dmarc_result['DMARC_FAIL']['color'];
+#		$color_sort_key = $dmarc_result['STATUS_FAIL']['status_sort_key'];
+	} elseif ($result == "pass") {
+		$color = $dmarc_result['DMARC_PASS']['color'];
+#		$color_sort_key = $dmarc_result['STATUS_PASS']['status_sort_key'];
 	} else {
-		$status     = $dmarc_result['OTHER_CONDITION']['color'];
-		$status_num = $dmarc_result['OTHER_CONDITION']['status_num'];
+		$color = $dmarc_result['DMARC_OTHER_CONDITION']['color'];
+#		$color_sort_key = $dmarc_result['STATUS_OTHER_CONDITION']['status_sort_key'];
 	}
-#	$status .= "\"><span style='display:none;'>" . $status_content . "</span></span>";
-#	$status_num .= "\"><span style='display:none;'>" . $status_content . "</span></span>";
-    return array($status, $status_num);
+
+    return array('color' => $color, 'status_sort_key' => $color_sort_key);
 }
 
 function format_date($date, $format) {
+
     $answer = date($format, strtotime($date));
     return $answer;
 };
