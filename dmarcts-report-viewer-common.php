@@ -34,26 +34,32 @@
 //### variables ######################################################
 //####################################################################
 
+// The order in which the options appear here is the order they appear in the DMARC Results dropdown box
 $dmarc_result = array(
-	'DKIM_AND_SPF_PASS' => array(
-		'text' => 'DKIM and SPF Pass',
-		'color' => 'lime',
-		'status_num' => 1,
+
+	'DMARC_PASS' => array(
+		'text' => 'Pass',
+		'status_text' => 'All Passed.',
+		'color' => 'green',
+		'status_sort_key' => 3,
 	),
-	'DKIM_OR_SPF_FAIL' => array(
-		'text' => 'DKIM or SPF Fail',
-		'color' => 'orange',
-		'status_num' => 3,
-	),
-	'DKIM_AND_SPF_FAIL' => array(
-		'text' => 'DKIM and SPF Fail',
+	'DMARC_FAIL' => array(
+		'text' => 'Fail',
+		'status_text' => 'All Failed.',
 		'color' => 'red',
-		'status_num' => 4,
+		'status_sort_key' => 0,
 	),
-	'OTHER_CONDITION' => array(
-		'text' => 'Other condition',
+	'DMARC_PASS_AND_FAIL' => array(
+		'text' => 'Mixed',
+		'status_text' => 'At least one failed result.',
+		'color' => 'orange',
+		'status_sort_key' => 1,
+	),
+	'DMARC_OTHER_CONDITION' => array(
+		'text' => 'Other',
+		'status_text' => 'Other condition.',
 		'color' => 'yellow',
-		'status_num' => 2,
+		'status_sort_key' => 2,
 	),
 );
 
