@@ -89,7 +89,38 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	$reportdata[] = "  <tbody>";
 
 	global $mysqli;
-	$sql = "SELECT * FROM rptrecord where serial = $reportnumber" . ( $dmarc_where ? " AND $dmarc_where" : "" ) . " ORDER BY ip ASC";
+
+$sql = "
+SELECT
+    *,
+    (CASE
+		WHEN dkim_align = 'fail' THEN 0
+		WHEN dkim_align = 'pass' THEN 1
+		ELSE 3
+    END)
+    +
+    (CASE
+		WHEN spf_align = 'fail' THEN 0
+		WHEN spf_align = 'pass' THEN 1
+		ELSE 3
+	END)
+	AS dmarc_result_min,
+	(CASE
+		WHEN dkim_align = 'fail' THEN 0
+		WHEN dkim_align = 'pass' THEN 1
+		ELSE 3
+    END)
+    +
+    (CASE
+		WHEN spf_align = 'fail' THEN 0
+		WHEN spf_align = 'pass' THEN 1
+		ELSE 3
+	END)
+	AS dmarc_result_max
+FROM
+    rptrecord
+WHERE serial = " . $reportnumber;
+
 // Debug
 // echo "<br><b>sql reportdata =</b> $sql<br>";
 

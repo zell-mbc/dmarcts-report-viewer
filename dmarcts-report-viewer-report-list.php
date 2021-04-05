@@ -231,15 +231,106 @@ if( $org_select <> '' ) {
 if( $per_select <> '' ) {
 	$ye = substr( $per_select, 0, 4) + 0;
 	$mo = substr( $per_select, 5, 2) + 0;
-	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " ((year(mindate)=$ye AND month(mindate) =$mo) OR (year(maxdate)=$ye AND month(maxdate) =$mo)) ";
+	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " ((year(mindate) = $ye AND month(mindate) = $mo) OR (year(maxdate) = $ye AND month(maxdate) = $mo)) ";
 }
 
 // Include the rcount via left join, so we do not have to make an sql query
 // for every single report.
 // --------------------------------------------------------------------------
-// $where = where_clause($dmarc_select, $dom_select, $org_select, $per_select);
 
-$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimresult) AS dkimresult, MIN(rptrecord.spfresult) AS spfresult FROM report LEFT JOIN (SELECT rcount, COALESCE(dkimresult, 'neutral') AS dkimresult, COALESCE(spfresult, 'neutral') AS spfresult, serial FROM rptrecord) AS rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate $sort, org";
+$sql = "
+SELECT
+    report.*,
+    rcount,
+    dkim_align_min,
+    spf_align_min,
+    dkim_result_min,
+    spf_result_min,
+    dmarc_result_min,
+    dmarc_result_max
+FROM
+    report
+	LEFT JOIN
+		(
+			SELECT
+				SUM(rcount) as rcount,
+				serial,
+				dkim_align,
+				spf_align,
+				dkimresult,
+				spfresult,
+				MIN(
+					(CASE
+						WHEN dkim_align = 'fail' THEN 0
+						WHEN dkim_align = 'pass' THEN 2
+						ELSE 1
+					END)
+				)
+				AS dkim_align_min,
+				MIN(
+					(CASE
+						WHEN spf_align = 'fail' THEN 0
+						WHEN spf_align = 'pass' THEN 2
+						ELSE 1
+					END)
+				)
+				AS spf_align_min,
+				MIN(
+					(CASE
+						WHEN dkimresult = 'fail' THEN 0
+						WHEN dkimresult = 'pass' THEN 2
+						ELSE 1
+					END)
+				)
+				AS dkim_result_min,
+				MIN(
+					(CASE
+						WHEN spfresult = 'fail' THEN 0
+						WHEN spfresult = 'pass' THEN 2
+						ELSE 1
+					END)
+				)
+				AS spf_result_min,
+				MIN(
+					(CASE
+						WHEN dkim_align = 'fail' THEN 0
+						WHEN dkim_align = 'pass' THEN 1
+						ELSE 3
+					END)
+					+
+					(CASE
+						WHEN spf_align = 'fail' THEN 0
+						WHEN spf_align = 'pass' THEN 1
+						ELSE 3
+					END)
+				)
+				AS dmarc_result_min,
+				MAX(
+					(CASE
+						WHEN dkim_align = 'fail' THEN 0
+						WHEN dkim_align = 'pass' THEN 1
+						ELSE 3
+					END)
+					+
+					(CASE
+						WHEN spf_align = 'fail' THEN 0
+						WHEN spf_align = 'pass' THEN 1
+						ELSE 3
+					END)
+				)
+				AS dmarc_result_max
+			FROM
+				rptrecord
+			GROUP BY serial
+		)
+	AS rptrecord
+ON
+	report.serial = rptrecord.serial
+$where
+GROUP BY serial
+ORDER BY
+    mindate $sort,
+    org";
 
 // Debug
 // echo "<br />sql where = $where<br />";
