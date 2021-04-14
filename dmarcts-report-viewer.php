@@ -63,16 +63,17 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 
 	//	Host lookup option
 	//	--------------------------------------------------------------------------
-	$html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span> <input type=\"radio\" name=\"selHostLookup\" value=\"1\" onclick=\"showReport(current_report)\"" . ($default_hostlookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onclick=\"showReport(current_report)\"" . ($default_hostlookup ? "" : " checked=\"checked\"" ) . "> off</div>";
+	$html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span><br>";
+		$html[] = "<input type=\"radio\" name=\"selHostLookup\" value=\"1\" onclick=\"showReport(current_report)\"" . ($default_hostlookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onclick=\"showReport(current_report)\"" . ($default_hostlookup ? "" : " checked=\"checked\"" ) . "> off</div>";
 
 
 	// 	DMARC select
 	// 	--------------------------------------------------------------------------
-		$html[] = "<div class='options'><span class='optionlabel'>DMARC Result:</span>";
+		$html[] = "<div class='options'><span class='optionlabel'>DMARC Result:</span><br>";
 		$html[] = "<select name=\"selDMARC\" id=\"selDMARC\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option " . ( $default_dmarc_result ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 		foreach($dmarc_result as $key => $value) {
-			$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%d\">%s</option>",
+			$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
 					$default_dmarc_result == $key ? "selected=\"selected\"" : "",
 					$key,
 					$value['text'],
@@ -101,7 +102,7 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	// 	Period select
 	// 	--------------------------------------------------------------------------
 	if ( count( $periods ) > 0 ) {
-		$html[] = "<div class='options'><span class='optionlabel'>Month:</span>";
+		$html[] = "<div class='options'><span class='optionlabel'>Month:</span><br>";
 		$html[] = "<select name=\"selPeriod\" id=\"selPeriod\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option value=\"all\">[all]</option>";
 
@@ -121,7 +122,7 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	//	Domains select
 	//	--------------------------------------------------------------------------
 	if ( count( $domains ) >= 1 ) {
-		$html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span>";
+		$html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span><br>";
 		$html[] = "<select name=\"selDomain\" id=\"selDomain\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option " . ( $default_domain ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 
@@ -137,7 +138,7 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	//	Organizations select
 	//	--------------------------------------------------------------------------
 	if ( count( $orgs ) > 0 ) {
-		$html[] = "<div class='options'><span class='optionlabel'>Reporter(s):</span>";
+		$html[] = "<div class='options'><span class='optionlabel'>Reporter(s):</span><br>";
 		$html[] = "<select name=\"selOrganisation\" id=\"selOrganisation\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option " . ( $default_reporter ? "" : "selected=\"selected\" " ) . "selected=\"selected\" value=\"all\">[all]</option>";
 
