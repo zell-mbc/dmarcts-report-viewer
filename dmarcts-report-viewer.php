@@ -82,6 +82,22 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 		$html[] = "</div>";
 
 
+		// 	Report Status select
+		// 	--------------------------------------------------------------------------
+			$html[] = "<div class='options'><span class='optionlabel'>Report Status:</span><br>";
+			$html[] = "<select name=\"ReportStatus\" id=\"selReportStatus\" onchange=\"showReportlist('reportlistTbl')\">";
+			$html[] = "<option " . ( $default_report_status ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
+			foreach($dmarc_result as $key => $value) {
+				$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
+						$default_report_status == $key ? "selected=\"selected\"" : "",
+						$key,
+						$value['status_text'],
+					);
+			}
+			$html[] = "</select>";
+			$html[] = "</div>";
+
+
 	// 	Period select
 	// 	--------------------------------------------------------------------------
 	if ( count( $periods ) > 0 ) {

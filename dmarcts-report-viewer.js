@@ -98,11 +98,13 @@ function showReportlist(str) { // str is the name of the <div> to be filled
 	var org = document.getElementById('selOrganisation').options[document.getElementById('selOrganisation').selectedIndex].value;
 	var period = document.getElementById('selPeriod').options[document.getElementById('selPeriod').selectedIndex].value;
 	var dmarc = document.getElementById('selDMARC').options[document.getElementById('selDMARC').selectedIndex].value;
+	var report_status = document.getElementById('selReportStatus').options[document.getElementById('selReportStatus').selectedIndex].value;
 
 	GETstring += "d=" + domain;
 	GETstring += "&o=" + org;
 	GETstring += "&p=" + period;
 	GETstring += "&dmarc=" + dmarc;
+	GETstring += "&rptstat=" + report_status;
 
 	xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange =

@@ -42,24 +42,28 @@ $dmarc_result = array(
 		'status_text' => 'All Passed',
 		'color' => 'green',
 		'status_sort_key' => 3,
+		'status_sql_where' => "dkim_align_min = 2 AND spf_align_min = 2 AND dkim_result_min = 2 AND spf_result_min = 2 AND dmarc_result_min = 2 AND dmarc_result_max = 2",
 	),
 	'DMARC_FAIL' => array(
 		'text' => 'Fail',
 		'status_text' => 'All Failed',
 		'color' => 'red',
 		'status_sort_key' => 0,
+		'status_sql_where' => "dkim_align_min = 0 AND spf_align_min = 0 AND dkim_result_min = 0 AND spf_result_min = 0 AND dmarc_result_min = 0 AND dmarc_result_max = 0",
 	),
 	'DMARC_PASS_AND_FAIL' => array(
 		'text' => 'Mixed',
 		'status_text' => 'At least one failed result',
 		'color' => 'orange',
 		'status_sort_key' => 1,
+		'status_sql_where' => "( dkim_align_min = 0 OR spf_align_min = 0 OR dkim_result_min = 0 OR spf_result_min = 0 OR dmarc_result_min = 0 OR dmarc_result_max = 0 )",
 	),
 	'DMARC_OTHER_CONDITION' => array(
 		'text' => 'Other',
 		'status_text' => 'Other condition',
 		'color' => 'yellow',
 		'status_sort_key' => 2,
+		'status_sql_where' => "( dkim_align_min = 1 OR spf_align_min = 1 OR dkim_result_min = 1 OR spf_result_min = 1 OR dmarc_result_min >= 3 OR dmarc_result_max >= 3 )",
 	),
 );
 
@@ -106,37 +110,38 @@ function get_report_status($row) {
 	global $dmarc_result;
 	$color = "";
 	$color_sort_key = "";
-	$result_text = "";
+	$status_text = "";
+	$status_sql_where = "";
 
-	$dmarc_status_min = min($row['dkim_align_min'],$row['spf_align_min'],$row['dkim_result_min'],$row['spf_result_min'],$row['dmarc_result_min']);
+	$report_status_min = min($row['dkim_align_min'],$row['spf_align_min'],$row['dkim_result_min'],$row['spf_result_min'],$row['dmarc_result_min']);
 
 	if ($row['dkim_align_min'] == 0 && $row['spf_align_min'] == 0 && $row['dkim_result_min'] == 0 && $row['spf_result_min'] == 0 && $row['dmarc_result_min'] == 0) {
 		$color = $dmarc_result['DMARC_FAIL']['color'];
 		$color_sort_key = $dmarc_result['DMARC_FAIL']['status_sort_key'];
-		$result_text = $dmarc_result['DMARC_FAIL']['status_text'];
+		$status_text = $dmarc_result['DMARC_FAIL']['status_text'];
 	} else {
-		switch ($dmarc_status_min) {
+		switch ($report_status_min) {
 			case 0:
 				$color = $dmarc_result['DMARC_PASS_AND_FAIL']['color'];
 				$color_sort_key = $dmarc_result['DMARC_PASS_AND_FAIL']['status_sort_key'];
-				$result_text = $dmarc_result['DMARC_PASS_AND_FAIL']['status_text'];
+				$status_text = $dmarc_result['DMARC_PASS_AND_FAIL']['status_text'];
 				break;
 			case 1:
 				$color = $dmarc_result['DMARC_OTHER_CONDITION']['color'];
 				$color_sort_key = $dmarc_result['DMARC_OTHER_CONDITION']['status_sort_key'];
-				$result_text = $dmarc_result['DMARC_OTHER_CONDITION']['status_text'];
+				$status_text = $dmarc_result['DMARC_OTHER_CONDITION']['status_text'];
 				break;
 			case 2:
 				$color = $dmarc_result['DMARC_PASS']['color'];
 				$color_sort_key = $dmarc_result['DMARC_PASS']['status_sort_key'];
-				$result_text = $dmarc_result['DMARC_PASS']['status_text'];
+				$status_text = $dmarc_result['DMARC_PASS']['status_text'];
 				break;
 			default:
 				break;
 		}
 	}
 
-	return array('color' => $color, 'status_sort_key' => $color_sort_key, 'status_text' => $result_text);
+	return array('color' => $color, 'status_sort_key' => $color_sort_key, 'status_text' => $status_text);
 }
 
 // This function sets variables for individual cells in the Report Data table
@@ -165,4 +170,3 @@ function format_date($date, $format) {
     $answer = date($format, strtotime($date));
     return $answer;
 };
-

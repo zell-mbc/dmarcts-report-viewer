@@ -108,6 +108,7 @@ $dom_select= '';
 $org_select= '';
 $per_select= '';
 $dmarc_select= '';
+$report_status = '';
 $where = '';
 
 // Parameters of GET
@@ -165,6 +166,12 @@ if(isset($_GET['dmarc'])){
 	$dmarc_select= '';
 }
 
+if(isset($_GET['rptstat'])){
+	$report_status = $_GET['rptstat'];
+}else{
+	$report_status = '';
+}
+
 // Debug
 // echo "<br />D=$dom_select <br /> O=$org_select <br />";
 // echo "<br />DMARC=$dmarc_select<br />";
@@ -215,6 +222,12 @@ switch ($dmarc_select) {
 		break;
 	default:
 		break;
+}
+
+// Report Status
+// --------------------------------------------------------------------------
+if ( $report_status != "all" ) {
+	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " " . $dmarc_result[$report_status]['status_sql_where'];
 }
 
 // Domains
