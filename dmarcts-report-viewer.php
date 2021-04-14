@@ -74,7 +74,7 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 		foreach($dmarc_result as $key => $value) {
 			$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%d\">%s</option>",
 					$default_dmarc_result == $key ? "selected=\"selected\"" : "",
-					$value['status_sort_key'],
+					$key,
 					$value['text'],
 				);
 		}
