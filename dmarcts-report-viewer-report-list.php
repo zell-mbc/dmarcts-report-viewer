@@ -201,16 +201,16 @@ if( $sortorder ) {
 switch ($dmarc_select) {
 	case "all": // Everything
 		break;
-	case 0: // DMARC Fail
+	case "DMARC_FAIL": // DMARC Fail
 		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " dmarc_result_min = 0 AND dmarc_result_max = 0";
 		break;
-	case 1: // DMARC Pass and Fail
+	case "DMARC_PASS_AND_FAIL": // DMARC Pass and Fail
 		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " dmarc_result_min = 0 AND (dmarc_result_max = 1 OR dmarc_result_max = 2)";
 		break;
-	case 2: // Other condition: Yellow
+	case "DMARC_OTHER_CONDITION": // Other condition: Yellow
 		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " dmarc_result_min >= 3 AND dmarc_result_max >= 3";
 		break;
-	case 3: // DMARC Pass
+	case "DMARC_PASS": // DMARC Pass
 		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " (dmarc_result_min = 1 OR dmarc_result_min = 2) AND (dmarc_result_max <= 2)";
 		break;
 	default:
