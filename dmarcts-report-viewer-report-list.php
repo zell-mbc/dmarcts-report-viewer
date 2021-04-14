@@ -243,20 +243,20 @@ if( $per_select <> '' ) {
 
 $sql = "
 SELECT
-    report.*,
-    rcount,
-    dkim_align_min,
-    spf_align_min,
-    dkim_result_min,
-    spf_result_min,
-    dmarc_result_min,
-    dmarc_result_max
+  report.*,
+  rcount,
+  dkim_align_min,
+  spf_align_min,
+  dkim_result_min,
+  spf_result_min,
+  dmarc_result_min,
+  dmarc_result_max
 FROM
-    report
+  report
 	LEFT JOIN
 		(
 			SELECT
-				SUM(rcount) as rcount,
+				SUM(rcount) AS rcount,
 				serial,
 				dkim_align,
 				spf_align,
@@ -324,16 +324,19 @@ FROM
 				AS dmarc_result_max
 			FROM
 				rptrecord
-			GROUP BY serial
+			GROUP BY
+				serial
 		)
-	AS rptrecord
-ON
-	report.serial = rptrecord.serial
+		AS rptrecord
+	ON
+		report.serial = rptrecord.serial
 $where
-GROUP BY serial
+GROUP BY
+	serial
 ORDER BY
     mindate $sort,
-    org";
+    org
+";
 
 // Debug
 // echo "<br />sql where = $where<br />";

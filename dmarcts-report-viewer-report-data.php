@@ -96,34 +96,38 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 
 $sql = "
 SELECT
-    *,
-    (CASE
+  *,
+  (CASE
 		WHEN dkim_align = 'fail' THEN 0
 		WHEN dkim_align = 'pass' THEN 1
 		ELSE 3
-    END)
-    +
-    (CASE
+  END)
+  +
+  (CASE
 		WHEN spf_align = 'fail' THEN 0
 		WHEN spf_align = 'pass' THEN 1
 		ELSE 3
-	END)
+		END)
 	AS dmarc_result_min,
 	(CASE
 		WHEN dkim_align = 'fail' THEN 0
 		WHEN dkim_align = 'pass' THEN 1
 		ELSE 3
-    END)
-    +
-    (CASE
+  END)
+  +
+  (CASE
 		WHEN spf_align = 'fail' THEN 0
 		WHEN spf_align = 'pass' THEN 1
 		ELSE 3
 	END)
 	AS dmarc_result_max
 FROM
-    rptrecord
-WHERE serial = " . $reportnumber . ( $dmarc_where ? " AND $dmarc_where" : "" ) . " ORDER BY ip ASC";
+  rptrecord
+WHERE
+	serial = " . $reportnumber . ( $dmarc_where ? " AND $dmarc_where" : "" ) . "
+ORDER BY
+	ip ASC
+";
 
 // Debug
 // echo "<br><b>sql reportdata =</b> $sql<br>";

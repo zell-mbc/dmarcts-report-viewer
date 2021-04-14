@@ -39,25 +39,25 @@ $dmarc_result = array(
 
 	'DMARC_PASS' => array(
 		'text' => 'Pass',
-		'status_text' => 'All Passed.',
+		'status_text' => 'All Passed',
 		'color' => 'green',
 		'status_sort_key' => 3,
 	),
 	'DMARC_FAIL' => array(
 		'text' => 'Fail',
-		'status_text' => 'All Failed.',
+		'status_text' => 'All Failed',
 		'color' => 'red',
 		'status_sort_key' => 0,
 	),
 	'DMARC_PASS_AND_FAIL' => array(
 		'text' => 'Mixed',
-		'status_text' => 'At least one failed result.',
+		'status_text' => 'At least one failed result',
 		'color' => 'orange',
 		'status_sort_key' => 1,
 	),
 	'DMARC_OTHER_CONDITION' => array(
 		'text' => 'Other',
-		'status_text' => 'Other condition.',
+		'status_text' => 'Other condition',
 		'color' => 'yellow',
 		'status_sort_key' => 2,
 	),
