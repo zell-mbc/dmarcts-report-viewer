@@ -52,7 +52,7 @@ function reset_report_list() {
 
 	filter = document.getElementsByTagName("select");
 	for (i = 0; i < filter.length; i++) {
-		filter[i].value = "all";
+		filter[i].selectedIndex = 0;
 	}
 	refresh_report_list();
 }
@@ -98,11 +98,13 @@ function showReportlist(str) { // str is the name of the <div> to be filled
 	var org = document.getElementById('selOrganisation').options[document.getElementById('selOrganisation').selectedIndex].value;
 	var period = document.getElementById('selPeriod').options[document.getElementById('selPeriod').selectedIndex].value;
 	var dmarc = document.getElementById('selDMARC').options[document.getElementById('selDMARC').selectedIndex].value;
+	var report_status = document.getElementById('selReportStatus').options[document.getElementById('selReportStatus').selectedIndex].value;
 
 	GETstring += "d=" + domain;
 	GETstring += "&o=" + org;
 	GETstring += "&p=" + period;
 	GETstring += "&dmarc=" + dmarc;
+	GETstring += "&rptstat=" + report_status;
 
 	xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange =
@@ -122,7 +124,7 @@ function showReportlist(str) { // str is the name of the <div> to be filled
 							document.getElementById('resizer_vertical').style.display = 'none';
 				}
 			}
-		}
+		};
 
 	xhttp.open("GET", "dmarcts-report-viewer-report-list.php" + GETstring, true);
 	xhttp.send();
@@ -273,7 +275,7 @@ function showReport(str) {
 					showXML("open_xml");
 				}
 			}
-		}
+		};
 
 	xhttp.open("GET", "dmarcts-report-viewer-report-data.php?" + GETstring, true);
 	xhttp.send();

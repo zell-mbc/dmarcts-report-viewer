@@ -29,8 +29,8 @@
 // for your database authentication and location.
 //
 // Edit the configuration variables in dmarcts-report-viewer.js with your preferences.
-// 
-// 
+//
+//
 //####################################################################
 //### functions ######################################################
 //####################################################################
@@ -42,7 +42,8 @@ function tmpl_reportList($reports, $sort) {
 	if (sizeof($reports) == 0) {
 		$reportlist[] = "<div class='center'><b>No Reports Match this filter</b><br />Click the <i>Reset</i> button or choose a different value for <i>DMARC Result</i>, <i>Month</i>, <i>Domain(s)</i> or <i>Reporter(s)</i>.</div>";
 	} else {
-		$title_message = "Click to toggle sort direction by this column";
+		$title_message_th = "Click to toggle sort direction by this column.";
+		$title_message_tr = "Click to view detailed report data.";
 	// echo $sort;
 		//	Resizer handles
 		//	--------------------------------------------------------------------------
@@ -51,13 +52,15 @@ function tmpl_reportList($reports, $sort) {
 		$reportlist[] = "<table id='reportlistTbl' class='reportlist'>";
 		$reportlist[] = "  <thead>";
 		$reportlist[] = "    <tr>";
-		$reportlist[] = "      <th title='" . $title_message . "'><span class=\"circle_black\"><span style='display:none;'>1</span></span></th>";
-		$reportlist[] = "      <th class=\"" . strtolower($sort) . "_triangle\" title='" . $title_message . "'>Start Date</th>";
-		$reportlist[] = "      <th title='" . $title_message . "'>End Date</th>";
-		$reportlist[] = "      <th title='" . $title_message . "'>Domain</th>";
-		$reportlist[] = "      <th title='" . $title_message . "'>Reporting Organization</th>";
-		$reportlist[] = "      <th title='" . $title_message . " (currently doesn&#39;t really sort well)'>Report ID</th>";
-		$reportlist[] = "      <th title='" . $title_message . "'>Messages</th>";
+		$reportlist[] = "      <th class='circle_container' style='padding-left: 5px' title='DMARC Result. " . $title_message_th . "'><div class='circle circle_left circle_black'></div><span style='display:none;'>1</span></span></th>";
+		$reportlist[] = "      <th class='circle_container'></th>";
+		$reportlist[] = "      <th class='circle_container' title='SPF/DKIM/DMARC Results. " . $title_message_th . "'><div class='circle circle_right circle_black'></div><span style='display:none;'>1</span></span></th>";
+		$reportlist[] = "      <th class=\"" . strtolower($sort) . "_triangle\" title='" . $title_message_th . "'>Start Date</th>";
+		$reportlist[] = "      <th title='" . $title_message_th . "'>End Date</th>";
+		$reportlist[] = "      <th title='" . $title_message_th . "'>Domain</th>";
+		$reportlist[] = "      <th title='" . $title_message_th . "'>Reporting Organization</th>";
+		$reportlist[] = "      <th title='" . $title_message_th . " (currently doesn&#39;t really sort well)'>Report ID</th>";
+		$reportlist[] = "      <th title='" . $title_message_th . "'>Messages</th>";
 		$reportlist[] = "    </tr>";
 		$reportlist[] = "  </thead>";
 
@@ -67,20 +70,23 @@ function tmpl_reportList($reports, $sort) {
 		foreach ($reports as $row) {
 			$row = array_map('htmlspecialchars', $row);
 			$date_output_format = "Y-m-d G:i:s T";
-			$reportlist[] =  "    <tr class='linkable' onclick=\"showReport('" . $row['serial'] . "')\" id='report" . $row['serial'] . "'>";
-			$reportlist[] =  "      <td class='right'><span class=\"circle_".get_status_color($row)[0]."\"><span style='display:none;'>" . get_status_color($row)[1] . "</span></span></td>"; // Col 0
+			$reportlist[] =  "    <tr class='linkable' onclick=\"showReport('" . $row['serial'] . "')\" id='report" . $row['serial'] . "' title='" . $title_message_tr . "'>";
+
+			$reportlist[] =  "      <td class='circle_container'><span class='status_sort_key'>" . get_dmarc_result($row)['status_sort_key'] . "</span></td>"; // Col 0
+			$reportlist[] =  "      <td class='circle_container'><div style='white-space: nowrap;' title='DMARC: " . get_dmarc_result($row)['result'] . "\nSPF/DKIM/DMARC: " . get_report_status($row)['status_text'] . "\n" . $title_message_tr . "'><div class='circle circle_left circle_" . get_dmarc_result($row)['color'] . "'></div><div class='circle circle_right circle_" . get_report_status($row)['color'] . "'></div></div></td>"; // Col 0
+			$reportlist[] =  "      <td class='circle_container'><span class='status_sort_key'>" . get_report_status($row)['status_sort_key'] . "</span></span></td>"; // Col 0
 			$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";   // Col 1
 			$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";   // Col 3
 			$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";                                     // Col 5
 			$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";                                        // Col 6
 			$reportlist[] =  "      <td class='center'>". $row['reportid'] . "</td>";
-			$reportlist[] =  "      <td class='center'>". number_format($row['rcount']+0,0). "</td>";                  // Col 9
+			$reportlist[] =  "      <td class='right'>". number_format($row['rcount']+0,0). "</td>";                  // Col 9
 			$reportlist[] =  "    </tr>";
 			$reportsum += $row['rcount'];
 		}
 
 		$reportlist[] =  "  </tbody>";
-		$reportlist[] = "<tr class='sum'><td></td><td></td><td></td><td></td><td></td><td class='right'>Sum:</td><td class='center'>".number_format($reportsum,0)."</td></tr>";
+		$reportlist[] = "<tr class='sum'><td class='circle_container'></td><td class='circle_container'></td><td class='circle_container'></td><td></td><td></td><td></td><td></td><td class='right'>Sum:</td><td class='right'>".number_format($reportsum,0)."</td></tr>";
 		$reportlist[] =  "</table>";
 
 		$reportlist[] = "<!-- End of report list -->";
@@ -102,8 +108,8 @@ $dom_select= '';
 $org_select= '';
 $per_select= '';
 $dmarc_select= '';
+$report_status = '';
 $where = '';
-
 
 // Parameters of GET
 // --------------------------------------------------------------------------
@@ -160,8 +166,10 @@ if(isset($_GET['dmarc'])){
 	$dmarc_select= '';
 }
 
-if( $dmarc_select == "all" ) {
-	$dmarc_select= '';
+if(isset($_GET['rptstat'])){
+	$report_status = $_GET['rptstat'];
+}else{
+	$report_status = '';
 }
 
 // Debug
@@ -195,24 +203,31 @@ if( $sortorder ) {
 
 // Build SQL WHERE clause
 
-// DMARC
-// dkimresult spfresult
+// DMARC Result
 // --------------------------------------------------------------------------
 switch ($dmarc_select) {
-	case 1: // DKIM and SPF Pass: Green
-		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " (dkimresult='pass' AND spfresult='pass')";
+	case "all": // Everything
 		break;
-	case 3: // DKIM or SPF Fail: Orange
-		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " (dkimresult='fail' OR spfresult='fail')";
+	case "DMARC_FAIL": // DMARC Fail
+		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " dmarc_result_min = 0 AND dmarc_result_max = 0";
 		break;
-	case 4: // DKIM and SPF Fail: Red
-		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " (dkimresult='fail' AND spfresult='fail')";
+	case "DMARC_PASS_AND_FAIL": // DMARC Pass and Fail
+		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " dmarc_result_min = 0 AND (dmarc_result_max = 1 OR dmarc_result_max = 2)";
 		break;
-	case 2: // Other condition: Yellow
-		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " NOT ((dkimresult='pass' AND spfresult='pass') OR (dkimresult='fail' OR spfresult='fail') OR (dkimresult='fail' AND spfresult='fail'))"; // In other words, "NOT" all three other conditions
+	case "DMARC_OTHER_CONDITION": // Other condition: Yellow
+		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " dmarc_result_min >= 3 AND dmarc_result_max >= 3";
 		break;
-	default: 
+	case "DMARC_PASS": // DMARC Pass
+		$where .= ( $where <> '' ? " AND" : " WHERE" ) . " (dmarc_result_min = 1 OR dmarc_result_min = 2) AND (dmarc_result_max <= 2)";
 		break;
+	default:
+		break;
+}
+
+// Report Status
+// --------------------------------------------------------------------------
+if ( $report_status != "all" ) {
+	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " " . $dmarc_result[$report_status]['status_sql_where'];
 }
 
 // Domains
@@ -232,15 +247,109 @@ if( $org_select <> '' ) {
 if( $per_select <> '' ) {
 	$ye = substr( $per_select, 0, 4) + 0;
 	$mo = substr( $per_select, 5, 2) + 0;
-	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " ((year(mindate)=$ye AND month(mindate) =$mo) OR (year(maxdate)=$ye AND month(maxdate) =$mo)) ";
+	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " ((year(mindate) = $ye AND month(mindate) = $mo) OR (year(maxdate) = $ye AND month(maxdate) = $mo)) ";
 }
 
 // Include the rcount via left join, so we do not have to make an sql query
 // for every single report.
 // --------------------------------------------------------------------------
-// $where = where_clause($dmarc_select, $dom_select, $org_select, $per_select);
 
-$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimresult) AS dkimresult, MIN(rptrecord.spfresult) AS spfresult FROM report LEFT JOIN (SELECT rcount, COALESCE(dkimresult, 'neutral') AS dkimresult, COALESCE(spfresult, 'neutral') AS spfresult, serial FROM rptrecord) AS rptrecord ON report.serial = rptrecord.serial $where GROUP BY serial ORDER BY mindate $sort, org";
+$sql = "
+SELECT
+  report.*,
+  rcount,
+  dkim_align_min,
+  spf_align_min,
+  dkim_result_min,
+  spf_result_min,
+  dmarc_result_min,
+  dmarc_result_max
+FROM
+  report
+	LEFT JOIN
+		(
+			SELECT
+				SUM(rcount) AS rcount,
+				serial,
+				dkim_align,
+				spf_align,
+				dkimresult,
+				spfresult,
+				MIN(
+					(CASE
+						WHEN dkim_align = 'fail' THEN 0
+						WHEN dkim_align = 'pass' THEN 2
+						ELSE 1
+					END)
+				)
+				AS dkim_align_min,
+				MIN(
+					(CASE
+						WHEN spf_align = 'fail' THEN 0
+						WHEN spf_align = 'pass' THEN 2
+						ELSE 1
+					END)
+				)
+				AS spf_align_min,
+				MIN(
+					(CASE
+						WHEN dkimresult = 'fail' THEN 0
+						WHEN dkimresult = 'pass' THEN 2
+						ELSE 1
+					END)
+				)
+				AS dkim_result_min,
+				MIN(
+					(CASE
+						WHEN spfresult = 'fail' THEN 0
+						WHEN spfresult = 'pass' THEN 2
+						ELSE 1
+					END)
+				)
+				AS spf_result_min,
+				MIN(
+					(CASE
+						WHEN dkim_align = 'fail' THEN 0
+						WHEN dkim_align = 'pass' THEN 1
+						ELSE 3
+					END)
+					+
+					(CASE
+						WHEN spf_align = 'fail' THEN 0
+						WHEN spf_align = 'pass' THEN 1
+						ELSE 3
+					END)
+				)
+				AS dmarc_result_min,
+				MAX(
+					(CASE
+						WHEN dkim_align = 'fail' THEN 0
+						WHEN dkim_align = 'pass' THEN 1
+						ELSE 3
+					END)
+					+
+					(CASE
+						WHEN spf_align = 'fail' THEN 0
+						WHEN spf_align = 'pass' THEN 1
+						ELSE 3
+					END)
+				)
+				AS dmarc_result_max
+			FROM
+				rptrecord
+			GROUP BY
+				serial
+		)
+		AS rptrecord
+	ON
+		report.serial = rptrecord.serial
+$where
+GROUP BY
+	serial
+ORDER BY
+    mindate $sort,
+    org
+";
 
 // Debug
 // echo "<br />sql where = $where<br />";
