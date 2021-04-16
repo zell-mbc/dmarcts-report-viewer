@@ -232,8 +232,10 @@ function showReport(str) {
 
 	if (str == null) {
 		// Hide handles
-		getElementById('resizer_horizontal').display = 'none';
-		getElementById('resizer_vertical').display = 'none';
+		document.getElementById('resizer_horizontal').display = 'none';
+		document.getElementById('resizer_vertical').display = 'none';
+		document.getElementById('screen_overlay').style.display = "none";
+		document.getElementById('screen_overlay').style.cursor = "default";
 		alert('No report is selected.');
 		return;
 	}
