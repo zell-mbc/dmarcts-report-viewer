@@ -76,7 +76,7 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 			$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
 					$default_dmarc_result == $key ? "selected=\"selected\"" : "",
 					$key,
-					$value['text'],
+					$value['text']
 				);
 		}
 		$html[] = "</select>";
@@ -92,7 +92,7 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 				$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
 						$default_report_status == $key ? "selected=\"selected\"" : "",
 						$key,
-						$value['status_text'],
+						$value['status_text']
 					);
 			}
 			$html[] = "</select>";
