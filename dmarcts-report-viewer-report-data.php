@@ -48,14 +48,14 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	$reportdata[] = "";
 	$reportdata[] = "<script type=\"text/javascript\">sorttable();</script>";
 
-//     $reportdata[] = "<!-- Start of report data -->";
+	$reportdata[] = "<!-- Start of report data -->";
+
 	$reportsum    = 0;
 
 	if (isset($reports[$reportnumber])) {
 		$row = $reports[$reportnumber];
 		$row['raw_xml'] = formatXML($row['raw_xml']);
 		$row = array_map('htmlspecialchars', $row);
-//         $reportdata[] = "<a id='rpt".$reportnumber."'></a>";
 
 		$reportdata[] = "<div id='report_desc_container' class='center reportdesc_container'>";
 		$reportdata[] = "<div id='report_desc' class='center reportdesc'>Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row['policy_adkim'] . ", aspf=" . $row['policy_aspf'] .  ", p=" . $row['policy_p'] .  ", sp=" . $row['policy_sp'] .  ", pct=" . $row['policy_pct'] . "</div>";
@@ -82,23 +82,58 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	$reportdata[] = "      <th title='" . $title_message . "'>Disposition</th>";
 	$reportdata[] = "      <th title='" . $title_message . "'>Reason</th>";
 	$reportdata[] = "      <th title='" . $title_message . "'>DKIM<br />Domain</th>";
-	$reportdata[] = "      <th title='" . $title_message . "'>DKIM<br />Result</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>DKIM<br />Auth</th>";
 	$reportdata[] = "      <th title='" . $title_message . "'>SPF<br />Domain</th>";
-	$reportdata[] = "      <th title='" . $title_message . "'>SPF<br />Result</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>SPF<br />Auth</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>DKIM<br />Align</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>SPF<br />Align</th>";
+	$reportdata[] = "      <th title='" . $title_message . "'>DMARC</th>";
 	$reportdata[] = "    </tr>";
 	$reportdata[] = "  </thead>";
-
 	$reportdata[] = "  <tbody>";
 
 	global $mysqli;
-	$sql = "SELECT * FROM rptrecord where serial = $reportnumber" . ( $dmarc_where ? " AND $dmarc_where" : "" ) . " ORDER BY ip ASC";
+
+$sql = "
+SELECT
+  *,
+  (CASE
+		WHEN dkim_align = 'fail' THEN 0
+		WHEN dkim_align = 'pass' THEN 1
+		ELSE 3
+  END)
+  +
+  (CASE
+		WHEN spf_align = 'fail' THEN 0
+		WHEN spf_align = 'pass' THEN 1
+		ELSE 3
+		END)
+	AS dmarc_result_min,
+	(CASE
+		WHEN dkim_align = 'fail' THEN 0
+		WHEN dkim_align = 'pass' THEN 1
+		ELSE 3
+  END)
+  +
+  (CASE
+		WHEN spf_align = 'fail' THEN 0
+		WHEN spf_align = 'pass' THEN 1
+		ELSE 3
+	END)
+	AS dmarc_result_max
+FROM
+  rptrecord
+WHERE
+	serial = " . $reportnumber . ( $dmarc_where ? " AND $dmarc_where" : "" ) . "
+ORDER BY
+	ip ASC
+";
+
 // Debug
 // echo "<br><b>sql reportdata =</b> $sql<br>";
 
 	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 	while($row = $query->fetch_assoc()) {
-		$status = get_status_color($row);
-
 		if ( $row['ip'] ) {
 			$ip = long2ip($row['ip']);
 		} elseif ( $row['ip6'] ) {
@@ -110,7 +145,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 		/* escape html characters after exploring binary values, which will be messed up */
 		$row = array_map('htmlspecialchars', $row);
 
-		$reportdata[] = "    <tr class='".get_status_color($row)[0]."'>";
+		$reportdata[] = "    <tr class='" . get_dmarc_result($row)['color'] . "' title='DMARC Result: " . get_dmarc_result($row)['result'] . "'>";
 		$reportdata[] = "      <td>". $ip. "</td>";
 		if ( $host_lookup ) {
 			$reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
@@ -121,15 +156,18 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 		$reportdata[] = "      <td>". $row['disposition']. "</td>";
 		$reportdata[] = "      <td>". $row['reason']. "</td>";
 		$reportdata[] = "      <td>". $row['dkimdomain']. "</td>";
-		$reportdata[] = "      <td>". $row['dkimresult']. "</td>";
+		$reportdata[] = "      <td class='" . get_status_color($row['dkimresult'])['color'] . "'>". $row['dkimresult']. "</td>";
 		$reportdata[] = "      <td>". $row['spfdomain']. "</td>";
-		$reportdata[] = "      <td>". $row['spfresult']. "</td>";
+		$reportdata[] = "      <td class='" . get_status_color($row['spfresult'])['color'] . "'>". $row['spfresult']. "</td>";
+		$reportdata[] = "      <td class='" . get_status_color($row['dkim_align'])['color'] . "'>". $row['dkim_align']. "</td>";
+		$reportdata[] = "      <td class='" . get_status_color($row['spf_align'])['color'] . "'>". $row['spf_align']. "</td>";
+		$reportdata[] = "      <td>" . get_dmarc_result($row)['result'] . "</td>";
 		$reportdata[] = "    </tr>";
 
 		$reportsum += $row['rcount'];
 	}
 	$reportdata[] = "  </tbody>";
-	$reportdata[] = "<tr><td></td><td class='right sum'>Sum:</td><td class='sum'>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
+	$reportdata[] = "<tr><td></td><td class='right sum'>Sum:</td><td class='sum'>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
 	$reportdata[] = "</table>";
 
 	$reportdata[] = "</div>";
@@ -232,16 +270,16 @@ if( $sortorder ) {
 // dkimresult spfresult
 // --------------------------------------------------------------------------
 switch ($dmarc_select) {
-	case 1: // DKIM and SPF Pass: Green
+	case "DMARC_PASS": // DKIM and SPF Pass: Green
 		$dmarc_where = "(rptrecord.dkimresult='pass' AND rptrecord.spfresult='pass')";
 		break;
-	case 3: // DKIM or SPF Fail: Orange
+	case "DMARC_PASS_AND_FAIL": // DKIM or SPF Fail: Orange
 		$dmarc_where = "(rptrecord.dkimresult='fail' OR rptrecord.spfresult='fail')";
 		break;
-	case 4: // DKIM and SPF Fail: Red
+	case "DMARC_FAIL": // DKIM and SPF Fail: Red
 		$dmarc_where = "(rptrecord.dkimresult='fail' AND rptrecord.spfresult='fail')";
 		break;
-	case 2: // Other condition: Yellow
+	case "DMARC_OTHER_CONDITION": // Other condition: Yellow
 		$dmarc_where = "NOT ((rptrecord.dkimresult='pass' AND rptrecord.spfresult='pass') OR (rptrecord.dkimresult='fail' OR rptrecord.spfresult='fail') OR (rptrecord.dkimresult='fail' AND rptrecord.spfresult='fail'))"; // In other words, "NOT" all three other conditions
 		break;
 	default:
@@ -252,7 +290,14 @@ switch ($dmarc_select) {
 // for every single report.
 // --------------------------------------------------------------------------
 
-$sql = "SELECT report.* , sum(rptrecord.rcount) AS rcount, MIN(rptrecord.dkimresult) AS dkimresult, MIN(rptrecord.spfresult) AS spfresult FROM report LEFT JOIN (SELECT rcount, COALESCE(dkimresult, 'neutral') AS dkimresult, COALESCE(spfresult, 'neutral') AS spfresult, serial FROM rptrecord) AS rptrecord ON report.serial = rptrecord.serial WHERE report.serial = " . $mysqli->real_escape_string($reportid) . " GROUP BY serial ORDER BY mindate $sort, maxdate $sort , org";
+$sql = "
+SELECT
+	*
+FROM
+	report
+WHERE
+	serial = " . $mysqli->real_escape_string($reportid)
+;
 
 // Debug
 // echo "<br /><b>Data Report sql:</b> $sql<br />";
