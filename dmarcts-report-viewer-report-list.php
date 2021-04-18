@@ -348,13 +348,13 @@ $where
 GROUP BY
 	serial
 ORDER BY
+    " . $cookie_options['sort_column'] . ( $cookie_options['sort'] ? " ASC" : " DESC" )
+;
 
 // Debug
 // echo "<br />sql where = $where<br />";
 // echo "<br /><b>Data List sql:</b>  $sql<br />";
 // echo "<br />per_select = " . urlencode($per_select) . "<br />";
-    " . $cookie_options['sort_column'] . ( $cookie_options['sort'] ? " ASC" : " DESC" )
-;
 
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 while($row = $query->fetch_assoc()) {
