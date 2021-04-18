@@ -34,27 +34,34 @@
 //### functions ######################################################
 //####################################################################
 
-function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_domain = undef, $default_reporter = undef, $cssfile, $domains = array(), $orgs = array(), $periods = array() ) {
+function html ($domains = array(), $orgs = array(), $periods = array() ) {
 
 	global $dmarc_result;
 
+	global $options;
+	global $cookie_options;
 	$html       = array();
-
 	$html[] = "<!DOCTYPE html>";
 	$html[] = "<html>";
 	$html[] = "  <head>";
 	$html[] = "    <title>DMARC Report Viewer</title>";
-	$html[] = "    <link rel='stylesheet' href='$cssfile'>";
+	$html[] = "    <link rel='stylesheet' href='" . $cookie_options['cssfile'] . "'>";
 	$html[] = "    <script src='dmarcts-report-viewer.js'></script>";
+	$html[] = "    <script>";
+	$html[] = "      var report_list_height_percent = " . $cookie_options["report_list_height_percent"] . ";";
+	$html[] = "      var report_data_xml_width_percent = " . $cookie_options["report_data_xml_width_percent"] . ";";
+	$html[] = "      var xml_data_open = " . $cookie_options['xml_data_open'] . ";";
+	$html[] = "    </script>";
 	$html[] = "    <meta charset=\"UTF-8\" />";
 	$html[] = "    <meta name='google' content='notranslate' />";
 	$html[] = "    <meta http-equiv=\"Content-Language\" content=\"en_US\" />";
 	$html[] = "  </head>";
 
-	$html[] = "  <body id='body' onload=showReportlist('reportlistTbl');set_heights(); onresize=showResizers();>";
+	$html[] = "  <body id='body' onload=showReportlist('reportlistTbl'); onresize=showResizers();>";
 	$html[] = "<div id='screen_overlay' onclick=\"hideMenu();\" style=\"top: 0;left: 0;height: 100%;width: 100%;position: absolute;display: none;z-index: 1;\">
     ";
 	$html[] = "</div>";
+
 
 	//	Optionblock form
 	//	--------------------------------------------------------------------------
@@ -64,17 +71,19 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	//	Host lookup option
 	//	--------------------------------------------------------------------------
 	$html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span><br>";
-		$html[] = "<input type=\"radio\" name=\"selHostLookup\" value=\"1\" onclick=\"showReport(current_report)\"" . ($default_hostlookup ? " checked=\"checked\"" : "" ) . "> on<input type=\"radio\" name=\"selHostLookup\" value=\"0\" onclick=\"showReport(current_report)\"" . ($default_hostlookup ? "" : " checked=\"checked\"" ) . "> off</div>";
+	$html[] = "	<input type=\"radio\" name=\"HostLookup\" value=\"1\" onclick=\"showReport(current_report)\"" . ($cookie_options['HostLookup'] ? " checked=\"checked\"" : "" ) . "> on";
+	$html[] = "	<input type=\"radio\" name=\"HostLookup\" value=\"0\" onclick=\"showReport(current_report)\"" . ($cookie_options['HostLookup'] ? "" : " checked=\"checked\"" ) . "> off";
+	$html[] = "</div>";
 
 
 	// 	DMARC select
 	// 	--------------------------------------------------------------------------
 		$html[] = "<div class='options'><span class='optionlabel'>DMARC Result:</span><br>";
-		$html[] = "<select name=\"selDMARC\" id=\"selDMARC\" onchange=\"showReportlist('reportlistTbl')\">";
-		$html[] = "<option " . ( $default_dmarc_result ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
+		$html[] = "<select name=\"DMARC\" id=\"selDMARC\" onchange=\"showReportlist('reportlistTbl')\">";
+		$html[] = "<option " . ( $cookie_options['DMARC'] ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 		foreach($dmarc_result as $key => $value) {
 			$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
-					$default_dmarc_result == $key ? "selected=\"selected\"" : "",
+					$cookie_options['DMARC'] == $key ? "selected=\"selected\"" : "",
 					$key,
 					$value['text']
 				);
@@ -87,10 +96,10 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 		// 	--------------------------------------------------------------------------
 			$html[] = "<div class='options'><span class='optionlabel'>Report Status:</span><br>";
 			$html[] = "<select name=\"ReportStatus\" id=\"selReportStatus\" onchange=\"showReportlist('reportlistTbl')\">";
-			$html[] = "<option " . ( $default_report_status ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
+			$html[] = "<option " . ( $cookie_options['ReportStatus'] ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 			foreach($dmarc_result as $key => $value) {
 				$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
-						$default_report_status == $key ? "selected=\"selected\"" : "",
+						$cookie_options['ReportStatus'] == $key ? "selected=\"selected\"" : "",
 						$key,
 						$value['status_text']
 					);
@@ -103,12 +112,12 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	// 	--------------------------------------------------------------------------
 	if ( count( $periods ) > 0 ) {
 		$html[] = "<div class='options'><span class='optionlabel'>Month:</span><br>";
-		$html[] = "<select name=\"selPeriod\" id=\"selPeriod\" onchange=\"showReportlist('reportlistTbl')\">";
-		$html[] = "<option value=\"all\">[all]</option>";
+		$html[] = "<select name=\"Period\" id=\"selPeriod\" onchange=\"showReportlist('reportlistTbl')\">";
+		$html[] = "<option value=\"all\"" . ($cookie_options['Period'] ? "" : " selected=\"selected\"") . ">[all]</option>";
 
 		for ($p = 0; $p < sizeof($periods); $p++) {
 			$arg = "";
-			if( $p == 0 ) {
+			if( $p == 0 && $cookie_options['Period'] == 1 ) {
 				$arg =" selected=\"selected\"";
 			}
 			$html[] = "<option $arg value=\"$periods[$p]\">$periods[$p]</option>";
@@ -123,11 +132,11 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	//	--------------------------------------------------------------------------
 	if ( count( $domains ) >= 1 ) {
 		$html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span><br>";
-		$html[] = "<select name=\"selDomain\" id=\"selDomain\" onchange=\"showReportlist('reportlistTbl')\">";
-		$html[] = "<option " . ( $default_domain ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
+		$html[] = "<select name=\"Domain\" id=\"selDomain\" onchange=\"showReportlist('reportlistTbl')\">";
+		$html[] = "<option " . ( $cookie_options['Domain'] ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 
 		foreach( $domains as $d) {
-			$html[] = "<option " . ( $default_domain == $d ? "selected=\"selected\" " : "" ) . "value=\"$d\">$d</option>";
+			$html[] = "<option " . ( $cookie_options['Domain'] == $d ? "selected=\"selected\" " : "" ) . "value=\"$d\">$d</option>";
 		}
 
 		$html[] = "</select>";
@@ -139,11 +148,11 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	//	--------------------------------------------------------------------------
 	if ( count( $orgs ) > 0 ) {
 		$html[] = "<div class='options'><span class='optionlabel'>Reporter(s):</span><br>";
-		$html[] = "<select name=\"selOrganisation\" id=\"selOrganisation\" onchange=\"showReportlist('reportlistTbl')\">";
-		$html[] = "<option " . ( $default_reporter ? "" : "selected=\"selected\" " ) . "selected=\"selected\" value=\"all\">[all]</option>";
+		$html[] = "<select name=\"Organisation\" id=\"selOrganisation\" onchange=\"showReportlist('reportlistTbl')\">";
+		$html[] = "<option " . ( $cookie_options['Organisation'] ? "" : "selected=\"selected\" " ) . "selected=\"selected\" value=\"all\">[all]</option>";
 
 		foreach( $orgs as $o) {
-			$html[] = "<option " . ( $default_reporter == $o ? "selected=\"selected\" " : "" ) . "value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
+			$html[] = "<option " . ( $cookie_options['Organisation'] == $o ? "selected=\"selected\" " : "" ) . "value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
 		}
 
 		$html[] = "</select>";
@@ -153,13 +162,13 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	//	Refresh button
 	//	--------------------------------------------------------------------------
 	$html[] = "<div class='options'>";
-	$html[] = "<button type=\"button\" onclick=\"refresh_report_list()\" title=\"Refreshes data with current filter.\">Refresh</button>";
+	$html[] = "&nbsp;<br><button type=\"button\" onclick=\"refresh_report_list()\" title=\"Refreshes data with current filter.\">Refresh</button>";
 	$html[] = "</div>";
 
 	//	Reset button
 	//	--------------------------------------------------------------------------
-	$html[] = "<div class='options' style='border-right: 0px;'>";
-	$html[] = "<button type=\"button\" onclick=\"reset_report_list()\" title=\"Resets the filter to show all records and refreshes the data.\">Reset</button>";
+	$html[] = "<div class='options'>";
+	$html[] = "&nbsp;<br><button type=\"button\" onclick=\"reset_report_list()\" title=\"Resets the filter to show all records and refreshes the data.\">Reset</button>";
 	$html[] = "</div>";
 
 	// Configuration Settings icon
@@ -223,6 +232,7 @@ if ($mysqli->connect_errno) {
 // 	echo "Database connection information: <br />dbhost: " . $dbhost . "<br />dbuser: " . $dbuser . "<br />dbpass: " . $dbpass . "<br />dbname: " . $dbname . "<br />dbport: " . $dbport . "<br />";
 	exit;
 }
+
 
 // Get all domains reported
 // --------------------------------------------------------------------------
@@ -290,11 +300,6 @@ while($row = $query->fetch_assoc()) {
 // Generate Page with report list and report data (if a report is selected).
 // --------------------------------------------------------------------------
 echo html(
-	$default_hostlookup,
-	$default_dmarc_result,
-	$default_domain,
-	$default_reporter,
-	$cssfile,
 	$domains,
 	$orgs,
 	$periods

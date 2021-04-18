@@ -38,6 +38,7 @@
 function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 
 	global $dmarc_where;
+	global $cookie_options;
 
 	$title_message = "Click to toggle sort direction by this column";
 
@@ -60,7 +61,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 		$reportdata[] = "<div id='report_desc_container' class='center reportdesc_container'>";
 		$reportdata[] = "<div id='report_desc' class='center reportdesc'>Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row['policy_adkim'] . ", aspf=" . $row['policy_aspf'] .  ", p=" . $row['policy_p'] .  ", sp=" . $row['policy_sp'] .  ", pct=" . $row['policy_pct'] . "</div>";
 
-		$reportdata[] = "<div style='display:inline-block;margin-left:20px;'><img src='xml.png' id='xml_html_img' width='30px' alt='Show Raw Report XML' title='Show Raw Report XML' onclick='showXML()'></div>";
+		$reportdata[] = "<div style='display:inline-block;margin-left:20px;'><img src='xml.png' id='xml_html_img' width='30px' alt='Show Raw Report XML' title='Show Raw Report XML' onclick='report_data_xml_display_toggle()'></div>";
 
 		$reportdata[] = "</div>";
 
@@ -129,9 +130,6 @@ ORDER BY
 	ip ASC
 ";
 
-// Debug
-// echo "<br><b>sql reportdata =</b> $sql<br>";
-
 	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
 	while($row = $query->fetch_assoc()) {
 		if ( $row['ip'] ) {
@@ -172,7 +170,6 @@ ORDER BY
 
 	$reportdata[] = "</div>";
 
-
 	$reportdata[] = "";
 
 	#indent generated html by 2 extra spaces
@@ -180,6 +177,7 @@ ORDER BY
 }
 
 function formatXML($xml) {
+
 	$dom = new DOMDocument();
 
 	// Initial block (must before load xml string)
@@ -233,7 +231,7 @@ if(isset($_GET['sortorder']) && is_numeric($_GET['sortorder'])){
 	die('Invalid sortorder flag');
 }
 
-if($dmarc_results_matching_only && isset($_GET['dmarc'])){
+if( $cookie_options['dmarc_results_matching_only'] && isset($_GET['dmarc']) ) {
 	$dmarc_select=$_GET['dmarc'];
 }else{
 	$dmarc_select= '';

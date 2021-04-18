@@ -32,8 +32,11 @@
 // Main Program
 // ----------------------------------------------------------------------------
 
+var current_report = "";
+var report_list_height = 0;
+var available_height = 0;
+var report_data_xml_width = 0;
 
-var current_report;
 const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
 const comparer = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
@@ -108,9 +111,11 @@ function showReportlist(str) { // str is the name of the <div> to be filled
 			if (this.readyState == 4 && this.status == 200) {
 				document.getElementById("report_list").innerHTML = this.responseText;
 				document.getElementById("report_data").innerHTML = "";
+				set_heights();
 				sorttable(str);
 				set_title(domain);
 				makeResizableDiv();
+
 				if 	(
 					(document.getElementById('resizer_horizontal') != 'undefined' && document.getElementById('resizer_horizontal') != null)
 					||
@@ -153,6 +158,11 @@ function optionMenu(_element) {
 	}
 }
 
+function change_stylesheet() {
+
+	document.getElementById('css_stylesheet').href = document.getElementById('selcssfile').value;
+}
+
 function set_title(domain) {
 
 	domain == 'all' ? document.getElementById('title').innerText = "DMARC Reports" : document.getElementById('title').innerText = "DMARC Reports for " + domain;
@@ -160,7 +170,6 @@ function set_title(domain) {
 
 function set_heights() {
 
-	var report_list_height_percentage = default_reportlist_height/100;
 	var taken_height =
 		parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-top'))
 		+ parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-bottom'))
@@ -169,10 +178,30 @@ function set_heights() {
 		+ document.getElementById('footer').offsetHeight
 		+ parseInt(window.getComputedStyle(document.getElementById('footer')).getPropertyValue('margin-top'))
 	;
-	var available_height = window.innerHeight - taken_height;
-	var report_list_height = parseInt(report_list_height_percentage * available_height);
-	var report_data_height = available_height - report_list_height;
 
+	available_height = window.innerHeight - taken_height;
+	report_list_height = parseInt(report_list_height_percent * available_height / 100 );
+
+	// See at least the header and the first row of the Report List even if the Report List-Initial Height is set to 0 percent
+	var min_height_report_list =
+		+ document.getElementById('title').offsetHeight
+		+ document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].offsetHeight
+	;
+
+	// The Report List should not be large enough to cover the Report Data description div (report_desc) but that div has not been rendered yet, so we can't get its height.
+	// However, a good proxy for the height of the description is about 3 times the height of the first row of the Report List
+	var max_height_report_list =
+		available_height
+		- document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].offsetHeight * 3
+	;
+
+	if ( report_list_height < min_height_report_list ) {
+		report_list_height = min_height_report_list;
+	}
+	if ( report_list_height > max_height_report_list ) {
+		report_list_height = max_height_report_list;
+	}
+	var report_data_height = available_height - report_list_height;
 
 	document.getElementById('report_list').style.height = report_list_height + "px";
 	document.getElementById('report_data').style.height = report_data_height + "px";
@@ -189,11 +218,42 @@ function set_report_data_heights() {
 	document.getElementById('report_data_xml').style.height = report_data_table_div_height;
 
 }
-function showXML() {
+function report_data_xml_display_toggle() {
 
-	if (document.getElementById('report_data_xml').style.display == 'none') {
-		var div_height = document.getElementById('report_data_table_div').style.height
-		set_report_data_widths("open_xml");
+	if (xml_data_open == 0) {
+		xml_data_open = 1;
+		set_report_data_widths();
+	} else {
+		xml_data_open = 0;
+		set_report_data_widths();
+	}
+}
+
+function set_report_data_widths () {
+
+	// An allowance to accomodate Report Data table width expanding/contracting when sorting arrow is added to/removed from the column title
+	// HTML5 doesn't seem to currently have a built-in onresize event for divs, so to do this automatically would take some decent JS library like https://github.com/marcj/css-element-queries
+	// May not need this anymore
+	allowance = getScrollBarWidth() * 2;
+	// allowance = 30;
+
+	if ( xml_data_open == 1 ) {
+		var min_width_xml_data =
+			document.getElementById('report_data_table').getElementsByTagName('thead')[0].getElementsByTagName('tr')[0].getElementsByTagName('th')[0].offsetWidth // i.e. the width of the first column of the Report Data table
+		;
+		var max_width_xml_data =
+		document.getElementById('report_data').offsetWidth
+		- min_width_xml_data
+		;
+		report_data_xml_width = parseInt(document.getElementById('report_data').offsetWidth * report_data_xml_width_percent / 100);
+		if ( report_data_xml_width < min_width_xml_data ) {
+			report_data_xml_width = min_width_xml_data;
+		}
+		if ( report_data_xml_width > max_width_xml_data ) {
+			report_data_xml_width = max_width_xml_data;
+		}
+
+		report_data_table_div_width = document.getElementById('report_data').offsetWidth - report_data_xml_width - allowance;
 		document.getElementById('report_data_xml').style.display = 'inline-block';
 		document.getElementById('report_data_table_div').style.display = 'inline-block';
 		document.getElementById('report_data_table_div').style.float = 'left';
@@ -202,8 +262,8 @@ function showXML() {
 		document.getElementById('xml_html_img').alt = 'Hide Raw Report XML';
 		document.getElementById('resizer_vertical').style.display = "block";
 	} else {
-		var div_height = document.getElementById('report_data_xml').style.height
-		set_report_data_widths("close_xml");
+		report_data_xml_width = 0;
+		report_data_table_div_width = document.getElementById('report_data').offsetWidth;
 		document.getElementById('report_data_xml').style.display = 'none';
 		document.getElementById('report_data_table_div').style.display = 'block';
 		document.getElementById('report_data_table_div').style.float = '';
@@ -212,54 +272,55 @@ function showXML() {
 		document.getElementById('xml_html_img').alt = 'Show Raw Report XML';
 		document.getElementById('resizer_vertical').style.display = "none";
 	}
-	showResizers();
-}
-
-function set_report_data_widths (open_close) {
-
-	report_data_xml_width_percent = .20;
-
-	// An allowance to accomodate Report Data table width expanding/contracting when sorting arrow is added to/removed from the column title
-	// HTML5 doesn't seem to currently have a built-in onresize event for divs, so to do this automatically would take some decent JS library like https://github.com/marcj/css-element-queries
-	allowance = 30;
-
-	if ( open_close == "open_xml" ) {
-		if ( report_data_xml_width_last == 0){
-			report_data_xml_width = parseInt(document.getElementById('report_data').offsetWidth * report_data_xml_width_percent);
-			report_data_table_div_width = document.getElementById('report_data').offsetWidth - report_data_xml_width - allowance;
-		} else {
-			report_data_xml_width = report_data_xml_width_last
-			- document.getElementById('resizer_vertical').offsetWidth / 2
-			-2
-			;
-			// Why '-2'? Because when the report_data_xml div is resized and another report is chosen, the handle and separator jump by 2 pixels
-			// If someone can find out why, please fix it (it's probably because of all the other tiny fudges all over the place)
-			report_data_table_div_width = document.getElementById('report_data').offsetWidth - report_data_xml_width - allowance;
-		}
-	} else {
-		report_data_xml_width = 0;
-		report_data_table_div_width = document.getElementById('report_data').offsetWidth;
-	}
 
 	document.getElementById('report_data_xml').style.width = report_data_xml_width + "px";
 	document.getElementById('report_data_table_div').style.width = report_data_table_div_width + "px";
 
-// 	document.getElementById('report_data').style.overflow = "hidden";
-
+	showResizers();
 }
 
+// From https://stackoverflow.com/a/986977
+function getScrollBarWidth() {
+  var inner = document.createElement('p');
+  inner.style.width = "100%";
+  inner.style.height = "200px";
+
+  var outer = document.createElement('div');
+  outer.style.position = "absolute";
+  outer.style.top = "0px";
+  outer.style.left = "0px";
+  outer.style.visibility = "hidden";
+  outer.style.width = "200px";
+  outer.style.height = "150px";
+  outer.style.overflow = "hidden";
+  outer.appendChild (inner);
+
+  document.body.appendChild (outer);
+  var w1 = inner.offsetWidth;
+  outer.style.overflow = 'scroll';
+  var w2 = inner.offsetWidth;
+  if (w1 == w2) w2 = outer.clientWidth;
+
+  document.body.removeChild (outer);
+
+  return (w1 - w2);
+};
+
 function showReport(str) {
+
+	if ( (typeof(document.getElementById('no_reports')) != 'undefined' && document.getElementById('no_reports') != null) || (typeof(str) == 'undefined' && str == null) ) {
+		return;
+	}
 
 	document.getElementById('screen_overlay').style.display = "block";
 	document.getElementById('screen_overlay').style.cursor = "wait";
 
-	if (str == null) {
+	if (str == "") {
 		// Hide handles
 		document.getElementById('resizer_horizontal').display = 'none';
 		document.getElementById('resizer_vertical').display = 'none';
 		document.getElementById('screen_overlay').style.display = "none";
 		document.getElementById('screen_overlay').style.cursor = "default";
-		alert('No report is selected.');
 		return;
 	}
 	setSelected(str);	// setSelected function highlights the report row that is selcted
@@ -267,15 +328,10 @@ function showReport(str) {
 	current_report = str;
 
 	var xhttp;
-	if (str == "") {
-		document.getElementById("report_data").innerHTML = "";
-		return;
-	}
-
 	var GETstring = "report=" + str;
 
-	var HostLookup = document.getElementsByName('selHostLookup');
-	var HostLookup_value = false;
+	var HostLookup = document.getElementsByName('HostLookup');
+
 	for ( var i = 0; i < HostLookup.length; i++) {
 		if(HostLookup[i].checked) {
 			GETstring += "&hostlookup=" + HostLookup[i].value;
@@ -296,8 +352,10 @@ function showReport(str) {
 				document.getElementById('screen_overlay').style.cursor = "default";
 				document.getElementById('screen_overlay').style.display = "none";
 				showResizers();
-				if ( typeof report_data_xml_width !== 'undefined' && report_data_xml_width > 0 ) {
-					showXML("open_xml");
+				current_report = "";
+
+				if ( xml_data_open == 1 ) {
+					set_report_data_widths();
 				}
 			}
 		};
@@ -305,6 +363,18 @@ function showReport(str) {
 	xhttp.open("GET", "dmarcts-report-viewer-report-data.php?" + GETstring, true);
 	xhttp.send();
 }
+
+function setSelected(str) {
+
+	const table = document.getElementById("reportlistTbl");
+	const rows = table.getElementsByTagName("tr");
+	for (i = 0; i < rows.length; i++) {
+		var currentRow = table.rows[i];
+		currentRow.classList.remove("selected");
+	}
+	document.getElementById("report"+str).className += " selected";
+}
+
 
 // Functions that allow resizing of the data and raw xml divs
 // Inspired by the code at https://medium.com/the-z/making-a-resizable-div-in-js-is-not-easy-as-you-think-bda19a1bc53d
@@ -321,15 +391,11 @@ function showResizers() {
 		- (document.getElementById('resizer_horizontal').offsetHeight)/2
 		+ "px";
 
-		document.getElementById('resizer_vertical').style.top =
-			parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-top'))
-			+ document.getElementById('optionblock').offsetHeight
-			+ document.getElementById('title').offsetHeight
-			+ document.getElementById('report_list').offsetHeight
-			+ document.getElementById('report_desc_container').offsetHeight
-			+ document.getElementById('report_data_xml').offsetHeight/2
-			- (document.getElementById('resizer_vertical').offsetHeight)/2
-			+ "px";
+			document.getElementById('resizer_vertical').style.top =
+				document.getElementById('report_data_xml').offsetTop
+				+ document.getElementById('report_data_xml').offsetHeight/2
+				- document.getElementById('resizer_vertical').offsetHeight/2
+				+ 'px'
 
 		document.getElementById('resizer_vertical').style.left =
 			+ document.getElementById('report_data_xml').offsetLeft
@@ -341,20 +407,9 @@ function showResizers() {
 	}
 }
 
-function setSelected(str) {
-
-	const table = document.getElementById("reportlistTbl");
-	const rows = table.getElementsByTagName("tr");
-	for (i = 0; i < rows.length; i++) {
-		var currentRow = table.rows[i];
-		currentRow.classList.remove("selected");
-	}
-	document.getElementById("report"+str).className += " selected";
-}
-
 function makeResizableDiv() {
 
-	if (document.getElementById('resizer_horizontal') != 'undefined' && document.getElementById('resizer_horizontal') != null) {
+	if (document.getElementById('resizer_horizontal') != 'undefined' && document.getElementById('resizer_vertical') != null) {
 		document.getElementById('resizer_horizontal').addEventListener(
 			'mousedown',
 				function (e) {
@@ -365,7 +420,7 @@ function makeResizableDiv() {
 					if ( document.getElementById('report_data_table_div') ) {
 						original_height_report_data_table_div = document.getElementById('report_data_table_div').offsetHeight;
 					}
-					original_height_resizer_vertical = 30; // Should be equal to the in css file
+					original_height_resizer_vertical = 30; // Should be equal to the resizer_vertical.height in css file
 					original_x = document.getElementById('resizer_horizontal').getBoundingClientRect().left;
 					original_y = document.getElementById('resizer_horizontal').getBoundingClientRect().top;
 					original_mouse_x = e.pageX;
@@ -378,10 +433,23 @@ function makeResizableDiv() {
 
 	function resize(e) {
 
-		const height =	original_height_report_list
-						- document.getElementById('optionblock').offsetHeight
+		var mouse_max_y =
+		parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-top'))
+		+ document.getElementById('optionblock').offsetHeight
+		+ document.getElementById('title').offsetHeight
+		+ document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].offsetHeight
+		+ document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].getElementsByTagName('tr')[0].offsetHeight
+		;
+
+		var mouse_min_y =
+			window.innerHeight
+			 - document.getElementById('footer').offsetHeight
+			- (document.getElementById('resizer_horizontal').offsetHeight / 2)
+			- document.getElementById('report_desc').offsetHeight
+			;
 						;
-		if ( (original_mouse_y - e.pageY) < height && e.pageY < (window.innerHeight - document.getElementById('footer').offsetHeight - (document.getElementById('resizer_horizontal').offsetHeight / 2)) ) {
+		// if statement prevents report list div from contracting small enough to hide the first row && expanding large enough to hide the Report Data description
+		if ( e.pageY > mouse_max_y  && e.pageY < mouse_min_y ) {
 			// Change all cursors over Report List table to ns-cursor
 			var cursors = document.getElementById("reportlistTbl").getElementsByTagName("tr");
 			for(var i=0;i<cursors.length;i++){
@@ -434,7 +502,7 @@ function makeResizableDiv() {
 
 	if (document.getElementById('resizer_vertical') != 'undefined' && document.getElementById('resizer_vertical') != null) {
 		document.getElementById('resizer_vertical').addEventListener('mousedown', function (e) {
-			e.preventDefault();// ;
+			e.preventDefault();
 			original_width_report_data_xml = document.getElementById('report_data_xml').offsetWidth;
 			original_width_report_data_table_div = document.getElementById('report_data_table_div').offsetWidth;
 			original_x = document.getElementById('resizer_vertical').getBoundingClientRect().left;
@@ -448,7 +516,11 @@ function makeResizableDiv() {
 
 	function resize_vertical(e) {
 
-		if ( e.pageX > document.getElementById('resizer_vertical').offsetWidth && e.pageX < window.innerWidth - document.getElementById('resizer_vertical').offsetWidth ) {
+		var mouse_min_x =
+			document.getElementById('report_data_table').getElementsByTagName('thead')[0].getElementsByTagName('tr')[0].getElementsByTagName('th')[0].offsetWidth // i.e. the width of the first column of the Report Data table
+		var mouse_max_x = window.innerWidth - mouse_min_x;
+
+		if ( e.pageX > mouse_min_x && e.pageX < mouse_max_x ) {
 			document.getElementById('body').style.cursor = "ew-resize";
 			mouse_movement = e.pageX - original_mouse_x;
 			document.getElementById('report_data_xml').style.width =+ original_width_report_data_xml - mouse_movement + 'px';
@@ -460,8 +532,7 @@ function makeResizableDiv() {
 				+ 'px'
 			;
 		}
-
-		report_data_xml_width_last = document.getElementById('report_data_xml').offsetWidth;
+		report_data_xml_width_percent = parseInt( document.getElementById('report_data_xml').offsetWidth / document.getElementById('report_data').offsetWidth * 100);
 	}
 
 		function stopResize_vertical() {
