@@ -104,6 +104,10 @@ function tmpl_reportList($reports, $sort) {
 include "dmarcts-report-viewer-config.php";
 include "dmarcts-report-viewer-common.php";
 
+// Get all configuration options
+// --------------------------------------------------------------------------
+configure();
+
 $dom_select= '';
 $org_select= '';
 $per_select= '';

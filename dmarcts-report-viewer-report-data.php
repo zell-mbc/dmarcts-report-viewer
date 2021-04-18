@@ -201,6 +201,11 @@ function formatXML($xml) {
 include "dmarcts-report-viewer-config.php";
 include "dmarcts-report-viewer-common.php";
 
+// Get all configuration options
+// --------------------------------------------------------------------------
+configure();
+
+
 // Parameters of GET
 // --------------------------------------------------------------------------
 

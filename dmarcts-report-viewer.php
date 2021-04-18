@@ -197,6 +197,12 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 include "dmarcts-report-viewer-config.php";
 include "dmarcts-report-viewer-common.php";
 
+// Get all configuration options
+// --------------------------------------------------------------------------
+configure();
+
+setcookie("dmarcts-options-tmp", "", "01 Jan 1970 00:00:00 UTC", "/");
+
 // Make a MySQL Connection using mysqli
 // --------------------------------------------------------------------------
 $mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname, $dbport);

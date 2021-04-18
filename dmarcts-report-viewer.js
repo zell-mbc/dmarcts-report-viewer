@@ -37,7 +37,7 @@ var current_report;
 const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
 const comparer = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
-var report_data_xml_width_last = 0;
+var cookie_name = "dmarcts-options";
 
 // ----------------------------------------------------------------------------
 //Functions
@@ -442,4 +442,118 @@ function makeResizableDiv() {
 			document.getElementById('body').style.cursor = "default";
 			window.removeEventListener('mousemove', resize_vertical);
 		}
+}
+
+// Cookie Functions
+// ----------------------------------------------------------------------------
+function build_cookie() {
+
+	// Don't allow cookie to be set if there are no reports displayed
+	if ( document.getElementById('reportlistTbl') != "undefined" && document.getElementById('reportlistTbl') != null ) {
+		// There are reports showing
+
+		// Build cookie from various sources
+
+		// Change the Period option from the value of the select to (i.e. 'all' or a date) to a boolean, to match the radio button option on the options page
+		if ( document.getElementById('selPeriod').value == "all" ) {
+			period = 0;
+		} else {
+			period = 1;
+		}
+
+		// Host lookup
+		if ( document.getElementsByName('HostLookup')[0].checked ) {
+			hostlookup = 1;
+		} else {
+			hostlookup = 0;
+		}
+
+		// Sort column and sort direction
+		if ( document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].getElementsByTagName('tr')[0].getElementsByClassName('desc_triangle').length != 0 ) {
+			sort_column = document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].getElementsByTagName('tr')[0].getElementsByClassName('desc_triangle')[0].id;
+			sort = 0;
+		} else {
+			sort_column = document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].getElementsByTagName('tr')[0].getElementsByClassName('asc_triangle')[0].id;
+			sort = 1;
+		}
+
+		// Create cookie_value object that gets placed into cookie
+
+		// When a new option is added, check the size of the cookie stored. The cookie size should be less than half of the maximum cookie size allowed per domain.
+		// Less than half because sometimes the cookie is stored twice (once as dmarcts-options and once as dmarcts-options-tmp). Most browsers have a cookie limit of 4KB.
+		// Currently, the following options generate a cookie of about 0.5KB
+	cookie_value = {
+			"cssfile" : document.styleSheets[0].href.split('/').pop() ,
+			"report_list_height_percent" : parseInt( document.getElementById('report_list').offsetHeight/available_height * 100 + 0.5 ) ,
+			"report_data_xml_width_percent" : report_data_xml_width_percent ,
+			"xml_data_open" : xml_data_open ,
+			"HostLookup" : hostlookup ,
+			"Period" : period ,
+			"DMARC" : document.getElementById('selDMARC').value ,
+			"ReportStatus" : document.getElementById('selReportStatus').value ,
+			"Domain" : document.getElementById('selDomain').value ,
+			"Organisation" : document.getElementById('selOrganisation').value ,
+			"sort_column" : sort_column ,
+			"sort" : sort ,
+			// "alignment_unknown" : 0 ,
+			"dmarc_results_matching_only" : 0 ,
+			"report_data_status" : "all"
+		};
+
+ 		cookie_value = JSON.stringify(cookie_value);
+		setCookie(cookie_name, cookie_value, 365)
+	} else {
+		// There are NO reports showing
+		alert("Settings cannot be saved if there are no reports to display.\n\nChange the filters to show some reports.");
+	}
+	setCookie("dmarcts-options-tmp", "", -365)
+	hideMenu();
+}
+
+function get_cookie(name) {
+
+	name = name + "=";
+	var cookie_str = decodeURIComponent(document.cookie);
+  var cookie_array = cookie_str.split(';');
+  for(var i = 0; i <cookie_array.length; i++) {
+    var c = cookie_array[i];
+    while ( c.charAt(0) == " " ) {
+      c = c.substring(1);
+    }
+    if ( c.indexOf(name) == 0 ) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function setCookie(name, value, exp_days) {
+
+  var d = new Date();
+  d.setTime(d.getTime() + (exp_days*24*60*60*1000));
+  var expires = "expires="+ d.toUTCString();
+  document.cookie = name + "=" + encodeURI(value) + ";" + expires + ";path=/";
+}
+
+function resetOptions() {
+
+	stored_cookie = get_cookie('dmarcts-options-tmp');
+
+	if ( stored_cookie == "" || stored_cookie == null ){
+		stored_cookie = get_cookie('dmarcts-options');
+		setCookie("dmarcts-options-tmp", stored_cookie, 365)
+		setCookie("dmarcts-options", "", 365)
+	}
+	window.location.href = 'dmarcts-report-viewer-options.php';
+}
+
+function cancelOptions() {
+
+	stored_cookie = get_cookie('dmarcts-options-tmp');
+
+	if ( stored_cookie ){
+		setCookie("dmarcts-options", stored_cookie, 365)
+		setCookie("dmarcts-options-tmp", "", -365)
+	}
+	window.location.href = 'dmarcts-report-viewer.php';
 }

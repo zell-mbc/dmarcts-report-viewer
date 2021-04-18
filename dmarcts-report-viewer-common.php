@@ -34,6 +34,8 @@
 //### variables ######################################################
 //####################################################################
 
+$cookie_name = "dmarcts-options";
+
 // The order in which the options appear here is the order they appear in the DMARC Results dropdown box
 $dmarc_result = array(
 
@@ -334,3 +336,46 @@ function format_date($date, $format) {
     $answer = date($format, strtotime($date));
     return $answer;
 };
+
+// Get all configuration options
+// --------------------------------------------------------------------------
+function configure() {
+
+	global $cookie_name;
+	global $cookie_options;
+	global $options;
+
+	$option = array_keys($options);
+	$cookie_options = array();
+	$cookie_timeout = 60*60*24*365;
+
+	if(!isset($_COOKIE[$cookie_name]) || $_COOKIE[$cookie_name] == "" ) {
+		// No Cookie
+		foreach ($option as $option_name) {
+			if ( $options[$option_name]['option_type'] != "heading" ) {
+				$cookie_options += array($option_name => $options[$option_name]['option_value']);
+			// 		foreach($options[$option_name] as $key=>$value) {
+			}
+		}
+		setcookie($cookie_name, json_encode($cookie_options), time() + $cookie_timeout, "/");
+	} else {
+		// Cookie exists
+		if ($_SERVER["REQUEST_METHOD"] == "POST") {
+			// POST
+			foreach ($option as $option_name) {
+				if ( $options[$option_name]['option_type'] != "heading" ) {
+					if ( is_null($_POST[$option_name]) ) {
+						$cookie_options += array($option_name => "");
+					} else {
+						$cookie_options += array($option_name => $_POST[$option_name]);
+					}
+				}
+			}
+			setcookie($cookie_name, json_encode($cookie_options), time() + $cookie_timeout, "/");
+			header("Location: dmarcts-report-viewer.php");
+			exit;
+		} else {	// Not POST
+			$cookie_options = json_decode($_COOKIE[$cookie_name], true);
+		}
+	}
+}
