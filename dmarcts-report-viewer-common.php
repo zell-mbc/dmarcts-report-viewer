@@ -69,9 +69,9 @@ $dmarc_result = array(
 	),
 );
 
-// Report List column headers
+// Sortable Report List column headers
 // --------------------------------------------------------------------------
-// Array to be used in DMARC Result option in dmarcts-report-viewer-options.php
+// Array to be used in 'Default sort column' option in dmarcts-report-viewer-options.php
 
 $report_list_columns = array(
 	"mindate" => "Start Date",
