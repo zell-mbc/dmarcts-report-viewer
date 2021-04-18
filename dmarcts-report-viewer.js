@@ -26,16 +26,12 @@
 // dmarcts-report-viewer-config.php and edit with the appropriate info
 // for your database authentication and location.
 //
-// Edit the configuration variables in dmarcts-report-viewer.js with your preferences.
+//####################################################################
 
 // ----------------------------------------------------------------------------
+// Main Program
 // ----------------------------------------------------------------------------
-// Supplemental Configuration
 
-var default_reportlist_height = 60; // Main Report List height as a percentage of browser window height (without the % mark)
-
-// End Supplemental Configuration
-// ----------------------------------------------------------------------------
 
 var current_report;
 const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
