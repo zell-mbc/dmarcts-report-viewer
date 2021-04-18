@@ -49,6 +49,22 @@ a {
   color: var(--link);
 }
 
+option.green {
+	background-color: var(--green);
+}
+
+option.yellow {
+	background-color: var(--yellow);
+}
+
+option.orange {
+	background-color: var(--orange);
+}
+
+option.red {
+	background-color: var(--red);
+}
+
 a:visted {
   color: var(--link_visited);
 }

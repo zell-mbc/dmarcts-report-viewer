@@ -82,7 +82,7 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 		$html[] = "<select name=\"DMARC\" id=\"selDMARC\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option " . ( $cookie_options['DMARC'] ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 		foreach($dmarc_result as $key => $value) {
-			$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
+			$html[] = sprintf("<option class='" . $value['color'] . "' %s value=\"%s\">%s</option>",
 					$cookie_options['DMARC'] == $key ? "selected=\"selected\"" : "",
 					$key,
 					$value['text']
@@ -98,7 +98,7 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 			$html[] = "<select name=\"ReportStatus\" id=\"selReportStatus\" onchange=\"showReportlist('reportlistTbl')\">";
 			$html[] = "<option " . ( $cookie_options['ReportStatus'] ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 			foreach($dmarc_result as $key => $value) {
-				$html[] = sprintf("<option style='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
+				$html[] = sprintf("<option class='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
 						$cookie_options['ReportStatus'] == $key ? "selected=\"selected\"" : "",
 						$key,
 						$value['status_text']
