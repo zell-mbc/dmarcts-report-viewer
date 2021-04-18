@@ -126,6 +126,33 @@ function showReportlist(str) { // str is the name of the <div> to be filled
 	xhttp.send();
 }
 
+function showMenu() {
+
+		document.getElementById('menu').style.display = 'block';
+		document.getElementById('screen_overlay').style.display = 'block';
+}
+
+function hideMenu() {
+
+		document.getElementById('menu').style.display = 'none';
+		document.getElementById('screen_overlay').style.display = 'none';
+}
+
+function optionMenu(_element) {
+
+	var _div = document.getElementById('menu');
+	var input = _element.getBoundingClientRect();
+
+	_div.style.right = window.innerWidth - input.right + 'px';
+	_div.style.top = document.getElementById('optionblock').bottom + 'px';
+
+	if ( document.getElementById('menu').style.display == 'none' || document.getElementById('menu').style.display == '' ) {
+		showMenu();
+	} else {
+		hideMenu();
+	}
+}
+
 function set_title(domain) {
 
 	domain == 'all' ? document.getElementById('title').innerText = "DMARC Reports" : document.getElementById('title').innerText = "DMARC Reports for " + domain;

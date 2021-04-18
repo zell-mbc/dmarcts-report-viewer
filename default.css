@@ -276,6 +276,57 @@ table.reportdata td.yellow {
 	cursor: default;
 }
 
+.menu_icon {
+	display: inline-block;
+	cursor: default;
+	font-size: 300%;
+}
+
+.menu_icon:hover{
+	/* font-weight: bold; */
+	background-color: var(--selected);
+}
+
+.menu {
+  font-family: arial, sans-serif;
+  color: var(--text);
+  position: absolute;
+  display: none;
+  z-index: 2;
+  background: var(--hover);
+  margin-top: 5px; /* Controls how close the main bubble is the the calling div */
+  border-radius: 2px;
+  box-shadow: 7px 7px 3px var(--shadow);
+}
+
+/* menu callout tail */
+.menu::after {
+  position: absolute;
+  content: '';
+  border: 15px solid transparent; /* The 'border-width' property controls the size of the tail and should be the same as .top.menu::after {top: } */
+}
+
+/* Tail position on top */
+.top.menu::after {
+  /* up triangle */
+  border-bottom-color: var(--hover);
+  border-top: 0;
+  top: -15px;	/* Controls how close the tail is to the main bubble and should be the same as .menu::after {border-width:} */
+  left: 95%;	/* Controls how close the tail is to the right corner of the main bubble */
+  margin-left: -20px;
+}
+
+.menu_option {
+	width: 100%;
+	padding: 7px 0;
+	margin-right: 20px;
+	cursor: default;
+}
+
+.menu_option:hover {
+	background-color: var(--selected);
+}
+
 .center {
 	text-align: center;
 }

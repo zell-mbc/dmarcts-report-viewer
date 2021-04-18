@@ -162,9 +162,18 @@ function html ($default_hostlookup = 1, $default_dmarc_result = undef, $default_
 	$html[] = "<button type=\"button\" onclick=\"reset_report_list()\" title=\"Resets the filter to show all records and refreshes the data.\">Reset</button>";
 	$html[] = "</div>";
 
+	// Configuration Settings icon
+	//	--------------------------------------------------------------------------
+	$html[] = "<div class='menu_icon' onclick=\"optionMenu(this);\">&#8801;</div>";
+
 	//	End optionblock
 	//	--------------------------------------------------------------------------
 	$html[] = "</form></div>";
+
+
+	// Dropdown menu
+	//	--------------------------------------------------------------------------
+	$html[] = "<div id='menu' class='menu top'><div class='menu_option' onclick=\"build_cookie();\">&nbsp;&nbsp;&nbsp;Save Current Settings as Initial View</div><div class='menu_option' onclick=\"window.location.href = 'dmarcts-report-viewer-options.php';\">&nbsp;&nbsp;&nbsp;Options...</div></div>";
 
 
 	//	Report divs
