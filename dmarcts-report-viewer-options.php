@@ -40,20 +40,20 @@ function html ($domains = array(), $orgs = array(), $dmarc_result_select = array
 	global $options;
 	global $cookie_options;
 
-	$html       = array();
+	global $html;
 
 	$html[] = "<!DOCTYPE html>";
 	$html[] = "<html>";
-	$html[] = "  <head>";
-	$html[] = "    <title>DMARC Report Viewer</title>";
-	$html[] = "    <link id='css_stylesheet' rel='stylesheet' href='" . $cookie_options["cssfile"] . "'>";
-	$html[] = "    <script src='dmarcts-report-viewer.js'></script>";
-	$html[] = "    <meta charset=\"UTF-8\" />";
-	$html[] = "    <meta name='google' content='notranslate' />";
-	$html[] = "    <meta http-equiv=\"Content-Language\" content=\"en_US\" />";
-	$html[] = "  </head>";
+	$html[] = "	<head>";
+	$html[] = "		<title>DMARC Report Viewer</title>";
+	$html[] = "		<link id='css_stylesheet' rel='stylesheet' href='" . $cookie_options["cssfile"] . "'>";
+	$html[] = "		<script src='dmarcts-report-viewer.js'></script>";
+	$html[] = "		<meta charset=\"UTF-8\" />";
+	$html[] = "		<meta name='google' content='notranslate' />";
+	$html[] = "		<meta http-equiv=\"Content-Language\" content=\"en_US\" />";
+	$html[] = "	</head>";
 
-	$html[] = "  <body id='body')>";
+	$html[] = "	<body id='body')>";
 
 // 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // 		$html[] = "<div  style='top: 0px;left: 0px;height: 100%;width: 100%;position: absolute;display: block;z-index: 1;align-items: center;display: flex;justify-content: center;height: 50%;'>";
@@ -66,10 +66,10 @@ function html ($domains = array(), $orgs = array(), $dmarc_result_select = array
 // 		$filter = "style='filter: blur(3px);opacity: 50%;'";
 // 	}
 
-	$html[] = "  <div id='title' class='title'" . $filter . ">DMARCTS Options</div>";
+	$html[] = "		<div id='title' class='title'" . $filter . ">DMARCTS Options</div>";
 
-	$html[] = "<form " . $filter . "method=\"post\">";
-	$html[] = "<table class='optionlist'>";
+	$html[] = "		<form " . $filter . "method=\"post\">";
+	$html[] = "			<table class='optionlist'>";
 
 	$option = array_keys($options);
 
@@ -77,41 +77,41 @@ function html ($domains = array(), $orgs = array(), $dmarc_result_select = array
 		foreach($options[$option_name] as $key=>$value) {
 			switch ($options[$option_name]['option_type']) {
 				case "heading":
-					$html[] = create_heading($options[$option_name]['option_label']);
+					create_heading($options[$option_name]['option_label']);
 					break 2;
 				case "text":
 				case "number":
-					$html[] = create_input_text($option_name, $options[$option_name]);
+					create_input_text($option_name, $options[$option_name]);
 					break 2;
 				case "radio":
 				case "checkbox":
-					$html[] = create_input_radio($option_name);
+					create_input_radio($option_name);
 					break 2;
 				case "select":
 					// For a select option, the option_values column contains the name of an array variable, e.g.$org, that is built in dmarcts-report-viewer.php
 					$var = str_replace("$", "", $options[$option_name]['option_values']);	// Remove the '$', so e.g. '$org' becomes 'org'
-					$html[] = create_select($option_name, $options[$option_name], $$var);	// Double $$ explanation: $var = org, so $$var = ${$var} = ${org} = $org
+					create_select($option_name, $options[$option_name], $$var);	// Double $$ explanation: $var = org, so $$var = ${$var} = ${org} = $org
 					break 2;
 				default:
 					break 2;
 			}
 		}
 	}
-	$html[] = "</table>";
+	$html[] = "			</table>";
 
-	$html[] = "<div style='text-align: center;'>";
-	$html[] = "<button type=\"button\" onclick=\"cancelOptions();\" title=\"Cancel changes and return to reports.\">Cancel</button>";
+	$html[] = "			<div style='text-align: center;'>";
+	$html[] = "				<button type=\"button\" onclick=\"cancelOptions();\" title=\"Cancel changes and return to reports.\">Cancel</button>";
 
-	$html[] = "<button type=\"button\" onclick=\"resetOptions()\" title=\"Reset all options to their default values.\">Reset</button>";
-	$html[] = "<input type=\"submit\" title=\"Save changes and return to reports.\" value=\"Save\">";
-	$html[] = "</div>";
-	$html[] = "    </form>";
-	$html[] = "<br /><br />";
+	$html[] = "				<button type=\"button\" onclick=\"resetOptions()\" title=\"Reset all options to their default values.\">Reset</button>";
+	$html[] = "				<input type=\"submit\" title=\"Save changes and return to reports.\" value=\"Save\">";
+	$html[] = "			</div>";
+	$html[] = "		</form>";
+	$html[] = "		<br /><br />";
 
 	//	Page Footer
 	//	--------------------------------------------------------------------------
-	$html[] = "  <div id='footer' class='footer'" . $filter . ">&copy; 2016-" . date("Y") . " by <a href='http://www.techsneeze.com'>TechSneeze.com</a>, John Bieling and <a href='mailto:dmarcts-report-viewer@hazelden.ca'>John P. New</a>.</div>";
-	$html[] = "  </body>";
+	$html[] = "		<div id='footer' class='footer'" . $filter . ">&copy; 2016-" . date("Y") . " by <a href='http://www.techsneeze.com'>TechSneeze.com</a>, John Bieling and <a href='mailto:dmarcts-report-viewer@hazelden.ca'>John P. New</a>.</div>";
+	$html[] = "	</body>";
 	$html[] = "</html>";
 
 	return implode("\n",$html);
@@ -119,17 +119,18 @@ function html ($domains = array(), $orgs = array(), $dmarc_result_select = array
 
 function create_heading($option_label) {
 
-	$html = "<tr class='option_title'>";
-	$html .= "<td colspan='2'>";
-	$html .= "<span>" . $option_label . "</span>";
-	$html .= "</td>";
-	$html .= "</tr>";
+	global $html;
 
-	return $html;
+	$html[] = "				<tr class='option_title'>";
+	$html[] = "					<td colspan='2'>";
+	$html[] = "						<span>" . $option_label . "</span>";
+	$html[] = "					</td>";
+	$html[] = "				</tr>";
 }
 
 function create_input_text($option_name, $option = array()) {
 
+	global $html;
 	global $cookie_options;
 
 	$extra_options = "";
@@ -142,13 +143,13 @@ function create_input_text($option_name, $option = array()) {
 	} else {
 		$value = "";
 	}
-	$html = "<tr>";
-	$html .= "<td class='left_column'>";
-	$html .= "<span class='bold'><label for=" . $option_name . ">" . $option["option_label"] . " </label></span>";
-	$html .= "<br>";
-	$html .= "<span class='option_description'>" . $option["option_description"] . "</span>";
-	$html .= "</td>";
-	$html .= "<td class='right_column'>";
+	$html[] = "				<tr>";
+	$html[] = "					<td class='left_column'>";
+	$html[] = "						<span class='bold'><label for=" . $option_name . ">" . $option["option_label"] . " </label></span>";
+	$html[] = "						<br>";
+	$html[] = "						<span class='option_description'>" . $option["option_description"] . "</span>";
+	$html[] = "					</td>";
+	$html[] = "					<td class='right_column'>";
 
 	switch ($option["option_type"]) {
 		case "number":
@@ -163,33 +164,30 @@ function create_input_text($option_name, $option = array()) {
 			break;
 	}
 
-	$html .= "<input $value type=" . $option["option_type"] . " id=" . $option_name . " name=" . $option_name . $extra_options . ">" . $after . "<br>";
-	$html .= "</td>";
-	$html .= "</tr>";
-
-	return $html;
+	$html[] = "						<input $value type=" . $option["option_type"] . " id=" . $option_name . " name=" . $option_name . $extra_options . ">" . $after . "<br>";
+	$html[] = "					</td>";
+	$html[] = "				</tr>";
 }
 
 function create_input_radio($option_name) {
 
+	global $html;
 	global $options;
 	global $cookie_options;
 
 	$values = $options[$option_name]["option_values"];
-	$html = "<tr>";
-	$html .= "<td class='left_column'>";
-	$html .= "<span  class='bold'>" . $options[$option_name]["option_label"] . "</span>";
-	$html .= "<br>";
-	$html .= "<span class='option_description'>" . $options[$option_name]["option_description"] . "</span>";
-	$html .= "</td>";
-	$html .= "<td class='right_column'>";
+	$html[] = "				<tr>";
+	$html[] = "					<td class='left_column'>";
+	$html[] = "						<span  class='bold'>" . $options[$option_name]["option_label"] . "</span>";
+	$html[] = "						<br>";
+	$html[] = "						<span class='option_description'>" . $options[$option_name]["option_description"] . "</span>";
+	$html[] = "					</td>";
+	$html[] = "					<td class='right_column'>";
 	for ($i = 0; $i < sizeof($values); $i+=2) {
-		$html .=	"<input type=" . $options[$option_name]["option_type"] . " id=" . strtolower(str_replace(" ", "_", $values[$i+1])) . " name=" . $option_name . ($options[$option_name]["option_type"] == "checkbox" ? "[]" : "" ) . " value='" . $values[$i] . "'" . checked($option_name, $values[$i]) . "><label for=" . $option_name . ">" . $values[$i+1] . " </label><br />";
+		$html[] =	"						<input type=" . $options[$option_name]["option_type"] . " id=" . strtolower(str_replace(" ", "_", $values[$i+1])) . " name=" . $option_name . ($options[$option_name]["option_type"] == "checkbox" ? "[]" : "" ) . " value='" . $values[$i] . "'" . checked($option_name, $values[$i]) . "><label for=" . $option_name . ">" . $values[$i+1] . " </label><br />";
 	}
-	$html .= "</td>";
-	$html .= "</tr>";
-
-	return $html;
+	$html[] = "					</td>";
+	$html[] = "				</tr>";
 }
 
 function checked($option_name, $values) {
@@ -213,6 +211,7 @@ function checked($option_name, $values) {
 
 function create_select($option_name, $option = array(), $var) {
 
+	global $html;
 	global $cookie_options;
 	// $ var is the array variable, e.g. $org
 
@@ -220,32 +219,30 @@ function create_select($option_name, $option = array(), $var) {
 	$selected = "";
 	$js = "";
 
-	$html = "<tr>";
-	$html .= "<td class='left_column'>";
-	$html .= "<span  class='bold'><label for=" . $option_name . ">" . $option["option_label"] . " </label></span>";
-	$html .= "<br>";
-	$html .= "<span class='option_description'>" . $option["option_description"] . "</span>";
-	$html .= "</td>";
-	$html .= "<td class='right_column'>";
+	$html[] = "					<tr>";
+	$html[] = "						<td class='left_column'>";
+	$html[] = "							<span  class='bold'><label for=" . $option_name . ">" . $option["option_label"] . " </label></span>";
+	$html[] = "							<br>";
+	$html[] = "							<span class='option_description'>" . $option["option_description"] . "</span>";
+	$html[] = "						</td>";
+	$html[] = "					<td class='right_column'>";
 
 	if ( $option_name == "cssfile" ) {
 		$js = " onchange='change_stylesheet();'";
 	}
 
-	$html .= "<select name='" . $option_name . "' id='sel" . $option_name . "'" . $js . ">";
+	$html[] = "						<select name='" . $option_name . "' id='sel" . $option_name . "'" . $js . ">";
 	foreach ($var as $key => $value) {
 		if ( $cookie_options[$option_name] == $key ) {
 			$selected = "selected";
 		} else {
 			$selected = "";
 		}
-		$html .=	"<option value='" . $key . "' " . $selected . ">" . $value . "</option>";
+		$html[] =	"							<option value='" . $key . "' " . $selected . ">" . $value . "</option>";
 	}
 
-	$html .= "</td>";
-	$html .= "</tr>";
-
-	return $html;
+	$html[] = "					</td>";
+	$html[] = "				</tr>";
 }
 
 function test_input($data) {
