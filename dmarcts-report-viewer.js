@@ -170,6 +170,7 @@ function set_title(domain) {
 
 function set_heights() {
 
+	if ( document.getElementById('reportlistTbl') != 'undefined' && document.getElementById('reportlistTbl') != null ) {
 	var taken_height =
 		parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-top'))
 		+ parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-bottom'))
@@ -205,6 +206,7 @@ function set_heights() {
 
 	document.getElementById('report_list').style.height = report_list_height + "px";
 	document.getElementById('report_data').style.height = report_data_height + "px";
+}
 }
 
 function set_report_data_heights() {
