@@ -171,42 +171,42 @@ function set_title(domain) {
 function set_heights() {
 
 	if ( document.getElementById('reportlistTbl') != 'undefined' && document.getElementById('reportlistTbl') != null ) {
-	var taken_height =
-		parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-top'))
-		+ parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-bottom'))
-		+ document.getElementById('optionblock').offsetHeight
-		+ document.getElementById('title').offsetHeight
-		+ document.getElementById('footer').offsetHeight
-		+ parseInt(window.getComputedStyle(document.getElementById('footer')).getPropertyValue('margin-top'))
-	;
+		var taken_height =
+			parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-top'))
+			+ parseInt(window.getComputedStyle(document.getElementById('body')).getPropertyValue('margin-bottom'))
+			+ document.getElementById('optionblock').offsetHeight
+			+ document.getElementById('title').offsetHeight
+			+ document.getElementById('footer').offsetHeight
+			+ parseInt(window.getComputedStyle(document.getElementById('footer')).getPropertyValue('margin-top'))
+		;
 
-	available_height = window.innerHeight - taken_height;
-	report_list_height = parseInt(report_list_height_percent * available_height / 100 );
+		available_height = window.innerHeight - taken_height;
+		report_list_height = parseInt(report_list_height_percent * available_height / 100 );
 
-	// See at least the header and the first row of the Report List even if the Report List-Initial Height is set to 0 percent
-	var min_height_report_list =
-		+ document.getElementById('title').offsetHeight
-		+ document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].offsetHeight
-	;
+		// See at least the header and the first row of the Report List even if the Report List-Initial Height is set to 0 percent
+		var min_height_report_list =
+			+ document.getElementById('title').offsetHeight
+			+ document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].offsetHeight
+		;
 
-	// The Report List should not be large enough to cover the Report Data description div (report_desc) but that div has not been rendered yet, so we can't get its height.
-	// However, a good proxy for the height of the description is about 3 times the height of the first row of the Report List
-	var max_height_report_list =
-		available_height
-		- document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].offsetHeight * 3
-	;
+		// The Report List should not be large enough to cover the Report Data description div (report_desc) but that div has not been rendered yet, so we can't get its height.
+		// However, a good proxy for the height of the description is about 3 times the height of the first row of the Report List
+		var max_height_report_list =
+			available_height
+			- document.getElementById('reportlistTbl').getElementsByTagName('thead')[0].offsetHeight * 3
+		;
 
-	if ( report_list_height < min_height_report_list ) {
-		report_list_height = min_height_report_list;
+		if ( report_list_height < min_height_report_list ) {
+			report_list_height = min_height_report_list;
+		}
+		if ( report_list_height > max_height_report_list ) {
+			report_list_height = max_height_report_list;
+		}
+		var report_data_height = available_height - report_list_height;
+
+		document.getElementById('report_list').style.height = report_list_height + "px";
+		document.getElementById('report_data').style.height = report_data_height + "px";
 	}
-	if ( report_list_height > max_height_report_list ) {
-		report_list_height = max_height_report_list;
-	}
-	var report_data_height = available_height - report_list_height;
-
-	document.getElementById('report_list').style.height = report_list_height + "px";
-	document.getElementById('report_data').style.height = report_data_height + "px";
-}
 }
 
 function set_report_data_heights() {
