@@ -91,6 +91,9 @@ function sorttable (table_id) {
 
 function showReportlist(str) { // str is the name of the <div> to be filled
 
+	// Clear current reportid because Report List is being reset
+	current_report = "";
+
 	var GETstring = "?";
 
 	var domain = document.getElementById('selDomain').options[document.getElementById('selDomain').selectedIndex].value;
@@ -318,9 +321,7 @@ function showReport(str) {
 	document.getElementById('screen_overlay').style.cursor = "wait";
 
 	if (str == "") {
-		// Hide handles
-		document.getElementById('resizer_horizontal').display = 'none';
-		document.getElementById('resizer_vertical').display = 'none';
+		// Remove screen overlay
 		document.getElementById('screen_overlay').style.display = "none";
 		document.getElementById('screen_overlay').style.cursor = "default";
 		return;
@@ -354,7 +355,7 @@ function showReport(str) {
 				document.getElementById('screen_overlay').style.cursor = "default";
 				document.getElementById('screen_overlay').style.display = "none";
 				showResizers();
-				current_report = "";
+				// current_report = "";
 
 				if ( xml_data_open == 1 ) {
 					set_report_data_widths();
