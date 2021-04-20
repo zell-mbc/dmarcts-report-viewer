@@ -367,7 +367,7 @@ function configure() {
 					if ( is_null($_POST[$option_name]) ) {
 						$cookie_options += array($option_name => "");
 					} else {
-						$cookie_options += array($option_name => $_POST[$option_name]);
+						$cookie_options += array($option_name => test_input($_POST[$option_name]));
 					}
 				}
 			}
@@ -378,4 +378,13 @@ function configure() {
 			$cookie_options = json_decode($_COOKIE[$cookie_name], true);
 		}
 	}
+}
+
+function test_input($data) {
+
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+
+  return $data;
 }

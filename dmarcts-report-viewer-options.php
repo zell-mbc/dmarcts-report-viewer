@@ -245,15 +245,6 @@ function create_select($option_name, $option = array(), $var) {
 	$html[] = "				</tr>";
 }
 
-function test_input($data) {
-
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-
-  return $data;
-}
-
 
 //####################################################################
 //### main ###########################################################
