@@ -376,6 +376,21 @@ function configure() {
 			exit;
 		} else {	// Not POST
 			$cookie_options = json_decode($_COOKIE[$cookie_name], true);
+
+			// Check if any options have been removed or added to $options[]
+			// Update $cookie_options with any new options from $options (excluding headings)
+			foreach ($option as $option_name) {
+				if ( $options[$option_name]['option_type'] != "heading" && is_null($cookie_options[$option_name]) ) {
+					$cookie_options[$option_name] = $options[$option_name]['option_value'];
+				}
+			}
+			// Remove any options from $cookie_options which are not in $options
+			foreach ($cookie_options as $key => $value) {
+				if ( $options[$key] == null ) {
+					unset($cookie_options[$key]);
+				}
+			}
+			setcookie($cookie_name, json_encode($cookie_options), time() + $cookie_timeout, "/");
 		}
 	}
 }
