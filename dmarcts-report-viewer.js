@@ -491,8 +491,10 @@ function makeResizableDiv() {
 			}
 			document.getElementById('body').style.cursor = "default";
 
-			window.removeEventListener('mousemove', resize);
-		}
+		report_list_height_percent = parseInt(document.getElementById('report_list').offsetHeight * 100 / available_height);
+
+		window.removeEventListener('mousemove', resize);
+	}
 
 	if (document.getElementById('resizer_vertical') != 'undefined' && document.getElementById('resizer_vertical') != null) {
 		document.getElementById('resizer_vertical').addEventListener('mousedown', function (e) {
@@ -576,7 +578,7 @@ function build_cookie() {
 		// Currently, the following options generate a cookie of about 0.5KB
 	cookie_value = {
 			"cssfile" : document.styleSheets[0].href.split('/').pop() ,
-			"report_list_height_percent" : parseInt( document.getElementById('report_list').offsetHeight/available_height * 100 + 0.5 ) ,
+			"report_list_height_percent" : report_list_height_percent ,
 			"report_data_xml_width_percent" : report_data_xml_width_percent ,
 			"xml_data_open" : xml_data_open ,
 			"HostLookup" : hostlookup ,
