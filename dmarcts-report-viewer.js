@@ -118,15 +118,6 @@ function showReportlist(str) { // str is the name of the <div> to be filled
 				sorttable(str);
 				set_title(domain);
 				makeResizableDiv();
-
-				if 	(
-					(document.getElementById('resizer_horizontal') != 'undefined' && document.getElementById('resizer_horizontal') != null)
-					||
-					(document.getElementById('resizer_vertical') != 'undefined' && document.getElementById('resizer_vertical') != null)
-					) {
-							document.getElementById('resizer_horizontal').style.display = 'none';
-							document.getElementById('resizer_vertical').style.display = 'none';
-				}
 			}
 		};
 
