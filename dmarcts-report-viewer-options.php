@@ -34,7 +34,7 @@
 //### functions ######################################################
 //####################################################################
 
-function html ($domains = array(), $orgs = array(), $dmarc_result_select = array(), $report_status_select = array(), $report_list_columns = array(), $filter , $cssfiles = array() ) {
+function html ($domains = array(), $orgs = array(), $dmarc_result_select = array(), $report_status_select = array(), $report_list_columns = array(), $cssfiles = array() ) {
 
 	global $dmarc_result;
 	global $options;
@@ -65,10 +65,11 @@ function html ($domains = array(), $orgs = array(), $dmarc_result_select = array
 // 		$html[] = "</div>";
 // 		$filter = "style='filter: blur(3px);opacity: 50%;'";
 // 	}
+// 	Note: If the above is implemented, and a blur effect behind the dialog is wanted, instead of using the $filter method, simply use backdrop-filter/-webkit-backdrop-filter on screen_overlay (see https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter)
 
-	$html[] = "		<div id='title' class='title'" . $filter . ">DMARCTS Options</div>";
+	$html[] = "		<div id='title' class='title'>DMARCTS Options</div>";
 
-	$html[] = "		<form " . $filter . "method=\"post\">";
+	$html[] = "		<form method='post'>";
 	$html[] = "			<table class='optionlist'>";
 
 	$option = array_keys($options);
@@ -110,7 +111,7 @@ function html ($domains = array(), $orgs = array(), $dmarc_result_select = array
 
 	//	Page Footer
 	//	--------------------------------------------------------------------------
-	$html[] = "		<div id='footer' class='footer'" . $filter . ">&copy; 2016-" . date("Y") . " by <a href='http://www.techsneeze.com'>TechSneeze.com</a>, John Bieling and <a href='mailto:dmarcts-report-viewer@hazelden.ca'>John P. New</a>.</div>";
+	$html[] = "		<div id='footer' class='footer'>&copy; 2016-" . date("Y") . " by <a href='http://www.techsneeze.com'>TechSneeze.com</a>, John Bieling and <a href='mailto:dmarcts-report-viewer@hazelden.ca'>John P. New</a>.</div>";
 	$html[] = "	</body>";
 	$html[] = "</html>";
 
@@ -344,7 +345,6 @@ echo html(
 	$dmarc_result_select,
 	$report_status_select,
 	$report_list_columns,
-	$filter,
 	$cssfiles
 );
 // }
