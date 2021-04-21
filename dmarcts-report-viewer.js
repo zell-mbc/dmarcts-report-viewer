@@ -590,8 +590,7 @@ function build_cookie() {
 			"sort_column" : sort_column ,
 			"sort" : sort ,
 			// "alignment_unknown" : 0 ,
-			"dmarc_results_matching_only" : 0 ,
-			"report_data_status" : "all"
+			"dmarc_results_matching_only" : 0
 		};
 
  		cookie_value = JSON.stringify(cookie_value);
