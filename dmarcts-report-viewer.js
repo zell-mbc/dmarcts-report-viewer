@@ -571,6 +571,11 @@ function build_cookie() {
 			sort = 1;
 		}
 
+		if ( sort_column == "" ) {
+			sort_column = "maxdate";
+			alert("Unfortuantely at this time, neither the DMARC Result nor the Report Status columns can be saved as initial sort columns. The initial sort column has been set to End Date, " + (sort == 0 ? "descending." : "ascending."));
+		}
+
 		// Create cookie_value object that gets placed into cookie
 
 		// When a new option is added, check the size of the cookie stored. The cookie size should be less than half of the maximum cookie size allowed per domain.
