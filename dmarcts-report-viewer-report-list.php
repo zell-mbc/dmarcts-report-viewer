@@ -37,6 +37,9 @@
 
 function tmpl_reportList($reports, $sort) {
 
+	global $options;
+	global $cookie_options;
+
     $reportlist[] = "";
 
 	if (sizeof($reports) == 0) {
@@ -44,7 +47,7 @@ function tmpl_reportList($reports, $sort) {
 	} else {
 		$title_message_th = "Click to toggle sort direction by this column.";
 		$title_message_tr = "Click to view detailed report data.";
-	// echo $sort;
+
 		//	Resizer handles
 		//	--------------------------------------------------------------------------
 		$reportlist[] = "<div id='resizer_horizontal' class='resizer resizer_horizontal'></div>";
@@ -52,15 +55,17 @@ function tmpl_reportList($reports, $sort) {
 		$reportlist[] = "<table id='reportlistTbl' class='reportlist'>";
 		$reportlist[] = "  <thead>";
 		$reportlist[] = "    <tr>";
+
+		$triangle = ($cookie_options['sort'] ? "asc":"desc") . "_triangle ";
 		$reportlist[] = "      <th class='circle_container' style='padding-left: 5px' title='DMARC Result. " . $title_message_th . "'><div class='circle circle_left circle_black'></div><span style='display:none;'>1</span></span></th>";
 		$reportlist[] = "      <th class='circle_container'></th>";
 		$reportlist[] = "      <th class='circle_container' title='SPF/DKIM/DMARC Results. " . $title_message_th . "'><div class='circle circle_right circle_black'></div><span style='display:none;'>1</span></span></th>";
-		$reportlist[] = "      <th class=\"" . strtolower($sort) . "_triangle\" title='" . $title_message_th . "'>Start Date</th>";
-		$reportlist[] = "      <th title='" . $title_message_th . "'>End Date</th>";
-		$reportlist[] = "      <th title='" . $title_message_th . "'>Domain</th>";
-		$reportlist[] = "      <th title='" . $title_message_th . "'>Reporting Organization</th>";
-		$reportlist[] = "      <th title='" . $title_message_th . " (currently doesn&#39;t really sort well)'>Report ID</th>";
-		$reportlist[] = "      <th title='" . $title_message_th . "'>Messages</th>";
+		$reportlist[] = "      <th id='mindate' class=\"" . ($cookie_options['sort_column'] == 'mindate' ? $triangle : "") . "\" title='" . $title_message_th . "'>Start Date</th>";
+		$reportlist[] = "      <th id='maxdate' class=\"" . ($cookie_options['sort_column'] == 'maxdate' ? $triangle : "") . "\" title='" . $title_message_th . "'>End Date</th>";
+		$reportlist[] = "      <th id='domain' class=\"" . ($cookie_options['sort_column'] == 'domain' ? $triangle : "") . "\" title='" . $title_message_th . "'>Domain</th>";
+		$reportlist[] = "      <th id='org' class=\"" . ($cookie_options['sort_column'] == 'org' ? $triangle : "") . "\" title='" . $title_message_th . "'>Reporting Organization</th>";
+		$reportlist[] = "      <th id='reportid' class=\"" . ($cookie_options['sort_column'] == 'reportid' ? $triangle : "") . "\" title='" . $title_message_th . " (currently doesn&#39;t really sort well)'>Report ID</th>";
+		$reportlist[] = "      <th id='rcount' class=\"" . ($cookie_options['sort_column'] == 'rcount' ? $triangle : "") . "\" title='" . $title_message_th . "'>Messages</th>";
 		$reportlist[] = "    </tr>";
 		$reportlist[] = "  </thead>";
 
@@ -104,6 +109,10 @@ function tmpl_reportList($reports, $sort) {
 include "dmarcts-report-viewer-config.php";
 include "dmarcts-report-viewer-common.php";
 
+// Get all configuration options
+// --------------------------------------------------------------------------
+configure();
+
 $dom_select= '';
 $org_select= '';
 $per_select= '';
@@ -113,14 +122,6 @@ $where = '';
 
 // Parameters of GET
 // --------------------------------------------------------------------------
-
-if(isset($_GET['hostlookup']) && is_numeric($_GET['hostlookup'])){
-	$hostlookup=$_GET['hostlookup']+0;
-}elseif(!isset($_GET['hostlookup'])){
-	$hostlookup= isset( $default_lookup ) ? $default_lookup : 1;
-}else{
-	die('Invalid hostlookup flag');
-}
 
 if(isset($_GET['sortorder']) && is_numeric($_GET['sortorder'])){
 	$sortorder=$_GET['sortorder']+0;
@@ -226,7 +227,7 @@ switch ($dmarc_select) {
 
 // Report Status
 // --------------------------------------------------------------------------
-if ( $report_status != "all" ) {
+if ( $report_status != "all" && $report_status != "" ) {
 	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " " . $dmarc_result[$report_status]['status_sql_where'];
 }
 
@@ -347,9 +348,8 @@ $where
 GROUP BY
 	serial
 ORDER BY
-    mindate $sort,
-    org
-";
+    " . $cookie_options['sort_column'] . ( $cookie_options['sort'] ? " ASC" : " DESC" )
+;
 
 // Debug
 // echo "<br />sql where = $where<br />";

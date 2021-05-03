@@ -34,6 +34,8 @@
 //### variables ######################################################
 //####################################################################
 
+$cookie_name = "dmarcts-options";
+
 // The order in which the options appear here is the order they appear in the DMARC Results dropdown box
 $dmarc_result = array(
 
@@ -66,6 +68,170 @@ $dmarc_result = array(
 		'status_sql_where' => "( dkim_align_min = 1 OR spf_align_min = 1 OR dkim_result_min = 1 OR spf_result_min = 1 OR dmarc_result_min >= 3 OR dmarc_result_max >= 3 )",
 	),
 );
+
+// Sortable Report List column headers
+// --------------------------------------------------------------------------
+// Array to be used in 'Default sort column' option in dmarcts-report-viewer-options.php
+
+$report_list_columns = array(
+	"mindate" => "Start Date",
+	"maxdate" => "End Date",
+	"domain" => "Domain",
+	"org" => "Reporter",
+	"reportid" => "Report ID",
+	"rcount" => "# Messages"
+);
+
+// Program Options
+// --------------------------------------------------------------------------
+
+// When a new option is added, check the size of the cookie stored. The cookie size should be less than half of the maximum cookie size allowed per domain.
+// Less than half because sometimes the cookie is stored twice (once as dmarcts-options and once as dmarcts-options-tmp). Most browsers have a cookie limit of 4KB.
+// Currently, the following options generate a cookie of about 0.5KB
+
+// Option Names must be unique.
+// The order in which the options appear below is the order they are rendered in the browser.
+// If sections are re-arranged, you don't have to re-name the corresponding heading (i.e. the heading option name (e.g. option_group_3_heading)) because it has no bearing on the order rendered in the browser.
+$options = array(
+	"option_group_1_heading" => array(
+			"option_type" => "heading",
+			"option_label" => "Appearance",
+			"option_values" => "",
+			"option_value" => "",
+			"option_description" => "",
+	),
+	"cssfile" => array(
+			"option_type" => "select",
+			"option_label" => "Default css file",
+			"option_values" => "\$cssfiles",
+			"option_value" => "default.css",
+			"option_description" => "Name of the css file to be used.<br>The dropdown list is automatically generated from any css files in the main dmarcts-report-viewer directory. The css is immediately applied to this page when selected.",
+	),
+	// This option will be implemented in a future version of dmarcts-reports-viewer.
+	// "xml_data_highlight" => array(
+	// 		"option_type" => "radio",
+	// 		"option_label" => "Use Report Data to Raw XML Highlighting",
+	// 		"option_values" => array(1,"On",0,"Off"),
+	// 		"option_value" => "1",
+	// 		"option_description" => "When the raw XML view is open, and when the mouse hovers over, or clicks on, a line of the Report Data table or the Report Data description, highlight the section in the raw XML that corresponds to that row or description. Also works in the opposite direction (i.e. hover/click on a XML record to highlight the corresponding Report Data table line or description). Facilitates determining which XML record corresponds to which line of the table.",
+	// ),
+	// This option will be implemented in a future version of dmarcts-reports-viewer.
+	// "xml_data_hljs" => array(
+	// 		"option_type" => "radio",
+	// 		"option_label" => "Use XML Syntax Highlighting",
+	// 		"option_values" => array(1,"On",0,"Off"),
+	// 		"option_value" => "1",
+	// 		"option_description" => "Use syntax highlighting on the Raw XML. This uses a small external javascript file which may or may not slow down the program.",
+	// ),
+	"option_group_2_heading" => array(
+			"option_type" => "heading",
+			"option_label" => "Filters",
+			"option_values" => "",
+			"option_value" => "",
+			"option_description" => "Default filters",
+	),
+	"DMARC" => array(
+			"option_type" => "select",
+			"option_label" => "Default DMARC Result",
+			"option_values" => "\$dmarc_result_select",
+			"option_value" => "all",
+			"option_description" => "Default for DMARC Result drop-down list.",
+	),
+	"dmarc_results_matching_only" => array(
+			"option_type" => "radio",
+			"option_label" => "Show Only Matching Report Data records.",
+			"option_values" => array(1,"On",0,"Off"),
+			"option_value" => 0,
+			"option_description" => "When enabled, only those records matching the DMARC Results dropdown box are shown in the Report Data table.",
+	),
+	"ReportStatus" => array(
+			"option_type" => "select",
+			"option_label" => "Default Report Data Status",
+			"option_values" => "\$report_status_select",
+			"option_value" => "all",
+			"option_description" => "Default for Report Data Status drop-down list.",
+	),
+	"Period" => array(
+			"option_type" => "radio",
+			"option_label" => "Default period",
+			"option_values" => array(0,"All",1,"Current Month"),
+			"option_value" => 1,
+			"option_description" => "Default for the Month drop-down.",
+	),
+	"Domain" => array(
+			"option_type" => "select",
+			"option_label" => "Default domain",
+			"option_values" => "\$domains",
+			"option_value" => "all",
+			"option_description" => "Default for the Domain(s) drop-down list.",
+	),
+	"Organisation" => array(
+			"option_type" => "select",
+			"option_label" => "Default reporter",
+			"option_values" => "\$orgs",
+			"option_value" => "all",
+			"option_description" => "Default for the Reporter(s) drop-down list.",
+	),
+	"option_group_3_heading" => array(
+			"option_type" => "heading",
+			"option_label" => "Initial Settings",
+			"option_values" => "",
+			"option_value" => "",
+			"option_description" => "Startup Defaults",
+	),
+	"HostLookup" => array(
+			"option_type" => "radio",
+			"option_label" => "Host lookup",
+			"option_values" => array(1,"On",0,"Off"),
+			"option_value" => 1,
+			"option_description" => "Turning off host lookup speeds up the display of the results, especially in the case of mail servers that have ceased to exist.",
+	),
+	"report_list_height_percent" => array(
+			"option_type" => "number",
+			"option_label" => "Report List - Initial Height",
+			"option_values" => array("units"=>"percent","min"=>"0","max"=>100),
+			"option_value" => 60,
+			"option_description" => "Initial height of the Report List window, a percentage of the height of the main browser window.",
+	),
+	"sort_column" => array(
+			"option_type" => "select",
+			"option_label" => "Default sort column",
+			"option_values" => "\$report_list_columns",
+			"option_value" => "maxdate",
+			"option_description" => "Report List column to sort initially.",
+	),
+	"sort" => array(
+			"option_type" => "radio",
+			"option_label" => "Default sort order",
+			"option_values" => array(1,"Ascending",0,"Descending"),
+			"option_value" => 0,
+			"option_description" => "Default sort order of Report List column chosen above.",
+	),
+	"xml_data_open" => array(
+			"option_type" => "radio",
+			"option_label" => "Show Report Data XML",
+			"option_values" => array(1,"On",0,"Off"),
+			"option_value" => 0,
+			"option_description" => "When a report is selected in the Report List, automatically open the XML view along with the Report Table.",
+	),
+	"report_data_xml_width_percent" => array(
+			"option_type" => "number",
+			"option_label" => "Report Data XML - Initial Width",
+			"option_values" => array("units"=>"percent","min"=>"0","max"=>"100"),
+			"option_value" => 25,
+			"option_description" => "Initial width of the Report Data XML window when it is opened, a percentage of the width of the main browser window.",
+	)
+	// This option will be implemented in a future version of dmarcts-reports-viewer.
+	// ),
+	// "alignment_unknown" => array(
+	// 		"option_type" => "radio",
+	// 		"option_label" => "Unknown SPF/DKIM Alignments",
+	// 		"option_values" => array(1,"Consider \"Failed\"",0,"Keep as \"Unknown\""),
+	// 		"option_value" => "0",
+	// 		"option_description" => "The DMARC specification dictates that reporting SPF/DKIM alignments is mandatory. However, there could be a situation where this information is not included. This option specifies whether or not those unknown results are included as an \"alignment failure\" or remain as \"unknown\".",
+	// )
+);
+
 
 //####################################################################
 //### functions ######################################################
@@ -170,3 +336,70 @@ function format_date($date, $format) {
     $answer = date($format, strtotime($date));
     return $answer;
 };
+
+// Get all configuration options
+// --------------------------------------------------------------------------
+function configure() {
+
+	global $cookie_name;
+	global $cookie_options;
+	global $options;
+
+	$option = array_keys($options);
+	$cookie_options = array();
+	$cookie_timeout = 60*60*24*365;
+
+	if(!isset($_COOKIE[$cookie_name]) || $_COOKIE[$cookie_name] == "" ) {
+		// No Cookie
+		foreach ($option as $option_name) {
+			if ( $options[$option_name]['option_type'] != "heading" ) {
+				$cookie_options += array($option_name => $options[$option_name]['option_value']);
+			// 		foreach($options[$option_name] as $key=>$value) {
+			}
+		}
+		setcookie($cookie_name, json_encode($cookie_options), time() + $cookie_timeout, "/");
+	} else {
+		// Cookie exists
+		if ($_SERVER["REQUEST_METHOD"] == "POST") {
+			// POST
+			foreach ($option as $option_name) {
+				if ( $options[$option_name]['option_type'] != "heading" ) {
+					if ( is_null($_POST[$option_name]) ) {
+						$cookie_options += array($option_name => "");
+					} else {
+						$cookie_options += array($option_name => test_input($_POST[$option_name]));
+					}
+				}
+			}
+			setcookie($cookie_name, json_encode($cookie_options), time() + $cookie_timeout, "/");
+			header("Location: dmarcts-report-viewer.php");
+			exit;
+		} else {	// Not POST
+			$cookie_options = json_decode($_COOKIE[$cookie_name], true);
+
+			// Check if any options have been removed or added to $options[]
+			// Update $cookie_options with any new options from $options (excluding headings)
+			foreach ($option as $option_name) {
+				if ( $options[$option_name]['option_type'] != "heading" && is_null($cookie_options[$option_name]) ) {
+					$cookie_options[$option_name] = $options[$option_name]['option_value'];
+				}
+			}
+			// Remove any options from $cookie_options which are not in $options
+			foreach ($cookie_options as $key => $value) {
+				if ( $options[$key] == null ) {
+					unset($cookie_options[$key]);
+				}
+			}
+			setcookie($cookie_name, json_encode($cookie_options), time() + $cookie_timeout, "/");
+		}
+	}
+}
+
+function test_input($data) {
+
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+
+  return $data;
+}

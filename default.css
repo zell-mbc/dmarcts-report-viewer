@@ -49,6 +49,22 @@ a {
   color: var(--link);
 }
 
+option.green {
+	background-color: var(--green);
+}
+
+option.yellow {
+	background-color: var(--yellow);
+}
+
+option.orange {
+	background-color: var(--orange);
+}
+
+option.red {
+	background-color: var(--red);
+}
+
 a:visted {
   color: var(--link_visited);
 }
@@ -68,6 +84,52 @@ a:visted {
     position: absolute;
     display: block;
     z-index: 1;
+}
+
+table.optionlist tr.option_title {
+	font-size: 120%;
+	font-weight: bold;
+	text-align: left;
+	background-color: var(--header);
+}
+
+table.optionlist {
+	margin: auto;
+	border-spacing: 0 15px;
+	clear: both;
+	cursor: inherit;
+}
+
+table.optionlist td {
+	padding-right: 10px;
+	vertical-align: baseline;
+	padding-left: 10px;
+}
+
+table.optionlist td.left_column {
+	padding-right: 10px;
+	padding-left: 10px;
+	vertical-align: baseline;
+	border-right: 1px solid  var(--text);
+	width: 50%
+}
+
+table.optionlist td.right_column {
+	vertical-align: middle;
+}
+table.optionlist td {
+	vertical-align: baseline;
+}
+
+table.optionlist span.bold {
+	vertical-align: baseline;
+	font-weight: bold;
+}
+
+.option_description {
+	font-family: sans-serif;
+	font-size: 95%;
+	font-style: italic;
 }
 
 table.reportlist {
@@ -201,8 +263,8 @@ table.reportdata td.yellow {
 	text-align: center;
 	border-top: 2px solid var(--shadow);
 	width: 100%;
-	margin: 10px auto 0px auto;
-	padding-top: 10px;
+	margin: 0px auto;
+	padding: 10px 0px;
 	position: fixed;
 	bottom: 0;
 	background-color: var(--background);
@@ -228,6 +290,57 @@ table.reportdata td.yellow {
 	border-right: 1px solid var(--text);
 	padding-right: 1em;
 	cursor: default;
+}
+
+.menu_icon {
+	display: inline-block;
+	cursor: default;
+	font-size: 300%;
+}
+
+.menu_icon:hover{
+	/* font-weight: bold; */
+	background-color: var(--selected);
+}
+
+.menu {
+  font-family: arial, sans-serif;
+  color: var(--text);
+  position: absolute;
+  display: none;
+  z-index: 2;
+  background: var(--hover);
+  margin-top: 5px; /* Controls how close the main bubble is the the calling div */
+  border-radius: 2px;
+  box-shadow: 7px 7px 3px var(--shadow);
+}
+
+/* menu callout tail */
+.menu::after {
+  position: absolute;
+  content: '';
+  border: 15px solid transparent; /* The 'border-width' property controls the size of the tail and should be the same as .top.menu::after {top: } */
+}
+
+/* Tail position on top */
+.top.menu::after {
+  /* up triangle */
+  border-bottom-color: var(--hover);
+  border-top: 0;
+  top: -15px;	/* Controls how close the tail is to the main bubble and should be the same as .menu::after {border-width:} */
+  left: 95%;	/* Controls how close the tail is to the right corner of the main bubble */
+  margin-left: -20px;
+}
+
+.menu_option {
+	width: 100%;
+	padding: 7px 0;
+	margin-right: 20px;
+	cursor: default;
+}
+
+.menu_option:hover {
+	background-color: var(--selected);
 }
 
 .center {
