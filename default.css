@@ -22,19 +22,21 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* All colors are controlled by the following section */
 :root {
-  --background: white;
-  --text: black;
-  --text_over_colorbg: #000000;
-  --header: silver;
-  --link: #0000EE;
-  --link_visited: #551A8B;
-  --hover: whitesmoke;
-  --shadow: grey;
-  --selected: gainsboro;
-  --green: #00FF00;
-  --yellow: #FFFF00;
-  --orange: #FFA500;
-  --red: #FF0000;
+	/* Ordered from darkest the lightest */
+	--text: black;
+	--text_over_colorbg: #000000;
+	--shadow: grey;
+	--header: silver;
+	--selected: gainsboro;
+	--hover: whitesmoke;
+	--background: white;
+
+	--link: #0000EE;
+	--link_visited: #551A8B;
+	--green: #00FF00;
+	--yellow: #FFFF00;
+	--orange: #FFA500;
+	--red: #FF0000;
 	--xml_highlighted: lightcyan;
 	--xml_pinned: #99ffff;
 }
