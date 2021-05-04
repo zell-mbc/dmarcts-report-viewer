@@ -1,0 +1,110 @@
+/*
+
+Original highlight.js style (c) Ivan Sagalaev <maniac@softwaremaniacs.org>
+
+*/
+:root {
+  --xml_text: #cb1212;
+	--xml_meta: #1f7199;
+	--xml_name_weight: normal;
+	--xml_name_color: #000000;
+}
+
+
+.hljs {
+  display: block;
+}
+
+.hljs-tag {
+	font-weight: bolder;
+	color: var(--text);
+}
+/* Base color: saturation 0; */
+
+.hljs,
+.hljs-subst {
+  /* color: #444; */
+	color: var(--xml_text);
+	font-weight: bold;
+}
+
+.hljs-comment {
+	color: var(--text);
+}
+
+.hljs-keyword,
+.hljs-attribute,
+.hljs-selector-tag,
+.hljs-meta-keyword,
+.hljs-doctag,
+.hljs-name {
+  color: var(--xml_name_color);
+	font-weight: var(--xml_name_weight);
+}
+
+
+/* User color: hue: 0 */
+
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+	color: var(--xml_text);
+}
+
+.hljs-title,
+.hljs-section {
+	color: var(--xml_text);
+  font-weight: bold;
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+	color: var(--xml_text);
+}
+
+
+/* Language color: hue: 90; */
+
+.hljs-literal {
+	color: var(--green);
+}
+
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+	color: var(--green);
+}
+
+
+/* Meta color: hue: 200 */
+
+.hljs-meta {
+	color: var(--xml_meta);
+	font-weight: bold;
+}
+
+.hljs-meta-string {
+	color: var(--xml_meta);
+}
+
+
+/* Misc effects */
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
