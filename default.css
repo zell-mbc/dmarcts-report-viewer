@@ -330,14 +330,17 @@ table.reportdata tr.pinned {
 }
 
 .menu_icon {
-	display: inline-block;
+	width: 1.5em;
 	cursor: default;
-	font-size: 300%;
+	border: .2em solid var(--header);
+	border-radius: .3em;
+	padding: .3em;
+	vertical-align: bottom;
+	transition: 0.15s all linear;
 }
 
 .menu_icon:hover{
-	/* font-weight: bold; */
-	background-color: var(--selected);
+	border-color: var(--shadow);
 }
 
 .menu {
