@@ -168,7 +168,7 @@ ORDER BY
 		$reportsum += $row['rcount'];
 	}
 	$reportdata[] = "  </tbody>";
-	$reportdata[] = "<tr><td></td><td class='right sum'>Sum:</td><td class='sum'>$reportsum</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>";
+	$reportdata[] = "<tr class='sum'><td></td><td class='right'>Sum:</td><td class='sum'>$reportsum</td><td colspan='9'></td></tr>";
 	$reportdata[] = "</table>";
 
 	$reportdata[] = "</div>";
