@@ -38,4 +38,6 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
   --yellow: #ffff64;
   --orange: #ffb826;
   --red: #ff4444;
+	--xml_highlighted: var(--hover);
+	--xml_pinned: var(--selected);
 }

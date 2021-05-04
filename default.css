@@ -35,6 +35,8 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
   --yellow: #FFFF00;
   --orange: #FFA500;
   --red: #FF0000;
+	--xml_highlighted: lightcyan;
+	--xml_pinned: #99ffff;
 }
 
 body {
@@ -43,6 +45,11 @@ body {
 }
 
 h1 {
+}
+
+pre {
+	margin: 0px;
+	cursor: pointer;
 }
 
 a {
@@ -200,13 +207,20 @@ table.reportlist td.hidden, table.reportlist th.hidden {
 
 table.reportdata {
 	margin: 0 auto;
+}
+
+table.reportdata thead {
 	cursor:pointer;
 }
 
-table.reportdata tr td {
+table.reportdata tr {
 	color: var(--text_over_colorbg);
 	text-align: center;
 	padding: 3px;
+}
+
+table.reportdata th {
+	color: var(--text);
 }
 
 table.reportdata tr th {
@@ -218,7 +232,8 @@ table.reportdata tr th {
 	background-color: var(--header);
 }
 
-table.reportdata td.sum {
+table.reportdata tr.sum {
+	cursor: default;
 	color: var(--text);
 }
 
@@ -256,6 +271,26 @@ table.reportdata tr.yellow {
 
 table.reportdata td.yellow {
 	background-color: var(--yellow);
+}
+
+table.reportdata tr.highlight {
+	background-color: var(--xml_highlighted);
+	color: var(--text)
+}
+
+table.reportdata tr.pinned {
+	background-color: var(--xml_pinned);
+	color: var(--text)
+}
+
+.highlight {
+	background-color: var(--xml_highlighted);
+	color: var(--text)
+}
+
+.pinned {
+	background-color: var(--xml_pinned);
+	color: var(--text)
 }
 
 .footer {
