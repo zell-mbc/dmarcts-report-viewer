@@ -75,7 +75,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 
 	$reportdata[] = "<div id='report_data_table_div' style='overflow-y:auto;'>";
 	if ( $cookie_options['dmarc_results_matching_only'] ) {
-		$reportdata[] = "\"Show Only Matching Report Data records\" option is \"On\".<br>Report records may not be all displayed.";
+		$reportdata[] = "\"Show Only Matching Report Data records\" option is \"On\".<br><span style='color: var(--red);'>Some report records may not be displayed.</span>";
 	}
 	$reportdata[] = "<table id='report_data_table' class='reportdata'>";
 	$reportdata[] = "  <thead>";
