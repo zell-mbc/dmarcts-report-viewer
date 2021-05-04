@@ -78,16 +78,20 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 
 	//	Host lookup option
 	//	--------------------------------------------------------------------------
-	$html[] = "<div class='options'><span class='optionlabel'>Hostname(s):</span><br>";
-	$html[] = "	<input type=\"radio\" name=\"HostLookup\" value=\"1\" onclick=\"showReport(current_report)\"" . ($cookie_options['HostLookup'] ? " checked=\"checked\"" : "" ) . "> on";
-	$html[] = "	<input type=\"radio\" name=\"HostLookup\" value=\"0\" onclick=\"showReport(current_report)\"" . ($cookie_options['HostLookup'] ? "" : " checked=\"checked\"" ) . "> off";
-	$html[] = "</div>";
+	$html[] = "		<div class='options'><span class='optionlabel'>Hostname(s):</span><br>";
+	$html[] = "			<div class='x-css'>";
+	$html[] = "				<input type=\"radio\" class='x-css' id='HostLookupOn' name=\"HostLookup\" value=\"1\" onclick=\"showReport(current_report)\"" . ($cookie_options['HostLookup'] ? " checked=\"checked\"" : "" ) . ">";
+	$html[] = "				<label for='HostLookupOn'>On</label>";
+	$html[] = "				<input type=\"radio\" class='x-css' id='HostLookupOff' name=\"HostLookup\" value=\"0\" onclick=\"showReport(current_report)\"" . ($cookie_options['HostLookup'] ? "" : " checked=\"checked\"" ) . ">";
+	$html[] = "				<label for='HostLookupOff'>Off</label>";
+	$html[] = "			</div>";
+	$html[] = "		</div>";
 
 
 	// 	DMARC select
 	// 	--------------------------------------------------------------------------
 		$html[] = "<div class='options'><span class='optionlabel'>DMARC Result:</span><br>";
-		$html[] = "<select name=\"DMARC\" id=\"selDMARC\" onchange=\"showReportlist('reportlistTbl')\">";
+		$html[] = "<select class='x-css' name=\"DMARC\" id=\"selDMARC\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option " . ( $cookie_options['DMARC'] ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 		foreach($dmarc_result as $key => $value) {
 			$html[] = sprintf("<option class='" . $value['color'] . "' %s value=\"%s\">%s</option>",
@@ -103,7 +107,7 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 		// 	Report Status select
 		// 	--------------------------------------------------------------------------
 			$html[] = "<div class='options'><span class='optionlabel'>Report Status:</span><br>";
-			$html[] = "<select name=\"ReportStatus\" id=\"selReportStatus\" onchange=\"showReportlist('reportlistTbl')\">";
+			$html[] = "<select class='x-css' name=\"ReportStatus\" id=\"selReportStatus\" onchange=\"showReportlist('reportlistTbl')\">";
 			$html[] = "<option " . ( $cookie_options['ReportStatus'] ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 			foreach($dmarc_result as $key => $value) {
 				$html[] = sprintf("<option class='color: " . $value['color'] . "' %s value=\"%s\">%s</option>",
@@ -120,7 +124,7 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 	// 	--------------------------------------------------------------------------
 	if ( count( $periods ) > 0 ) {
 		$html[] = "<div class='options'><span class='optionlabel'>Month:</span><br>";
-		$html[] = "<select name=\"Period\" id=\"selPeriod\" onchange=\"showReportlist('reportlistTbl')\">";
+		$html[] = "<select class='x-css' name=\"Period\" id=\"selPeriod\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option value=\"all\"" . ($cookie_options['Period'] ? "" : " selected=\"selected\"") . ">[all]</option>";
 
 		for ($p = 0; $p < sizeof($periods); $p++) {
@@ -140,7 +144,7 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 	//	--------------------------------------------------------------------------
 	if ( count( $domains ) >= 1 ) {
 		$html[] = "<div class='options'><span class='optionlabel'>Domain(s):</span><br>";
-		$html[] = "<select name=\"Domain\" id=\"selDomain\" onchange=\"showReportlist('reportlistTbl')\">";
+		$html[] = "<select class='x-css' name=\"Domain\" id=\"selDomain\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option " . ( $cookie_options['Domain'] ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 
 		foreach( $domains as $d) {
@@ -156,7 +160,7 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 	//	--------------------------------------------------------------------------
 	if ( count( $orgs ) > 0 ) {
 		$html[] = "<div class='options'><span class='optionlabel'>Reporter(s):</span><br>";
-		$html[] = "<select name=\"Organisation\" id=\"selOrganisation\" onchange=\"showReportlist('reportlistTbl')\">";
+		$html[] = "<select class='x-css' name=\"Organisation\" id=\"selOrganisation\" onchange=\"showReportlist('reportlistTbl')\">";
 		$html[] = "<option " . ( $cookie_options['Organisation'] ? "" : "selected=\"selected\" " ) . "selected=\"selected\" value=\"all\">[all]</option>";
 
 		foreach( $orgs as $o) {
@@ -170,18 +174,18 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 	//	Refresh button
 	//	--------------------------------------------------------------------------
 	$html[] = "<div class='options'>";
-	$html[] = "&nbsp;<br><button type=\"button\" onclick=\"refresh_report_list()\" title=\"Refreshes data with current filter.\">Refresh</button>";
+	$html[] = "&nbsp;<br><button type=\"button\" class=\"x-css\" onclick=\"refresh_report_list()\" title=\"Refreshes data with current filter.\" tabindex='0'>Refresh</button>";
 	$html[] = "</div>";
 
 	//	Reset button
 	//	--------------------------------------------------------------------------
 	$html[] = "<div class='options'>";
-	$html[] = "&nbsp;<br><button type=\"button\" onclick=\"reset_report_list()\" title=\"Resets the filter to show all records and refreshes the data.\">Reset</button>";
+	$html[] = "&nbsp;<br><button type=\"button\" class=\"x-css\" onclick=\"reset_report_list()\" title=\"Resets the filter to show all records and refreshes the data.\" tabindex='0'>Reset</button>";
 	$html[] = "</div>";
 
 	// Configuration Settings icon
 	//	--------------------------------------------------------------------------
-	$html[] = "<div class='menu_icon' onclick=\"optionMenu(this);\">&#8801;</div>";
+	$html[] = "<img class='menu_icon' src='menu_icon_" . $cookie_options['cssfile'] . ".png' tabindex='0' onclick='optionMenu(this);'>";
 
 	//	End optionblock
 	//	--------------------------------------------------------------------------
