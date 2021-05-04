@@ -107,22 +107,6 @@ $options = array(
 			"option_value" => "default.css",
 			"option_description" => "Name of the css file to be used.<br>The dropdown list is automatically generated from any css files in the main dmarcts-report-viewer directory. The css is immediately applied to this page when selected.",
 	),
-	// This option will be implemented in a future version of dmarcts-reports-viewer.
-	// "xml_data_highlight" => array(
-	// 		"option_type" => "radio",
-	// 		"option_label" => "Use Report Data to Raw XML Highlighting",
-	// 		"option_values" => array(1,"On",0,"Off"),
-	// 		"option_value" => "1",
-	// 		"option_description" => "When the raw XML view is open, and when the mouse hovers over, or clicks on, a line of the Report Data table or the Report Data description, highlight the section in the raw XML that corresponds to that row or description. Also works in the opposite direction (i.e. hover/click on a XML record to highlight the corresponding Report Data table line or description). Facilitates determining which XML record corresponds to which line of the table.",
-	// ),
-	// This option will be implemented in a future version of dmarcts-reports-viewer.
-	// "xml_data_hljs" => array(
-	// 		"option_type" => "radio",
-	// 		"option_label" => "Use XML Syntax Highlighting",
-	// 		"option_values" => array(1,"On",0,"Off"),
-	// 		"option_value" => "1",
-	// 		"option_description" => "Use syntax highlighting on the Raw XML. This uses a small external javascript file which may or may not slow down the program.",
-	// ),
 	"option_group_2_heading" => array(
 			"option_type" => "heading",
 			"option_label" => "Filters",
@@ -207,6 +191,13 @@ $options = array(
 			"option_value" => 0,
 			"option_description" => "Default sort order of Report List column chosen above.",
 	),
+	"option_group_4_heading" => array(
+			"option_type" => "heading",
+			"option_label" => "XML Data",
+			"option_values" => "",
+			"option_value" => "",
+			"option_description" => "Startup Defaults",
+	),
 	"xml_data_open" => array(
 			"option_type" => "radio",
 			"option_label" => "Show Report Data XML",
@@ -220,6 +211,20 @@ $options = array(
 			"option_values" => array("units"=>"percent","min"=>"0","max"=>"100"),
 			"option_value" => 25,
 			"option_description" => "Initial width of the Report Data XML window when it is opened, a percentage of the width of the main browser window.",
+	),
+	"xml_data_highlight" => array(
+			"option_type" => "radio",
+			"option_label" => "Use Report Data to Raw XML Highlighting",
+			"option_values" => array(1,"On",0,"Off"),
+			"option_value" => "1",
+			"option_description" => "When the raw XML view is open, and when the mouse hovers over, or clicks on, a line of the Report Data table or the Report Data description, highlight the section in the raw XML that corresponds to that row or description. Also works in the opposite direction (i.e. hover/click on a XML record to highlight the corresponding Report Data table line or description). Facilitates determining which XML record corresponds to which line of the table.",
+	),
+	"xml_data_hljs" => array(
+			"option_type" => "radio",
+			"option_label" => "Use XML Syntax Highlighting",
+			"option_values" => array(1,"On",0,"Off"),
+			"option_value" => "1",
+			"option_description" => "Use syntax highlighting on the Raw XML. This uses a small external javascript file which may or may not slow down the program.",
 	)
 	// This option will be implemented in a future version of dmarcts-reports-viewer.
 	// ),
