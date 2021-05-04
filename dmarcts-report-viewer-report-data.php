@@ -55,11 +55,11 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 
 	if (isset($reports[$reportnumber])) {
 		$row = $reports[$reportnumber];
-		$row['raw_xml'] = formatXML($row['raw_xml']);
-		$row = array_map('htmlspecialchars', $row);
+
+		$row['raw_xml'] = formatXML($row['raw_xml'], $reportnumber);
 
 		$reportdata[] = "<div id='report_desc_container' class='center reportdesc_container'>";
-		$reportdata[] = "<div id='report_desc' class='center reportdesc'>Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row['policy_adkim'] . ", aspf=" . $row['policy_aspf'] .  ", p=" . $row['policy_p'] .  ", sp=" . $row['policy_sp'] .  ", pct=" . $row['policy_pct'] . "</div>";
+		$reportdata[] = "<div id='report_desc' class='center reportdesc'  class='hilighted' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'>Report from ".$row['org']." for ".$row['domain']."<br>(". format_date($row['mindate'], "r" ). " - ".format_date($row['maxdate'], "r" ).")<br> Policies: adkim=" . $row['policy_adkim'] . ", aspf=" . $row['policy_aspf'] .  ", p=" . $row['policy_p'] .  ", sp=" . $row['policy_sp'] .  ", pct=" . $row['policy_pct'] . "</div>";
 
 		$reportdata[] = "<div style='display:inline-block;margin-left:20px;'><img src='xml.png' id='xml_html_img' width='30px' alt='Show Raw Report XML' title='Show Raw Report XML' onclick='report_data_xml_display_toggle()'></div>";
 
@@ -70,7 +70,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	}
 
 	$reportdata[] = "<div id='report_data_xml' style='display:none; float:right; overflow-y:auto; border-left: 2px solid var(--shadow); text-align:left;padding-left: 7px;'>";
-	$reportdata[] =  "<pre lang=\"xml\">" . $row['raw_xml'] . "</pre>";
+	$reportdata[] =  $row['raw_xml'];
 	$reportdata[] = "</div>";
 
 	$reportdata[] = "<div id='report_data_table_div' style='overflow-y:auto;'>";
@@ -146,7 +146,7 @@ ORDER BY
 		/* escape html characters after exploring binary values, which will be messed up */
 		$row = array_map('htmlspecialchars', $row);
 
-		$reportdata[] = "    <tr class='" . get_dmarc_result($row)['color'] . "' title='DMARC Result: " . get_dmarc_result($row)['result'] . "'>";
+		$reportdata[] = "    <tr id='line" . $row['id'] . "' class='" . get_dmarc_result($row)['color'] . "' title='DMARC Result: " . get_dmarc_result($row)['result'] . "'  onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this);'>";
 		$reportdata[] = "      <td>". $ip. "</td>";
 		if ( $host_lookup ) {
 			$reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
@@ -179,19 +179,66 @@ ORDER BY
 	return implode("\n  ",$reportdata);
 }
 
-function formatXML($xml) {
+function formatXML($raw_xml, $reportnumber) {
+
+	global $mysqli;
+
+	$out = "";
+	$html = "";
+
+	$sql = "
+	SELECT
+		MIN(id) AS id_min,
+		MAX(id) AS id_max
+	FROM
+		rptrecord
+	WHERE
+		serial = $reportnumber;
+	";
+
+	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+
+	while($row = $query->fetch_assoc()) {
+		$id_min = $row['id_min'];
+		$id_max = $row['id_max'];
+	}
 
 	$dom = new DOMDocument();
-
-	// Initial block (must before load xml string)
 	$dom->preserveWhiteSpace = false;
 	$dom->formatOutput = true;
-	// End initial block
+	$dom->loadXML($raw_xml);
 
-	$dom->loadXML($xml);
-	$out = $dom->saveXML();
+	// These next few lines adding <?xml version=\"1.0\" encoding=\"UTF-8\" > and <feedback> (as well as the lines adding the closing </feedback> tag) are are very risky because they assume that the first two lines and the last line of the raw_xml are weel-formed
+	// Hopefully not too risky as the raw_xml has already gone through the dmarcts-parser routine that looks for bad XML.
+	// If someone can code a proper way to get those lines, it would be appreciated.
+	$xml_arr = explode(PHP_EOL,$raw_xml);
+	$out = $xml_arr[0] . "\n" . $xml_arr[1];
+	// Should return first 2 lines of xml: <?xml version=\"1.0\" encoding=\"UTF-8\"> and <feedback>
+	$html = "<pre><code class='xml'>" . htmlspecialchars($out) . "</code></pre>";
 
-	return $out;
+	$out = $dom->saveXML($dom->getElementsByTagName("report_metadata")[0]);
+	$out = htmlspecialchars($out);
+
+	$html .= "<div id='report_metadata' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>" . $out . "</code></pre></div>";
+
+	$records = $dom->getElementsByTagName("record");
+	$i = 0;
+	// $i++;
+	foreach ( $records as $record) {
+		$out = $dom->saveXML($dom->getElementsByTagName("record")[$i]);
+		$out = htmlspecialchars($out);
+		$html .= "<div id='record$id_min' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>";
+		$html .= $out;
+		$html .= "</code></pre></div>";
+		$id_min++;
+		$i++;
+	}
+
+	$out = $xml_arr[sizeof($xml_arr)-2];
+	$out = htmlspecialchars($out);
+		$html .= "<pre><code class='xml'>" . $out . "</code></pre>";
+
+	return $html;
 }
 
 //####################################################################
