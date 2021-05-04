@@ -608,7 +608,9 @@ function build_cookie() {
 			"sort_column" : sort_column ,
 			"sort" : sort ,
 			// "alignment_unknown" : 0 ,
-			"dmarc_results_matching_only" : 0
+			"dmarc_results_matching_only" : 0 ,
+			"xml_data_highlight" : xml_data_highlight,
+			"xml_data_hljs" : xml_data_hljs
 		};
 
  		cookie_value = JSON.stringify(cookie_value);
