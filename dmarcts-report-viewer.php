@@ -219,7 +219,7 @@ include "dmarcts-report-viewer-common.php";
 // --------------------------------------------------------------------------
 configure();
 
-setcookie("dmarcts-options-tmp", "", "01 Jan 1970 00:00:00 UTC", "/");
+setcookie("dmarcts-options-tmp", "", time() - 3600, "/");
 
 // Make a MySQL Connection using mysqli
 // --------------------------------------------------------------------------
