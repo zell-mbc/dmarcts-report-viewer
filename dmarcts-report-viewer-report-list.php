@@ -228,7 +228,7 @@ switch ($dmarc_select) {
 // Report Status
 // --------------------------------------------------------------------------
 if ( $report_status != "all" && $report_status != "" ) {
-	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " " . $dmarc_result[$report_status]['status_sql_where'];
+	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " " . $mysqli->real_escape_string($dmarc_result[$report_status]['status_sql_where']);
 }
 
 // Domains
