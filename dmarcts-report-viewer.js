@@ -218,11 +218,20 @@ function report_data_xml_display_toggle() {
 
 	if (xml_data_open == 0) {
 		xml_data_open = 1;
+		cursor('pointer')
 		set_report_data_widths();
 	} else {
+		unpin_all();
 		xml_data_open = 0;
+		cursor('default')
 		set_report_data_widths();
 	}
+}
+
+function cursor(type) {
+
+	document.getElementById('report_desc').style.cursor = type;
+	document.getElementById('report_data_table').getElementsByTagName('tbody')[0].style.cursor = type
 }
 
 function set_report_data_widths () {
@@ -350,6 +359,10 @@ function showReport(str) {
 
 				if ( xml_data_open == 1 ) {
 					set_report_data_widths();
+					cursor('pointer')
+				}
+				if ( xml_data_hljs ) {
+					hljs.highlightAll();
 				}
 			}
 		};
@@ -595,7 +608,9 @@ function build_cookie() {
 			"sort_column" : sort_column ,
 			"sort" : sort ,
 			// "alignment_unknown" : 0 ,
-			"dmarc_results_matching_only" : 0
+			"dmarc_results_matching_only" : 0 ,
+			"xml_data_highlight" : xml_data_highlight,
+			"xml_data_hljs" : xml_data_hljs
 		};
 
  		cookie_value = JSON.stringify(cookie_value);
@@ -654,4 +669,80 @@ function cancelOptions() {
 		setCookie("dmarcts-options-tmp", "", -365)
 	}
 	window.location.href = 'dmarcts-report-viewer.php';
+}
+
+// Functions to highlight XML data
+
+function highlight(element) {
+
+		if ( xml_data_open == 1 && xml_data_highlight == 1 ) {
+			element.classList.add('highlight');
+			document.getElementById(other_element(element.id)).classList.add('highlight')
+		}
+}
+
+function unhighlight(element) {
+
+		if ( xml_data_open == 1 && xml_data_highlight == 1 ) {
+			element.classList.remove("highlight");
+			document.getElementById(other_element(element.id)).classList.remove('highlight')
+		}
+}
+
+function pin(element) {
+
+	if ( xml_data_open == 1 && xml_data_highlight == 1 ) {
+		if ( element.className.indexOf('pinned') != -1 ){
+			// Unpins element
+			element.classList.remove('pinned');
+			document.getElementById(other_element(element.id)).classList.remove('pinned');
+		} else {
+			// Pins element
+			unpin_all();
+			element.classList.add('pinned');
+			document.getElementById(other_element(element.id)).classList.add('pinned');
+			if ( element.id.indexOf('record') == 0 ) {
+				document.getElementById(other_element(element.id)).scrollIntoView({ behavior: 'smooth', block: 'center' });
+			} else {
+				document.getElementById(other_element(element.id)).scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}
+		}
+	}
+}
+
+function other_element(str) {
+
+	num = str.replace(/[a-zA-Z]+/g,"");
+	name = str.replace(/[0-9]+/g,"");
+
+	// Special case of first section of xml (report_metadata) and Report Description (report_desc)
+	if ( str == "report_desc" ) {
+		return "report_metadata";
+	}
+	if( str == "report_metadata") {
+		return "report_desc";
+	}
+
+	switch (name) {
+		case "record":
+			other_name = "line";
+			break;
+		case "line":
+			other_name = "record";
+			break;
+		default:
+			other_name = "";
+	}
+
+	return other_name + num;
+}
+
+function unpin_all() {
+
+	pinned = document.getElementsByClassName('pinned')
+	if ( pinned.length != 0 ) {
+		for ( i = 0; i <= pinned.length; i++ ) {
+			pinned[0].classList.remove('pinned');
+		}
+	}
 }

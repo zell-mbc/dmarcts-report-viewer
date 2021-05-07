@@ -47,10 +47,18 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 	$html[] = "    <title>DMARC Report Viewer</title>";
 	$html[] = "    <link rel='stylesheet' href='" . $cookie_options['cssfile'] . "'>";
 	$html[] = "    <script src='dmarcts-report-viewer.js'></script>";
+
+	if ( $cookie_options['xml_data_hljs'] ) {
+		$html[] = "    <link rel='stylesheet' href='highlight.js/styles/" . $cookie_options['cssfile'] . "'>";
+		$html[] = "    <script src='highlight.js/highlight.pack.js'></script>";
+	}
+
 	$html[] = "    <script>";
 	$html[] = "      var report_list_height_percent = " . $cookie_options["report_list_height_percent"] . ";";
 	$html[] = "      var report_data_xml_width_percent = " . $cookie_options["report_data_xml_width_percent"] . ";";
 	$html[] = "      var xml_data_open = " . $cookie_options['xml_data_open'] . ";";
+	$html[] = "      var xml_data_highlight = " . $cookie_options['xml_data_highlight'] . ";";
+	$html[] = "      var xml_data_hljs = " . $cookie_options['xml_data_hljs'] . ";";
 	$html[] = "    </script>";
 	$html[] = "    <meta charset=\"UTF-8\" />";
 	$html[] = "    <meta name='google' content='notranslate' />";

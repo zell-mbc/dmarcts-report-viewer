@@ -1,0 +1,16 @@
+/*
+
+Original highlight.js style (c) Ivan Sagalaev <maniac@softwaremaniacs.org>
+
+*/
+
+/* Include default.css */
+@import "default.css";
+
+/* All colors are controlled by the following section */
+:root {
+  --xml_text: #6cff7c;
+	--xml_meta: #1f7199;
+	--xml_name_weight: normal;
+	--xml_name_color: var(--text);
+}
