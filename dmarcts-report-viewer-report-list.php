@@ -228,7 +228,7 @@ switch ($dmarc_select) {
 // Report Status
 // --------------------------------------------------------------------------
 if ( $report_status != "all" && $report_status != "" ) {
-	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " " . $dmarc_result[$report_status]['status_sql_where'];
+	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " " . $mysqli->real_escape_string($dmarc_result[$report_status]['status_sql_where']);
 }
 
 // Domains
@@ -272,10 +272,6 @@ FROM
 			SELECT
 				SUM(rcount) AS rcount,
 				serial,
-				dkim_align,
-				spf_align,
-				dkimresult,
-				spfresult,
 				MIN(
 					(CASE
 						WHEN dkim_align = 'fail' THEN 0
@@ -345,8 +341,6 @@ FROM
 	ON
 		report.serial = rptrecord.serial
 $where
-GROUP BY
-	serial
 ORDER BY
     " . $cookie_options['sort_column'] . ( $cookie_options['sort'] ? " ASC" : " DESC" )
 ;
