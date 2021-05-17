@@ -74,7 +74,6 @@ function tmpl_reportList($reports, $sort) {
 
 		foreach ($reports as $row) {
 			$row = array_map('htmlspecialchars', $row);
-			$date_output_format = "Y-m-d G:i:s T";
 			$reportlist[] =  "    <tr class='linkable' onclick=\"showReport('" . $row['serial'] . "')\" id='report" . $row['serial'] . "' title='" . $title_message_tr . "'>";
 
 			$reportlist[] =  "      <td class='circle_container'><span class='status_sort_key'>" . get_dmarc_result($row)['status_sort_key'] . "</span></td>"; // Col 0
