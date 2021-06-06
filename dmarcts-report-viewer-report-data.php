@@ -221,6 +221,11 @@ function formatXML($raw_xml, $reportnumber) {
 
 	$html .= "<div id='report_metadata' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>" . $out . "</code></pre></div>";
 
+	$out = $dom->saveXML($dom->getElementsByTagName("policy_published")[0]);
+	$out = htmlspecialchars($out);
+
+	$html .= "<div id='policy_published' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>" . $out . "</code></pre></div>";
+
 	$records = $dom->getElementsByTagName("record");
 	$i = 0;
 	// $i++;
