@@ -213,13 +213,13 @@ function formatXML($raw_xml, $reportnumber) {
 
 	// Extract <?xml ...> from raw_xml, if it matches the regex pattern.
     if (preg_match("/<\?xml([^?>]*)\?>/", $raw_xml, $matches)) {
-        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code</pre>";
+        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code></pre>";
     }
 
     // Extract root <feedback> from raw_xml.
     $rootName = $dom->firstChild->localName;
     if (preg_match("/<". $rootName ."([^>]*)>/", $raw_xml, $matches)) {
-        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code</pre>";
+        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code></pre>";
     }
 
 	$out = $dom->saveXML($dom->getElementsByTagName("report_metadata")[0]);
@@ -247,7 +247,7 @@ function formatXML($raw_xml, $reportnumber) {
 
     // Extract closing </feedback> from raw_xml.
     if (preg_match("/<\/". $rootName .">/", $raw_xml, $matches)) {
-        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code</pre>";
+        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code></pre>";
     }
 
 	return $html;
