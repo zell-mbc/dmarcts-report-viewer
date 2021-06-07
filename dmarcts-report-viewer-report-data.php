@@ -208,13 +208,19 @@ function formatXML($raw_xml, $reportnumber) {
 	$dom->formatOutput = true;
 	$dom->loadXML($raw_xml);
 
-	// These next few lines adding <?xml version=\"1.0\" encoding=\"UTF-8\" > and <feedback> (as well as the lines adding the closing </feedback> tag) are are very risky because they assume that the first two lines and the last line of the raw_xml are weel-formed
-	// Hopefully not too risky as the raw_xml has already gone through the dmarcts-parser routine that looks for bad XML.
-	// If someone can code a proper way to get those lines, it would be appreciated.
-	$xml_arr = explode(PHP_EOL,$raw_xml);
-	$out = $xml_arr[0] . "\n" . $xml_arr[1];
-	// Should return first 2 lines of xml: <?xml version=\"1.0\" encoding=\"UTF-8\"> and <feedback>
-	$html = "<pre><code class='xml'>" . htmlspecialchars($out) . "</code></pre>";
+    // Note that the XML formatter prints expected elements only.
+    // If the report contains junk (or an unknown extension), it will be omitted from output.
+
+	// Extract <?xml ...> from raw_xml, if it matches the regex pattern.
+    if (preg_match("/<\?xml([^?>]*)\?>/", $raw_xml, $matches)) {
+        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code</pre>";
+    }
+
+    // Extract root <feedback> from raw_xml.
+    $rootName = $dom->firstChild->localName;
+    if (preg_match("/<". $rootName ."([^>]*)>/", $raw_xml, $matches)) {
+        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code</pre>";
+    }
 
 	$out = $dom->saveXML($dom->getElementsByTagName("report_metadata")[0]);
 	$out = htmlspecialchars($out);
@@ -239,9 +245,10 @@ function formatXML($raw_xml, $reportnumber) {
 		$i++;
 	}
 
-	$out = $xml_arr[sizeof($xml_arr)-2];
-	$out = htmlspecialchars($out);
-		$html .= "<pre><code class='xml'>" . $out . "</code></pre>";
+    // Extract closing </feedback> from raw_xml.
+    if (preg_match("/<\/". $rootName .">/", $raw_xml, $matches)) {
+        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code</pre>";
+    }
 
 	return $html;
 }
