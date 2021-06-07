@@ -208,45 +208,35 @@ function formatXML($raw_xml, $reportnumber) {
 	$dom->formatOutput = true;
 	$dom->loadXML($raw_xml);
 
-    // Note that the XML formatter prints expected elements only.
-    // If the report contains junk (or an unknown extension), it will be omitted from output.
-
-	// Extract <?xml ...> from raw_xml, if it matches the regex pattern.
+	// Extract and print <?xml ...> from raw_xml, if it matches the regex pattern.
     if (preg_match("/<\?xml([^?>]*)\?>/", $raw_xml, $matches)) {
         $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code></pre>";
     }
 
-    // Extract root <feedback> from raw_xml.
-    $rootName = $dom->firstChild->localName;
-    if (preg_match("/<". $rootName ."([^>]*)>/", $raw_xml, $matches)) {
+    // Extract and print root <feedback> from raw_xml.
+    $root = $dom->firstChild;
+    if (preg_match("/<". $root->localName ."([^>]*)>/", $raw_xml, $matches)) {
         $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code></pre>";
     }
 
-	$out = $dom->saveXML($dom->getElementsByTagName("report_metadata")[0]);
-	$out = htmlspecialchars($out);
+    // Print all child nodes
+    foreach ($root->childNodes as $element) {
+        $out = $dom->saveXML($element);
+        $out = htmlspecialchars($out);
 
-	$html .= "<div id='report_metadata' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>" . $out . "</code></pre></div>";
+        $elementName = $element->localName;
 
-	$out = $dom->saveXML($dom->getElementsByTagName("policy_published")[0]);
-	$out = htmlspecialchars($out);
+        // If element is a 'record', append database id to unique HTML id
+        if ($elementName === "record") {
+            $elementName .= $id_min;
+            $id_min++;
+        }
 
-	$html .= "<div id='policy_published' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>" . $out . "</code></pre></div>";
-
-	$records = $dom->getElementsByTagName("record");
-	$i = 0;
-	// $i++;
-	foreach ( $records as $record) {
-		$out = $dom->saveXML($dom->getElementsByTagName("record")[$i]);
-		$out = htmlspecialchars($out);
-		$html .= "<div id='record$id_min' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>";
-		$html .= $out;
-		$html .= "</code></pre></div>";
-		$id_min++;
-		$i++;
+        $html .= "<div id='". $elementName ."' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>" . $out . "</code></pre></div>";
 	}
 
     // Extract closing </feedback> from raw_xml.
-    if (preg_match("/<\/". $rootName .">/", $raw_xml, $matches)) {
+    if (preg_match("/<\/". $root->localName .">/", $raw_xml, $matches)) {
         $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code></pre>";
     }
 
