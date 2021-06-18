@@ -140,7 +140,7 @@ function create_input_text($option_name, $option = array()) {
 	$values = $option["option_values"];
 
 	if (isset($cookie_options[$option_name]) ) {
-		$value = "value='" . $cookie_options[$option_name] . "'";
+		$value = "value='" . preg_replace("/'/", "&#39;", $cookie_options[$option_name]). "'";
 	} else {
 		$value = "";
 	}

@@ -74,14 +74,13 @@ function tmpl_reportList($reports, $sort) {
 
 		foreach ($reports as $row) {
 			$row = array_map('htmlspecialchars', $row);
-			$date_output_format = "Y-m-d G:i:s T";
 			$reportlist[] =  "    <tr class='linkable' onclick=\"showReport('" . $row['serial'] . "')\" id='report" . $row['serial'] . "' title='" . $title_message_tr . "'>";
 
 			$reportlist[] =  "      <td class='circle_container'><span class='status_sort_key'>" . get_dmarc_result($row)['status_sort_key'] . "</span></td>"; // Col 0
 			$reportlist[] =  "      <td class='circle_container'><div style='white-space: nowrap;' title='DMARC: " . get_dmarc_result($row)['result'] . "\nSPF/DKIM/DMARC: " . get_report_status($row)['status_text'] . "\n" . $title_message_tr . "'><div class='circle circle_left circle_" . get_dmarc_result($row)['color'] . "'></div><div class='circle circle_right circle_" . get_report_status($row)['color'] . "'></div></div></td>"; // Col 0
 			$reportlist[] =  "      <td class='circle_container'><span class='status_sort_key'>" . get_report_status($row)['status_sort_key'] . "</span></span></td>"; // Col 0
-			$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $date_output_format). "</td>";   // Col 1
-			$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $date_output_format). "</td>";   // Col 3
+			$reportlist[] =  "      <td class='right'>". format_date($row['mindate'], $cookie_options['date_format']). "</td>";   // Col 1
+			$reportlist[] =  "      <td class='right'>". format_date($row['maxdate'], $cookie_options['date_format']). "</td>";   // Col 3
 			$reportlist[] =  "      <td class='center'>". $row['domain']. "</td>";                                     // Col 5
 			$reportlist[] =  "      <td class='center'>". $row['org']. "</td>";                                        // Col 6
 			$reportlist[] =  "      <td class='center'>". $row['reportid'] . "</td>";

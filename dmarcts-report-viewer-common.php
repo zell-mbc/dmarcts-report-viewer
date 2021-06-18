@@ -107,7 +107,14 @@ $options = array(
 			"option_value" => "default.css",
 			"option_description" => "Name of the css file to be used.<br>The dropdown list is automatically generated from any css files in the main dmarcts-report-viewer directory. The css is immediately applied to this page when selected.",
 	),
-	"option_group_2_heading" => array(
+	"date_format" => array(
+			"option_type" => "text",
+			"option_label" => "Date Format",
+			"option_values" => "",
+			"option_value" => "Y-m-d G:i:s T",
+			"option_description" => "String to format the dates in the Report List and the Report Description.<br>The default format string is Y-m-d G:i:s T which shows, for example, 2020-01-01 00:00:00 UTC.<br>For the allowable options in the format string, see <a href='https://www.php.net/manual/en/datetime.format.php#refsect1-datetime.format-parameters' target='_blank'>the documentation</a>.",
+	),
+"option_group_2_heading" => array(
 			"option_type" => "heading",
 			"option_label" => "Filters",
 			"option_values" => "",
