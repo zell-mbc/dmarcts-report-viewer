@@ -208,35 +208,37 @@ function formatXML($raw_xml, $reportnumber) {
 	$dom->formatOutput = true;
 	$dom->loadXML($raw_xml);
 
-	// These next few lines adding <?xml version=\"1.0\" encoding=\"UTF-8\" > and <feedback> (as well as the lines adding the closing </feedback> tag) are are very risky because they assume that the first two lines and the last line of the raw_xml are weel-formed
-	// Hopefully not too risky as the raw_xml has already gone through the dmarcts-parser routine that looks for bad XML.
-	// If someone can code a proper way to get those lines, it would be appreciated.
-	$xml_arr = explode(PHP_EOL,$raw_xml);
-	$out = $xml_arr[0] . "\n" . $xml_arr[1];
-	// Should return first 2 lines of xml: <?xml version=\"1.0\" encoding=\"UTF-8\"> and <feedback>
-	$html = "<pre><code class='xml'>" . htmlspecialchars($out) . "</code></pre>";
+	// Extract and print <?xml ...> from raw_xml, if it matches the regex pattern.
+    if (preg_match("/<\?xml([^?>]*)\?>/", $raw_xml, $matches)) {
+        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code></pre>";
+    }
 
-	$out = $dom->saveXML($dom->getElementsByTagName("report_metadata")[0]);
-	$out = htmlspecialchars($out);
+    // Extract and print root <feedback> from raw_xml.
+    $root = $dom->firstChild;
+    if (preg_match("/<". $root->localName ."([^>]*)>/", $raw_xml, $matches)) {
+        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code></pre>";
+    }
 
-	$html .= "<div id='report_metadata' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>" . $out . "</code></pre></div>";
+    // Print all child nodes
+    foreach ($root->childNodes as $element) {
+        $out = $dom->saveXML($element);
+        $out = htmlspecialchars($out);
 
-	$records = $dom->getElementsByTagName("record");
-	$i = 0;
-	// $i++;
-	foreach ( $records as $record) {
-		$out = $dom->saveXML($dom->getElementsByTagName("record")[$i]);
-		$out = htmlspecialchars($out);
-		$html .= "<div id='record$id_min' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>";
-		$html .= $out;
-		$html .= "</code></pre></div>";
-		$id_min++;
-		$i++;
+        $elementName = $element->localName;
+
+        // If element is a 'record', append database id to unique HTML id
+        if ($elementName === "record") {
+            $elementName .= $id_min;
+            $id_min++;
+        }
+
+        $html .= "<div id='". $elementName ."' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'><pre><code class='xml'>" . $out . "</code></pre></div>";
 	}
 
-	$out = $xml_arr[sizeof($xml_arr)-2];
-	$out = htmlspecialchars($out);
-		$html .= "<pre><code class='xml'>" . $out . "</code></pre>";
+    // Extract closing </feedback> from raw_xml.
+    if (preg_match("/<\/". $root->localName .">/", $raw_xml, $matches)) {
+        $html .= "<pre><code class='xml'>" . htmlspecialchars($matches[0]) . "</code></pre>";
+    }
 
 	return $html;
 }
