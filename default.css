@@ -22,19 +22,21 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* All colors are controlled by the following section */
 :root {
-  --background: white;
-  --text: black;
-  --text_over_colorbg: #000000;
-  --header: silver;
-  --link: #0000EE;
-  --link_visited: #551A8B;
-  --hover: whitesmoke;
-  --shadow: grey;
-  --selected: gainsboro;
-  --green: #00FF00;
-  --yellow: #FFFF00;
-  --orange: #FFA500;
-  --red: #FF0000;
+	/* Ordered from darkest the lightest */
+	--text: black;
+	--text_over_colorbg: #000000;
+	--shadow: grey;
+	--header: silver;
+	--selected: gainsboro;
+	--hover: whitesmoke;
+	--background: white;
+
+	--link: #0000EE;
+	--link_visited: #551A8B;
+	--green: #00FF00;
+	--yellow: #FFFF00;
+	--orange: #FFA500;
+	--red: #FF0000;
 	--xml_highlighted: lightcyan;
 	--xml_pinned: #99ffff;
 }
@@ -305,6 +307,10 @@ table.reportdata tr.pinned {
 	background-color: var(--background);
 }
 
+form {
+	vertical-align: bottom;
+	}
+
 .optionblock {
 	white-space: nowrap;
 	overflow: auto;
@@ -325,17 +331,22 @@ table.reportdata tr.pinned {
 	border-right: 1px solid var(--text);
 	padding-right: 1em;
 	cursor: default;
+	text-align: center;
+	vertical-align: bottom;
 }
 
 .menu_icon {
-	display: inline-block;
+	width: 1.5em;
 	cursor: default;
-	font-size: 300%;
+	border: .2em solid var(--header);
+	border-radius: .3em;
+	padding: .3em;
+	vertical-align: bottom;
+	transition: 0.15s all linear;
 }
 
 .menu_icon:hover{
-	/* font-weight: bold; */
-	background-color: var(--selected);
+	border-color: var(--shadow);
 }
 
 .menu {
@@ -465,3 +476,156 @@ table.reportdata tr.pinned {
 	height: 30px;
 	cursor: ew-resize;
 }
+
+/* Cross-browser (hopefully) styling of buttons and inputs
+	Based on https://github.com/filamentgroup/select-css */
+
+/* class applies to select element itself, not a wrapper element */
+.x-css {
+	font-size: inherit;
+	font-family: inherit;
+	display: block;
+	margin: auto;
+	color: var(--text);
+	padding: .2em 1.4em .2em .3em;
+	box-sizing: border-box;
+	border: .2em solid var(--header);
+	border-radius: .3em;
+	transition: 0.15s all linear;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	appearance: none;
+	background-image:
+	/* Note: background-image uses 2 urls.
+		The first is an svg data uri for the arrow icon.
+		The second is the gradient for the icon.
+			If you want to change the color, be sure to use `%23` instead of `#`, since it's a url.
+		You can also swap in a different svg icon or an external image reference */
+		url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%233DAEE9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'),
+		linear-gradient(to bottom, var(--background) 0%,var(--selected) 100%);
+	background-repeat: no-repeat, repeat;
+	/* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
+	background-position: right .5em top 50%, 0 0;
+	/* icon size, then gradient */
+	background-size: .65em auto, 100%;
+}
+
+.x-css-left-align {
+	margin: 0;
+}
+.x-css option {
+	color: var(--text_over_colorbg);
+}
+
+.x-css label {
+	padding: 0 .5em 0 0;
+}
+
+div.x-css,
+button.x-css,
+input[type=submit].x-css,
+input[type=number].x-css,
+input[type=radio].x-css {
+	display: inline-block;
+	padding: .2em .5em;
+	background-image: linear-gradient(to bottom, var(--background) 0%,var(--selected) 100%);
+	background-repeat: repeat;
+	background-position: 0 0;
+	background-size: 100%;
+}
+
+input[type=radio].x-css {
+	margin: 0 0 0 .15em;
+}
+
+/* button.x-css,
+input[type=submit].x-css {
+	border: 2px outset var(--shadow);
+} */
+
+div.x-css {
+	padding: .25em .3em .1em .3em;
+}
+
+input[type=number].x-css {
+	padding: .1em .3em;
+}
+
+input[type=radio].x-css,
+label.x-css {
+	background-image: unset;
+	padding: 0;
+	border-radius: 49%;
+	width: .8em;
+	height: .8em;
+	border: .15em solid var(--text);
+	}
+
+button:active,
+input[type=submit]:active {
+	transform: translate(0.08em, 0.1em);
+}
+
+input[type=radio].x-css:checked {
+		background-color: #3daee9;
+	}
+
+/* Hide arrow icon in IE browsers */
+.x-css::-ms-expand {
+	display: none;
+}
+
+/* Hover style */
+.x-css:hover {
+	border-color: var(--shadow);
+}
+
+.x-css:focus,
+.menu_icon:focus,
+button:focus,
+input[type=number]:focus,
+input[type=submit]:focus,
+input[type=radio]:focus {
+	/* border-color: #aaa; */
+	/* It'd be nice to use -webkit-focus-ring-color here but it doesn't work on box-shadow */
+	box-shadow: 0 0 1px 2px rgba(59, 153, 252, .7);
+	box-shadow: 0 0 0 2px -moz-mac-focusring;
+	color: var(--text);
+	outline: none;
+}
+
+/* Support for rtl text, explicit support for Arabic and Hebrew */
+*[dir="rtl"] .x-css,
+:root:lang(ar) .x-css,
+:root:lang(iw) .x-css {
+	background-position: left .7em top 50%, 0 0;
+	padding: .6em .8em .5em 1.4em;
+}
+
+/* Disabled styles */
+select.x-css:disabled,
+select.x-css[aria-disabled=true] {
+	color: var(--shadow);
+	background-image:
+	/* Note: background-image uses 2 urls.
+		The first is an svg data uri for the arrow icon.
+		The second is the gradient for the icon.
+			If you want to change the color, be sure to use `%23` instead of `#`, since it's a url.
+		You can also swap in a different svg icon or an external image reference */
+		url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22graytext%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'),
+		linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);
+}
+
+.x-css:disabled,
+.x-css[aria-disabled=true] {
+	background-image: linear-gradient(to bottom, var(--selected) 0%,var(--hover) 100%);
+	color: var(--shadow);
+}
+
+.x-css:disabled:hover,
+.x-css[aria-disabled=true] {
+	border: .1em solid var(--hover);
+}
+
+/* Will have to work on this if ever need to disable radio buttons */
+/* input[type=radio].x-css {} */

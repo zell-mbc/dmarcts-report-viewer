@@ -101,10 +101,10 @@ function html ($domains = array(), $orgs = array(), $dmarc_result_select = array
 	$html[] = "			</table>";
 
 	$html[] = "			<div style='text-align: center;'>";
-	$html[] = "				<button type=\"button\" onclick=\"cancelOptions();\" title=\"Cancel changes and return to reports.\">Cancel</button>";
+	$html[] = "				<button type=\"button\" class=\"x-css\" onclick=\"cancelOptions();\" title=\"Cancel changes and return to reports.\">Cancel</button>";
 
-	$html[] = "				<button type=\"button\" onclick=\"resetOptions()\" title=\"Reset all options to their default values.\">Reset</button>";
-	$html[] = "				<input type=\"submit\" title=\"Save changes and return to reports.\" value=\"Save\">";
+	$html[] = "				<button type=\"button\" class=\"x-css\" onclick=\"resetOptions()\" title=\"Reset all options to their default values.\">Reset</button>";
+	$html[] = "				<input type=\"submit\" class=\"x-css\" title=\"Save changes and return to reports.\" value=\"Save\">";
 	$html[] = "			</div>";
 	$html[] = "		</form>";
 	$html[] = "		<br /><br />";
@@ -165,7 +165,7 @@ function create_input_text($option_name, $option = array()) {
 			break;
 	}
 
-	$html[] = "						<input $value type=" . $option["option_type"] . " id=" . $option_name . " name=" . $option_name . $extra_options . ">" . $after . "<br>";
+	$html[] = "						<input $value type=" . $option["option_type"] . " class='x-css' id=" . $option_name . " name=" . $option_name . $extra_options . ">" . $after . "<br>";
 	$html[] = "					</td>";
 	$html[] = "				</tr>";
 }
@@ -184,9 +184,12 @@ function create_input_radio($option_name) {
 	$html[] = "						<span class='option_description'>" . $options[$option_name]["option_description"] . "</span>";
 	$html[] = "					</td>";
 	$html[] = "					<td class='right_column'>";
+	$html[] = "					<div class='x-css'>";
 	for ($i = 0; $i < sizeof($values); $i+=2) {
-		$html[] =	"						<input type=" . $options[$option_name]["option_type"] . " id=" . strtolower(str_replace(" ", "_", $values[$i+1])) . " name=" . $option_name . ($options[$option_name]["option_type"] == "checkbox" ? "[]" : "" ) . " value='" . $values[$i] . "'" . checked($option_name, $values[$i]) . "><label for=" . $option_name . ">" . $values[$i+1] . " </label><br />";
+		$html[] =	"						<input type=" . $options[$option_name]["option_type"] . " class='x-css' id=" . $option_name . $i . " name=" . $option_name . ($options[$option_name]["option_type"] == "checkbox" ? "[]" : "" ) . " value='" . $values[$i] . "'" . checked($option_name, $values[$i]) . ">";
+		$html[] =	"						<label for=" . $option_name . $i . ">" . $values[$i+1] . " </label>";
 	}
+	$html[] = "					</div>";
 	$html[] = "					</td>";
 	$html[] = "				</tr>";
 }
@@ -232,7 +235,7 @@ function create_select($option_name, $option = array(), $var) {
 		$js = " onchange='change_stylesheet();'";
 	}
 
-	$html[] = "						<select name='" . $option_name . "' id='sel" . $option_name . "'" . $js . ">";
+	$html[] = "						<select class='x-css x-css-left-align' name='" . $option_name . "' id='sel" . $option_name . "'" . $js . ">";
 	foreach ($var as $key => $value) {
 		if ( $cookie_options[$option_name] == $key ) {
 			$selected = "selected";
