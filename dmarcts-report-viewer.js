@@ -677,7 +677,10 @@ function highlight(element) {
 
 		if ( xml_data_open == 1 && xml_data_highlight == 1 ) {
 			element.classList.add('highlight');
-			document.getElementById(other_element(element.id)).classList.add('highlight')
+			var el = document.getElementById(other_element(element.id));
+            if ( el ) {
+                el.classList.add('highlight');
+            }
 		}
 }
 
@@ -685,7 +688,10 @@ function unhighlight(element) {
 
 		if ( xml_data_open == 1 && xml_data_highlight == 1 ) {
 			element.classList.remove("highlight");
-			document.getElementById(other_element(element.id)).classList.remove('highlight')
+			var el = document.getElementById(other_element(element.id));
+            if ( el ) {
+                el.classList.remove('highlight');
+            }
 		}
 }
 
@@ -695,16 +701,22 @@ function pin(element) {
 		if ( element.className.indexOf('pinned') != -1 ){
 			// Unpins element
 			element.classList.remove('pinned');
-			document.getElementById(other_element(element.id)).classList.remove('pinned');
+			var el = document.getElementById(other_element(element.id));
+            if ( el ) {
+                el.classList.remove('pinned');
+            }
 		} else {
 			// Pins element
 			unpin_all();
 			element.classList.add('pinned');
-			document.getElementById(other_element(element.id)).classList.add('pinned');
-			if ( element.id.indexOf('record') == 0 ) {
-				document.getElementById(other_element(element.id)).scrollIntoView({ behavior: 'smooth', block: 'center' });
-			} else {
-				document.getElementById(other_element(element.id)).scrollIntoView({ behavior: 'smooth', block: 'start' });
+			var el = document.getElementById(other_element(element.id));
+            if ( el ) {
+                el.classList.add('pinned');
+            }
+            var el = document.getElementById(other_element(element.id));
+            if ( el ) {
+                var scrollBlock = element.id.indexOf('record') == 0 ? 'center' : 'start';
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			}
 		}
 	}
