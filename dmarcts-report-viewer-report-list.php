@@ -176,17 +176,9 @@ if(isset($_GET['rptstat'])){
 // echo "<br />D=$dom_select <br /> O=$org_select <br />";
 // echo "<br />DMARC=$dmarc_select<br />";
 
-// Make a MySQL Connection using mysqli
+// Make a DB Connection
 // --------------------------------------------------------------------------
-$mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname, $dbport);
-
-if ($mysqli->connect_errno) {
-	echo "Errno: " . $mysqli->connect_errno . " ";
-	echo "Error: " . $mysqli->connect_error . " ";
-// Debug ONLY. This will expose database credentials when database connection fails
-// 	echo "Database connection information: <br />dbhost: " . $dbhost . "<br />dbuser: " . $dbuser . "<br />dbpass: " . $dbpass . "<br />dbname: " . $dbname . "<br />dbport: " . $dbport . "<br />";
-	exit;
-}
+$dbh = connect_db($dbtype, $dbhost, $dbport, $dbname, $dbuser, $dbpass);
 
 // Get allowed reports and cache them - using serial as key
 // --------------------------------------------------------------------------
@@ -227,19 +219,19 @@ switch ($dmarc_select) {
 // Report Status
 // --------------------------------------------------------------------------
 if ( $report_status != "all" && $report_status != "" ) {
-	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " " . $mysqli->real_escape_string($dmarc_result[$report_status]['status_sql_where']);
+	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " " . $dmarc_result[$report_status]['status_sql_where'];
 }
 
 // Domains
 // --------------------------------------------------------------------------
 if( $dom_select <> '' ) {
-	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " domain='" . $mysqli->real_escape_string($dom_select) . "'";
+	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " domain=" . $dbh->quote($dom_select);
 }
 
 // Organisations
 // --------------------------------------------------------------------------
 if( $org_select <> '' ) {
-	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " org='" . $mysqli->real_escape_string($org_select) . "'";
+	$where .= ( $where <> '' ? " AND" : " WHERE" ) . " org=" . $dbh->quote($org_select);
 }
 
 // Periods
@@ -349,8 +341,8 @@ ORDER BY
 // echo "<br /><b>Data List sql:</b>  $sql<br />";
 // echo "<br />per_select = " . urlencode($per_select) . "<br />";
 
-$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
-while($row = $query->fetch_assoc()) {
+$query = $dbh->query($sql);
+foreach($query as $row) {
     if (true) {
         //add data by serial
         $reports[$row['serial']] = $row;

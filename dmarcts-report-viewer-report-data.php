@@ -96,7 +96,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	$reportdata[] = "  </thead>";
 	$reportdata[] = "  <tbody>";
 
-	global $mysqli;
+	global $dbh;
 
 $sql = "
 SELECT
@@ -133,8 +133,8 @@ ORDER BY
 	ip ASC
 ";
 
-	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
-	while($row = $query->fetch_assoc()) {
+	$query = $dbh->query($sql);
+	foreach($query as $row) {
 		if ( $row['ip'] ) {
 			$ip = long2ip($row['ip']);
 		} elseif ( $row['ip6'] ) {
@@ -181,7 +181,7 @@ ORDER BY
 
 function formatXML($raw_xml, $reportnumber) {
 
-	global $mysqli;
+	global $dbh;
 
 	$out = "";
 	$html = "";
@@ -196,9 +196,9 @@ function formatXML($raw_xml, $reportnumber) {
 		serial = $reportnumber;
 	";
 
-	$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+	$query = $dbh->query($sql);
 
-	while($row = $query->fetch_assoc()) {
+	foreach($query as $row) {
 		$id_min = $row['id_min'];
 		$id_max = $row['id_max'];
 	}
@@ -296,17 +296,9 @@ if( $dmarc_select == "all" ) {
 // Debug
 //echo "<br />D=$dom_select <br /> O=$org_select <br />";
 
-// Make a MySQL Connection using mysqli
+// Make a DB Connection
 // --------------------------------------------------------------------------
-$mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname, $dbport);
-if ($mysqli->connect_errno) {
-	echo "Error: Failed to make a MySQL connection, here is why: \n";
-	echo "Errno: " . $mysqli->connect_errno . "\n";
-	echo "Error: " . $mysqli->connect_error . "\n";
-// Debug ONLY. This will expose database credentials when database connection fails
-// 	echo "Database connection information: <br />dbhost: " . $dbhost . "<br />dbuser: " . $dbuser . "<br />dbpass: " . $dbpass . "<br />dbname: " . $dbname . "<br />dbport: " . $dbport . "<br />";
-	exit;
-}
+$dbh = connect_db($dbtype, $dbhost, $dbport, $dbname, $dbuser, $dbpass);
 
 // // Get allowed reports and cache them - using serial as key
 // --------------------------------------------------------------------------
@@ -351,14 +343,14 @@ SELECT
 FROM
 	report
 WHERE
-	serial = " . $mysqli->real_escape_string($reportid)
+	serial = " . $dbh->quote($reportid)
 ;
 
 // Debug
 // echo "<br /><b>Data Report sql:</b> $sql<br />";
 
-$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
-while($row = $query->fetch_assoc()) {
+$query = $dbh->query($sql);
+foreach($query as $row) {
 	if (true) {
 		//add data by serial
 		$reports[$row['serial']] = $row;
