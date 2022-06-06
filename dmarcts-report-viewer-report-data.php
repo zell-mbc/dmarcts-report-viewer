@@ -96,6 +96,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 	$reportdata[] = "  </thead>";
 	$reportdata[] = "  <tbody>";
 
+	global $dbtype;
 	global $dbh;
 
 $sql = "
@@ -138,6 +139,9 @@ ORDER BY
 		if ( $row['ip'] ) {
 			$ip = long2ip($row['ip']);
 		} elseif ( $row['ip6'] ) {
+			if ( $dbtype == 'pgsql') {
+				$row['ip6'] = stream_get_contents($row['ip6']);
+			}
 			$ip = inet_ntop($row['ip6']);
 		} else {
 			$ip = "-";

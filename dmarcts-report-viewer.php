@@ -277,16 +277,16 @@ foreach($query as $row) {
 $sql = "
 (
 	SELECT
-		YEAR(mindate) AS year,
-		MONTH(mindate) AS month
+		EXTRACT(YEAR FROM mindate) AS year,
+		EXTRACT(MONTH FROM mindate) AS month
 	FROM
 		report
 )
 UNION
 (
 	SELECT
-		YEAR(maxdate) AS year,
-		MONTH(maxdate) AS month
+		EXTRACT(YEAR FROM mindate) AS year,
+		EXTRACT(MONTH FROM mindate) AS month
 	FROM
 		report
 )
