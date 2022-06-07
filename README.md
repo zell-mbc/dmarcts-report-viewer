@@ -1,5 +1,5 @@
 # dmarcts-report-viewer
-A PHP viewer for DMARC records that have been parsed by [John Levine's rddmarc script](http://www.taugh.com/rddmarc/) or the [dmarcts-report-parser.pl](https://github.com/techsneeze/dmarcts-report-parser) into a MySQL database.
+A PHP viewer for DMARC records that have been parsed by [John Levine's rddmarc script](http://www.taugh.com/rddmarc/) or the [dmarcts-report-parser.pl](https://github.com/techsneeze/dmarcts-report-parser) into a MySQL or PostgreSQL database.
 
 ### Features
 * View a table of parsed reports
@@ -9,7 +9,7 @@ A PHP viewer for DMARC records that have been parsed by [John Levine's rddmarc s
 * View DKIM/SPF details for each report in a table, with the same red/orange/yellow/green colour-coding
 * Sort report detail table by any column
 * View the raw XML of the report beside the report detail table
-* Uses AJAX calls to the MySQL database; no external Javascript libraries are needed
+* Uses AJAX calls to the database; no external Javascript libraries are needed
 
 ## Screenshots
 ### Screenshot: Initial Report Listing
@@ -31,11 +31,11 @@ A PHP viewer for DMARC records that have been parsed by [John Levine's rddmarc s
 
 ### Requirements
 
-* A MySQL database populated with data from [techsneeze.com's dmarcts-report-parser.pl](https://github.com/techsneeze/dmarcts-report-parser) script or [John Levine's rddmarc script](http://www.taugh.com/rddmarc/).
+* A MySQL or PostgreSQL database populated with data from [techsneeze.com's dmarcts-report-parser.pl](https://github.com/techsneeze/dmarcts-report-parser) script or [John Levine's rddmarc script](http://www.taugh.com/rddmarc/).
 
 * A working webserver (apache, nginx, ...) with PHP
 
-* Installed `php-mysql` and `php-dom`
+* Installed `php-mysql` or `php-pgsql` and `php-dom`
 
 ### Download dmarcts-report-viewer:
 ```
@@ -57,6 +57,8 @@ cp dmarcts-report-viewer-config.php.sample dmarcts-report-viewer-config.php
 Next, edit these basic configuration options near the top of the `dmarcts-report-viewer-config.php` file with your specific information:
 
 ```
+// Supported types: mysql, pgsql. If unset, defaults to mysql
+//$dbtype="mysql";
 $dbhost="localhost";
 $dbname="<dmarc-database-name>";
 $dbuser="<dmarc-database-username>";
