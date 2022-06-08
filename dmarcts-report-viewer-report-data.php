@@ -144,7 +144,7 @@ ORDER BY
 		}
 
 		/* escape html characters after exploring binary values, which will be messed up */
-		$row = array_map('htmlspecialchars', $row);
+		$row = array_map('html_escape', $row);
 
 		$reportdata[] = "    <tr id='line" . $row['id'] . "' class='" . get_dmarc_result($row)['color'] . "' title='DMARC Result: " . get_dmarc_result($row)['result'] . "'  onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this);'>";
 		$reportdata[] = "      <td>". $ip. "</td>";
