@@ -415,3 +415,20 @@ function test_input($data) {
 
   return $data;
 }
+
+// This functions opens a connection to the database using PDO
+function connect_db($dbtype, $dbhost, $dbport, $dbname, $dbuser, $dbpass) {
+	$dbtype = $dbtype ?: 'mysql';
+	try {
+		$dbh = new PDO("$dbtype:host=$dbhost;port=$dbport;dbname=$dbname", $dbuser, $dbpass);
+		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$dbh->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+		return $dbh;
+	} catch (PDOException $e) {
+		echo "Error: Failed to make a database connection<br />";
+		echo "Error: " . $e->getMessage() . " ";
+	// Debug ONLY. This will expose database credentials when database connection fails
+	// 	echo "Database connection information: <br />dbhost: " . $dbhost . "<br />dbuser: " . $dbuser . "<br />dbpass: " . $dbpass . "<br />dbname: " . $dbname . "<br />dbport: " . $dbport . "<br />";
+		exit;
+	}
+}

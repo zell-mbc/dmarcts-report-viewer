@@ -263,17 +263,9 @@ include "dmarcts-report-viewer-common.php";
 configure();
 
 
-// Make a MySQL Connection using mysqli
+// Make a DB Connection
 // --------------------------------------------------------------------------
-$mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname, $dbport);
-if ($mysqli->connect_errno) {
-	echo "Error: Failed to make a MySQL connection<br />";
-	echo "Errno: " . $mysqli->connect_errno . " ";
-	echo "Error: " . $mysqli->connect_error . " ";
-// Debug ONLY. This will expose database credentials when database connection fails
-// 	echo "Database connection information: <br />dbhost: " . $dbhost . "<br />dbuser: " . $dbuser . "<br />dbpass: " . $dbpass . "<br />dbname: " . $dbname . "<br />dbport: " . $dbport . "<br />";
-	exit;
-}
+$dbh = connect_db($dbtype, $dbhost, $dbport, $dbname, $dbuser, $dbpass);
 
 
 // Get all css files in dmartcts directory
@@ -300,10 +292,10 @@ FROM
 	report
 ORDER BY domain";
 
-$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+$query = $dbh->query($sql);
 
 $domains['all'] = "[all]";
-while($row = $query->fetch_assoc()) {
+foreach($query as $row) {
 	$domains[$row['domain']] = $row['domain'];
 }
 
@@ -333,9 +325,9 @@ foreach($dmarc_result as $key => $value) {
 }
 
 
-$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+$query = $dbh->query($sql);
 $orgs['all'] = "[all]";
-while($row = $query->fetch_assoc()) {
+foreach($query as $row) {
 	$orgs[$row['org']] = $row['org'];
 }
 

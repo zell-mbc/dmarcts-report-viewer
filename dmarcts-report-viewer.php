@@ -233,17 +233,9 @@ configure();
 
 setcookie("dmarcts-options-tmp", "", time() - 3600, "/");
 
-// Make a MySQL Connection using mysqli
+// Make a DB Connection
 // --------------------------------------------------------------------------
-$mysqli = new mysqli($dbhost, $dbuser, $dbpass, $dbname, $dbport);
-if ($mysqli->connect_errno) {
-	echo "Error: Failed to make a MySQL connection<br />";
-	echo "Errno: " . $mysqli->connect_errno . " ";
-	echo "Error: " . $mysqli->connect_error . " ";
-// Debug ONLY. This will expose database credentials when database connection fails
-// 	echo "Database connection information: <br />dbhost: " . $dbhost . "<br />dbuser: " . $dbuser . "<br />dbpass: " . $dbpass . "<br />dbname: " . $dbname . "<br />dbport: " . $dbport . "<br />";
-	exit;
-}
+$dbh = connect_db($dbtype, $dbhost, $dbport, $dbname, $dbuser, $dbpass);
 
 
 // Get all domains reported
@@ -257,9 +249,9 @@ ORDER BY
 	domain
 ";
 
-$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+$query = $dbh->query($sql);
 
-while($row = $query->fetch_assoc()) {
+foreach($query as $row) {
 	$domains[] = $row['domain'];
 }
 
@@ -274,9 +266,9 @@ ORDER BY
 	org
 ";
 
-$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+$query = $dbh->query($sql);
 
-while($row = $query->fetch_assoc()) {
+foreach($query as $row) {
 	$orgs[] = $row['org'];
 }
 
@@ -285,16 +277,16 @@ while($row = $query->fetch_assoc()) {
 $sql = "
 (
 	SELECT
-		YEAR(mindate) AS year,
-		MONTH(mindate) AS month
+		EXTRACT(YEAR FROM mindate) AS year,
+		EXTRACT(MONTH FROM mindate) AS month
 	FROM
 		report
 )
 UNION
 (
 	SELECT
-		YEAR(maxdate) AS year,
-		MONTH(maxdate) AS month
+		EXTRACT(YEAR FROM mindate) AS year,
+		EXTRACT(MONTH FROM mindate) AS month
 	FROM
 		report
 )
@@ -303,9 +295,9 @@ ORDER BY
 	month DESC
 ";
 
-$query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+$query = $dbh->query($sql);
 
-while($row = $query->fetch_assoc()) {
+foreach($query as $row) {
 	$periods[] = sprintf( "%'.04d-%'.02d", $row['year'], $row['month'] );
 }
 

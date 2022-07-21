@@ -4,6 +4,8 @@
 // ### configuration ##################################################
 // ####################################################################
 
+// Supported types: mysql, pgsql. If unset, defaults to mysql
+//$dbtype="mysql";
 $dbhost="localhost";
 $dbname="dmarc";
 $dbuser="dmarc";
