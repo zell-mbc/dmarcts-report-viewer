@@ -301,6 +301,19 @@ foreach($query as $row) {
 	$periods[] = sprintf( "%'.04d-%'.02d", $row['year'], $row['month'] );
 }
 
+// When arrays of data do not exist, for example in a new & empty set-up, create empty arrays
+// --------------------------------------------------------------------------
+if(!isset($domains)){
+        $domains = array();
+}
+if(!isset($orgs)){
+        $orgs = array();
+}
+if(!isset($periods)){
+        $periods = array();
+}
+
+
 // Generate Page with report list and report data (if a report is selected).
 // --------------------------------------------------------------------------
 echo html(
