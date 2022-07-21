@@ -349,6 +349,15 @@ function format_date($date, $format) {
     return $answer;
 };
 
+// null-safe version of htmlspecialchars for PHP 8+ compatibility
+// --------------------------------------------------------------------------
+function html_escape($str) {
+	if ($str == null) {
+		return null;
+	}
+	return htmlspecialchars($str);
+}
+
 // Get all configuration options
 // --------------------------------------------------------------------------
 function configure() {
