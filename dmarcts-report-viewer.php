@@ -148,7 +148,7 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 		$html[] = "<option " . ( $cookie_options['Domain'] ? "" : "selected=\"selected\" " ) . "value=\"all\">[all]</option>";
 
 		foreach( $domains as $d) {
-			$html[] = "<option " . ( $cookie_options['Domain'] == $d ? "selected=\"selected\" " : "" ) . "value=\"$d\">$d</option>";
+			$html[] = "<option " . ( $cookie_options['Domain'] == $d ? "selected=\"selected\" " : "" ) . "value=\"".htmlspecialchars($d)."\">".htmlspecialchars($d)."</option>";
 		}
 
 		$html[] = "</select>";
@@ -164,7 +164,7 @@ function html ($domains = array(), $orgs = array(), $periods = array() ) {
 		$html[] = "<option " . ( $cookie_options['Organisation'] ? "" : "selected=\"selected\" " ) . "selected=\"selected\" value=\"all\">[all]</option>";
 
 		foreach( $orgs as $o) {
-			$html[] = "<option " . ( $cookie_options['Organisation'] == $o ? "selected=\"selected\" " : "" ) . "value=\"$o\">" . ( strlen( $o ) > 25 ? substr( $o, 0, 22) . "..." : $o ) . "</option>";
+			$html[] = "<option " . ( $cookie_options['Organisation'] == $o ? "selected=\"selected\" " : "" ) . "value=\"".htmlspecialchars($o)."\">" . ( strlen( $o ) > 25 ? htmlspecialchars(substr( $o, 0, 22)) . "..." : htmlspecialchars($o) ) . "</option>";
 		}
 
 		$html[] = "</select>";

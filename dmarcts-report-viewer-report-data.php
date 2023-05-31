@@ -57,6 +57,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 		$row = $reports[$reportnumber];
 
 		$row['raw_xml'] = formatXML($row['raw_xml'], $reportnumber);
+		$row = array_map('html_escape', $row);
 
 		$reportdata[] = "<div id='report_desc_container' class='center reportdesc_container'>";
 		$reportdata[] = "<div id='report_desc' class='center reportdesc'  class='hilighted' onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this)'>Report from ".$row['org']." for ".$row['domain']."<br>". format_date($row['mindate'], $cookie_options['date_format']). " to ".format_date($row['maxdate'], $cookie_options['date_format'])."<br> Policies: adkim=" . $row['policy_adkim'] . ", aspf=" . $row['policy_aspf'] .  ", p=" . $row['policy_p'] .  ", sp=" . $row['policy_sp'] .  ", pct=" . $row['policy_pct'] . "</div>";
@@ -151,7 +152,7 @@ ORDER BY
 		$row = array_map('html_escape', $row);
 
 		$reportdata[] = "    <tr id='line" . $row['id'] . "' class='" . get_dmarc_result($row)['color'] . "' title='DMARC Result: " . get_dmarc_result($row)['result'] . "'  onmouseover='highlight(this);' onmouseout='unhighlight(this);' onclick='pin(this);'>";
-		$reportdata[] = "      <td>". $ip. "</td>";
+		$reportdata[] = "      <td>". htmlspecialchars($ip) . "</td>";
 		if ( $host_lookup ) {
 			$reportdata[] = "      <td>". gethostbyaddr($ip). "</td>";
 		} else {
