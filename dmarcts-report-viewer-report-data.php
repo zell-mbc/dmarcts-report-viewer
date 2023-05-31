@@ -55,7 +55,7 @@ function tmpl_reportData($reportnumber, $reports, $host_lookup = 1) {
 
 	if (isset($reports[$reportnumber])) {
 		$row = $reports[$reportnumber];
-		
+
 		$row['raw_xml'] = formatXML($row['raw_xml'], $reportnumber);
 		$row = array_map('html_escape', $row);
 
