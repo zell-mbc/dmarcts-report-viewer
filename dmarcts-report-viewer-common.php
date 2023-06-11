@@ -1,443 +1,644 @@
-<?php
+/*
+default.css - The default theme css file for dmarcts-report-viewer, a PHP based viewer of parsed DMARC reports.
+Copyright (C) 2016 TechSneeze.com, John Bieling and John P. New
+with additional extensions (sort order) of Klaus Tachtler.
 
-// dmarcts-report-viewer - A PHP based viewer of parsed DMARC reports.
-// Copyright (C) 2016 TechSneeze.com, John Bieling and John P. New
-// with additional extensions (sort order) of Klaus Tachtler.
-//
-// Available at:
-// https://github.com/techsneeze/dmarcts-report-viewer
-//
-// This program is free software: you can redistribute it and/or modify it
-// under the terms of the GNU General Public License as published by the Free
-// Software Foundation, either version 3 of the License, or (at your option)
-// any later version.
-//
-// This program is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-// more details.
-//
-// You should have received a copy of the GNU General Public License along with
-// this program.  If not, see <http://www.gnu.org/licenses/>.
-//
-//####################################################################
-//### configuration ##################################################
-//####################################################################
+Available at:
+https://github.com/techsneeze/dmarcts-report-viewer
 
-// Copy dmarcts-report-viewer-config.php.sample to
-// dmarcts-report-viewer-config.php and edit with the appropriate info
-// for your database authentication and location.
-//
-// Edit the configuration variables in dmarcts-report-viewer.js with your preferences.
+This file is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version.
 
-//####################################################################
-//### variables ######################################################
-//####################################################################
+This file is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+more details.
 
-$cookie_name = "dmarcts-options";
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-// The order in which the options appear here is the order they appear in the DMARC Results dropdown box
-$dmarc_result = array(
+/* All colors are controlled by the following section */
+:root {
+	/* Ordered from darkest the lightest */
+	--text: black;
+	--text_over_colorbg: #000000;
+	--shadow: grey;
+	--header: silver;
+	--selected: gainsboro;
+	--hover: whitesmoke;
+	--background: white;
 
-	'DMARC_PASS' => array(
-		'text' => 'Pass',
-		'status_text' => 'All Passed',
-		'color' => 'green',
-		'status_sort_key' => 3,
-		'status_sql_where' => "dkim_align_min = 2 AND spf_align_min = 2 AND dkim_result_min = 2 AND spf_result_min = 2 AND dmarc_result_min = 2 AND dmarc_result_max = 2",
-	),
-	'DMARC_FAIL' => array(
-		'text' => 'Fail',
-		'status_text' => 'All Failed',
-		'color' => 'red',
-		'status_sort_key' => 0,
-		'status_sql_where' => "dkim_align_min = 0 AND spf_align_min = 0 AND dkim_result_min = 0 AND spf_result_min = 0 AND dmarc_result_min = 0 AND dmarc_result_max = 0",
-	),
-	'DMARC_PASS_AND_FAIL' => array(
-		'text' => 'Mixed',
-		'status_text' => 'At least one failed result',
-		'color' => 'orange',
-		'status_sort_key' => 1,
-		'status_sql_where' => "( dkim_align_min = 0 OR spf_align_min = 0 OR dkim_result_min = 0 OR spf_result_min = 0 OR dmarc_result_min = 0 OR dmarc_result_max = 0 )",
-	),
-	'DMARC_OTHER_CONDITION' => array(
-		'text' => 'Other',
-		'status_text' => 'Other condition',
-		'color' => 'yellow',
-		'status_sort_key' => 2,
-		'status_sql_where' => "( dkim_align_min = 1 OR spf_align_min = 1 OR dkim_result_min = 1 OR spf_result_min = 1 OR dmarc_result_min >= 3 OR dmarc_result_max >= 3 )",
-	),
-);
-
-// Sortable Report List column headers
-// --------------------------------------------------------------------------
-// Array to be used in 'Default sort column' option in dmarcts-report-viewer-options.php
-
-$report_list_columns = array(
-	"mindate" => "Start Date",
-	"maxdate" => "End Date",
-	"domain" => "Domain",
-	"org" => "Reporter",
-	"reportid" => "Report ID",
-	"rcount" => "# Messages"
-);
-
-// Program Options
-// --------------------------------------------------------------------------
-
-// When a new option is added, check the size of the cookie stored. The cookie size should be less than half of the maximum cookie size allowed per domain.
-// Less than half because sometimes the cookie is stored twice (once as dmarcts-options and once as dmarcts-options-tmp). Most browsers have a cookie limit of 4KB.
-// Currently, the following options generate a cookie of about 0.5KB
-
-// Option Names must be unique.
-// The order in which the options appear below is the order they are rendered in the browser.
-// If sections are re-arranged, you don't have to re-name the corresponding heading (i.e. the heading option name (e.g. option_group_3_heading)) because it has no bearing on the order rendered in the browser.
-$options = array(
-	"option_group_1_heading" => array(
-			"option_type" => "heading",
-			"option_label" => "Appearance",
-			"option_values" => "",
-			"option_value" => "",
-			"option_description" => "",
-	),
-	"cssfile" => array(
-			"option_type" => "select",
-			"option_label" => "Default css file",
-			"option_values" => "\$cssfiles",
-			"option_value" => "default.css",
-			"option_description" => "Name of the css file to be used.<br>The dropdown list is automatically generated from any css files in the main dmarcts-report-viewer directory. The css is immediately applied to this page when selected.",
-	),
-	"date_format" => array(
-			"option_type" => "text",
-			"option_label" => "Date Format",
-			"option_values" => "",
-			"option_value" => "Y-m-d G:i:s T",
-			"option_description" => "String to format the dates in the Report List and the Report Description.<br>The default format string is Y-m-d G:i:s T which shows, for example, 2020-01-01 00:00:00 UTC.<br>For the allowable options in the format string, see <a href='https://www.php.net/manual/en/datetime.format.php#refsect1-datetime.format-parameters' target='_blank'>the documentation</a>.",
-	),
-"option_group_2_heading" => array(
-			"option_type" => "heading",
-			"option_label" => "Filters",
-			"option_values" => "",
-			"option_value" => "",
-			"option_description" => "Default filters",
-	),
-	"DMARC" => array(
-			"option_type" => "select",
-			"option_label" => "Default DMARC Result",
-			"option_values" => "\$dmarc_result_select",
-			"option_value" => "all",
-			"option_description" => "Default for DMARC Result drop-down list.",
-	),
-	"dmarc_results_matching_only" => array(
-			"option_type" => "radio",
-			"option_label" => "Show Only Matching Report Data records.",
-			"option_values" => array(1,"On",0,"Off"),
-			"option_value" => 0,
-			"option_description" => "When enabled, only those records matching the DMARC Results dropdown box are shown in the Report Data table.",
-	),
-	"ReportStatus" => array(
-			"option_type" => "select",
-			"option_label" => "Default Report Data Status",
-			"option_values" => "\$report_status_select",
-			"option_value" => "all",
-			"option_description" => "Default for Report Data Status drop-down list.",
-	),
-	"Period" => array(
-			"option_type" => "radio",
-			"option_label" => "Default period",
-			"option_values" => array(0,"All",1,"Current Month"),
-			"option_value" => 1,
-			"option_description" => "Default for the Month drop-down.",
-	),
-	"Domain" => array(
-			"option_type" => "select",
-			"option_label" => "Default domain",
-			"option_values" => "\$domains",
-			"option_value" => "all",
-			"option_description" => "Default for the Domain(s) drop-down list.",
-	),
-	"Organisation" => array(
-			"option_type" => "select",
-			"option_label" => "Default reporter",
-			"option_values" => "\$orgs",
-			"option_value" => "all",
-			"option_description" => "Default for the Reporter(s) drop-down list.",
-	),
-	"option_group_3_heading" => array(
-			"option_type" => "heading",
-			"option_label" => "Initial Settings",
-			"option_values" => "",
-			"option_value" => "",
-			"option_description" => "Startup Defaults",
-	),
-	"HostLookup" => array(
-			"option_type" => "radio",
-			"option_label" => "Host lookup",
-			"option_values" => array(1,"On",0,"Off"),
-			"option_value" => 1,
-			"option_description" => "Turning off host lookup speeds up the display of the results, especially in the case of mail servers that have ceased to exist.",
-	),
-	"report_list_height_percent" => array(
-			"option_type" => "number",
-			"option_label" => "Report List - Initial Height",
-			"option_values" => array("units"=>"percent","min"=>"0","max"=>100),
-			"option_value" => 60,
-			"option_description" => "Initial height of the Report List window, a percentage of the height of the main browser window.",
-	),
-	"sort_column" => array(
-			"option_type" => "select",
-			"option_label" => "Default sort column",
-			"option_values" => "\$report_list_columns",
-			"option_value" => "maxdate",
-			"option_description" => "Report List column to sort initially.",
-	),
-	"sort" => array(
-			"option_type" => "radio",
-			"option_label" => "Default sort order",
-			"option_values" => array(1,"Ascending",0,"Descending"),
-			"option_value" => 0,
-			"option_description" => "Default sort order of Report List column chosen above.",
-	),
-	"option_group_4_heading" => array(
-			"option_type" => "heading",
-			"option_label" => "XML Data",
-			"option_values" => "",
-			"option_value" => "",
-			"option_description" => "Startup Defaults",
-	),
-	"xml_data_open" => array(
-			"option_type" => "radio",
-			"option_label" => "Show Report Data XML",
-			"option_values" => array(1,"On",0,"Off"),
-			"option_value" => 0,
-			"option_description" => "When a report is selected in the Report List, automatically open the XML view along with the Report Table.",
-	),
-	"report_data_xml_width_percent" => array(
-			"option_type" => "number",
-			"option_label" => "Report Data XML - Initial Width",
-			"option_values" => array("units"=>"percent","min"=>"0","max"=>"100"),
-			"option_value" => 25,
-			"option_description" => "Initial width of the Report Data XML window when it is opened, a percentage of the width of the main browser window.",
-	),
-	"xml_data_highlight" => array(
-			"option_type" => "radio",
-			"option_label" => "Use Report Data to Raw XML Highlighting",
-			"option_values" => array(1,"On",0,"Off"),
-			"option_value" => "1",
-			"option_description" => "When the raw XML view is open, and when the mouse hovers over, or clicks on, a line of the Report Data table or the Report Data description, highlight the section in the raw XML that corresponds to that row or description. Also works in the opposite direction (i.e. hover/click on a XML record to highlight the corresponding Report Data table line or description). Facilitates determining which XML record corresponds to which line of the table.",
-	),
-	"xml_data_hljs" => array(
-			"option_type" => "radio",
-			"option_label" => "Use XML Syntax Highlighting",
-			"option_values" => array(1,"On",0,"Off"),
-			"option_value" => "1",
-			"option_description" => "Use syntax highlighting on the Raw XML. This uses a small external javascript file which may or may not slow down the program.",
-	)
-	// This option will be implemented in a future version of dmarcts-reports-viewer.
-	// ),
-	// "alignment_unknown" => array(
-	// 		"option_type" => "radio",
-	// 		"option_label" => "Unknown SPF/DKIM Alignments",
-	// 		"option_values" => array(1,"Consider \"Failed\"",0,"Keep as \"Unknown\""),
-	// 		"option_value" => "0",
-	// 		"option_description" => "The DMARC specification dictates that reporting SPF/DKIM alignments is mandatory. However, there could be a situation where this information is not included. This option specifies whether or not those unknown results are included as an \"alignment failure\" or remain as \"unknown\".",
-	// )
-);
-
-
-//####################################################################
-//### functions ######################################################
-//####################################################################
-
-function main() {
-
-	include "dmarcts-report-viewer-config.php";
+	--link: #0000EE;
+	--link_visited: #551A8B;
+	--green: #00FF00;
+	--yellow: #FFFF00;
+	--orange: #FFA500;
+	--red: #FF0000;
+	--xml_highlighted: lightcyan;
+	--xml_pinned: #99ffff;
 }
 
-// This function sets variables for the DMARC Result portion (left half-circle) in the Report List
-function get_dmarc_result($row) {
-
-	global $dmarc_result;
-	$color = "";
-	$color_sort_key = "";
-	$result_text = "";
-
-	if (($row['dmarc_result_min'] == 0) && ($row['dmarc_result_max'] == 0)) {
-		$color     = $dmarc_result['DMARC_FAIL']['color'];
-		$color_sort_key = $dmarc_result['DMARC_FAIL']['status_sort_key'];
-		$result_text = $dmarc_result['DMARC_FAIL']['text'];
-	} elseif (($row['dmarc_result_min'] == 0) && ($row['dmarc_result_max'] == 1 || $row['dmarc_result_max'] == 2)) {
-		$color     = $dmarc_result['DMARC_PASS_AND_FAIL']['color'];
-		$color_sort_key = $dmarc_result['DMARC_PASS_AND_FAIL']['status_sort_key'];
-		$result_text = $dmarc_result['DMARC_PASS_AND_FAIL']['text'];
-	} elseif (($row['dmarc_result_min'] == 1 || $row['dmarc_result_min'] == 2) && ($row['dmarc_result_max'] == 1 || $row['dmarc_result_max'] == 2)) {
-		$color     = $dmarc_result['DMARC_PASS']['color'];
-		$color_sort_key = $dmarc_result['DMARC_PASS']['status_sort_key'];
-		$result_text = $dmarc_result['DMARC_PASS']['text'];
-	} else {
-		$color     = $dmarc_result['DMARC_OTHER_CONDITION']['color'];
-		$color_sort_key = $dmarc_result['DMARC_OTHER_CONDITION']['status_sort_key'];
-		$result_text = $dmarc_result['DMARC_OTHER_CONDITION']['text'];
-	}
-	return array('color' => $color, 'status_sort_key' => $color_sort_key, 'result' => $result_text);
+body {
+	color: var(--text);
+	background-color: var(--background);
 }
 
-// This function sets variables for the All Results portion (right half-circle) in the Report List table
-function get_report_status($row) {
+h1 {
+}
 
-	global $dmarc_result;
-	$color = "";
-	$color_sort_key = "";
-	$status_text = "";
-	$status_sql_where = "";
+pre {
+	margin: 0px;
+	cursor: pointer;
+}
 
-	$report_status_min = min($row['dkim_align_min'],$row['spf_align_min'],$row['dkim_result_min'],$row['spf_result_min'],$row['dmarc_result_min']);
+a {
+  color: var(--link);
+}
 
-	if ($row['dkim_align_min'] == 0 && $row['spf_align_min'] == 0 && $row['dkim_result_min'] == 0 && $row['spf_result_min'] == 0 && $row['dmarc_result_min'] == 0) {
-		$color = $dmarc_result['DMARC_FAIL']['color'];
-		$color_sort_key = $dmarc_result['DMARC_FAIL']['status_sort_key'];
-		$status_text = $dmarc_result['DMARC_FAIL']['status_text'];
-	} else {
-		switch ($report_status_min) {
-			case 0:
-				$color = $dmarc_result['DMARC_PASS_AND_FAIL']['color'];
-				$color_sort_key = $dmarc_result['DMARC_PASS_AND_FAIL']['status_sort_key'];
-				$status_text = $dmarc_result['DMARC_PASS_AND_FAIL']['status_text'];
-				break;
-			case 1:
-				$color = $dmarc_result['DMARC_OTHER_CONDITION']['color'];
-				$color_sort_key = $dmarc_result['DMARC_OTHER_CONDITION']['status_sort_key'];
-				$status_text = $dmarc_result['DMARC_OTHER_CONDITION']['status_text'];
-				break;
-			case 2:
-				$color = $dmarc_result['DMARC_PASS']['color'];
-				$color_sort_key = $dmarc_result['DMARC_PASS']['status_sort_key'];
-				$status_text = $dmarc_result['DMARC_PASS']['status_text'];
-				break;
-			default:
-				break;
-		}
+option.green {
+	background-color: var(--green);
+}
+
+option.yellow {
+	background-color: var(--yellow);
+}
+
+option.orange {
+	background-color: var(--orange);
+}
+
+option.red {
+	background-color: var(--red);
+}
+
+a:visted {
+  color: var(--link_visited);
+}
+
+.title {
+	font-size: 140%;
+	font-weight: bold;
+	text-align: center;
+	padding: 5px 0px;
+}
+
+#screen_overlay {
+	top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    display: block;
+    z-index: 1;
+}
+
+table.optionlist tr.option_title {
+	font-size: 120%;
+	font-weight: bold;
+	text-align: left;
+	background-color: var(--header);
+}
+
+table.optionlist {
+	margin: auto;
+	border-spacing: 0 15px;
+	clear: both;
+	cursor: inherit;
+}
+
+table.optionlist td {
+	padding-right: 10px;
+	vertical-align: baseline;
+	padding-left: 10px;
+}
+
+table.optionlist td.left_column {
+	padding-right: 10px;
+	padding-left: 10px;
+	vertical-align: baseline;
+	border-right: 1px solid  var(--text);
+	width: 50%
+}
+
+table.optionlist td.right_column {
+	vertical-align: middle;
+}
+table.optionlist td {
+	vertical-align: baseline;
+}
+
+table.optionlist span.bold {
+	vertical-align: baseline;
+	font-weight: bold;
+}
+
+.option_description {
+	font-family: sans-serif;
+	font-size: 95%;
+	font-style: italic;
+}
+
+table.reportlist {
+	margin: auto;
+	border-collapse: collapse;
+	clear: both;
+	cursor: pointer;
+}
+
+table.reportlist td {
+	padding:0px 10px;
+}
+
+table.reportlist td.circle_container {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+table.reportlist td span.status_sort_key {
+	display: none;
+}
+
+table.reportlist th {
+	padding:3px;
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	top: 0;
+	background-color: var(--header);
+	white-space: nowrap;
+}
+
+table.reportlist th.circle_container {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+table.reportlist tr:hover {
+	background-color: var(--hover);
+}
+
+table.reportlist tbody tr:first-child td {
+	padding-top: 10px;
+}
+
+table.reportlist tr.sum {
+	border-top: 1px solid var(--shadow);
+}
+
+table.reportlist tr.selected {
+	background-color: var(--selected);
+}
+
+table.reportlist td.hidden, table.reportlist th.hidden {
+	display: none;
+}
+
+.reportdesc {
+	display:inline-block;
+	font-weight: bold;
+	padding: 1em 0;
+	margin: 0 auto;
+}
+
+.reportdesc_container {
+	border-top: 2px solid var(--shadow);
+	margin: 0 auto;
+}
+
+table.reportdata {
+	margin: 0 auto;
+}
+
+table.reportdata thead {
+	cursor:pointer;
+}
+
+table.reportdata tr {
+	color: var(--text_over_colorbg);
+	text-align: center;
+	padding: 3px;
+}
+
+table.reportdata th {
+	color: var(--text);
+}
+
+table.reportdata tr th {
+	text-align: center;
+	padding: 3px;
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	top: 0px;
+	background-color: var(--header);
+}
+
+table.reportdata tr.sum {
+	cursor: default;
+	color: var(--text);
+}
+
+table.reportdata td.right {
+	text-align: right;
+}
+
+table.reportdata tr.red {
+	background-color: var(--red);
+}
+
+table.reportdata td.red {
+	background-color: var(--red);
+}
+
+table.reportdata tr.orange {
+	background-color: var(--orange);
+}
+
+table.reportdata td.orange {
+	background-color: var(--orange);
+}
+
+table.reportdata tr.green {
+	background-color: var(--green);
+}
+
+table.reportdata td.green {
+	background-color: var(--green);
+}
+
+table.reportdata tr.yellow {
+	background-color: var(--yellow);
+}
+
+table.reportdata td.yellow {
+	background-color: var(--yellow);
+}
+
+table.reportdata tr.highlight {
+	background-color: var(--xml_highlighted);
+	color: var(--text)
+}
+
+table.reportdata tr.pinned {
+	background-color: var(--xml_pinned);
+	color: var(--text)
+}
+
+.highlight {
+	background-color: var(--xml_highlighted);
+	color: var(--text)
+}
+
+.pinned {
+	background-color: var(--xml_pinned);
+	color: var(--text)
+}
+
+.footer {
+	font-size: 70%;
+	text-align: center;
+	border-top: 2px solid var(--shadow);
+	width: 100%;
+	margin: 0px auto;
+	padding: 10px 0px;
+	position: fixed;
+	bottom: 0;
+	background-color: var(--background);
+}
+
+form {
+	vertical-align: bottom;
 	}
 
-	return array('color' => $color, 'status_sort_key' => $color_sort_key, 'status_text' => $status_text);
+.optionblock {
+	white-space: nowrap;
+	overflow: auto;
+	font-size: 80%;
+	padding: .5em;
+	background-color: var(--header);
+	margin: auto;
+	text-align: center;
 }
 
-// This function sets variables for individual cells in the Report Data table
-function get_status_color($result) {
+.optionlabel {
+	font-weight: bold;
+}
 
-	global $dmarc_result;
-	$color = "";
-	$color_sort_key = "";
+.options {
+	margin-right: .5em;
+	display: inline-block;
+	border-right: 1px solid var(--text);
+	padding-right: 1em;
+	cursor: default;
+	text-align: center;
+	vertical-align: bottom;
+}
 
-	if ($result == "fail") {
-		$color = $dmarc_result['DMARC_FAIL']['color'];
-#		$color_sort_key = $dmarc_result['STATUS_FAIL']['status_sort_key'];
-	} elseif ($result == "pass") {
-		$color = $dmarc_result['DMARC_PASS']['color'];
-#		$color_sort_key = $dmarc_result['STATUS_PASS']['status_sort_key'];
-	} else {
-		$color = $dmarc_result['DMARC_OTHER_CONDITION']['color'];
-#		$color_sort_key = $dmarc_result['STATUS_OTHER_CONDITION']['status_sort_key'];
+.menu_icon {
+	width: 1.5em;
+	cursor: default;
+	border: .2em solid var(--header);
+	border-radius: .3em;
+	padding: .3em;
+	vertical-align: bottom;
+	transition: 0.15s all linear;
+}
+
+.menu_icon:hover{
+	border-color: var(--shadow);
+}
+
+.menu {
+  font-family: arial, sans-serif;
+  color: var(--text);
+  position: absolute;
+  display: none;
+  z-index: 2;
+  background: var(--hover);
+  margin-top: 5px; /* Controls how close the main bubble is the the calling div */
+  border-radius: 2px;
+  box-shadow: 7px 7px 3px var(--shadow);
+}
+
+/* menu callout tail */
+.menu::after {
+  position: absolute;
+  content: '';
+  border: 15px solid transparent; /* The 'border-width' property controls the size of the tail and should be the same as .top.menu::after {top: } */
+}
+
+/* Tail position on top */
+.top.menu::after {
+  /* up triangle */
+  border-bottom-color: var(--hover);
+  border-top: 0;
+  top: -15px;	/* Controls how close the tail is to the main bubble and should be the same as .menu::after {border-width:} */
+  left: 95%;	/* Controls how close the tail is to the right corner of the main bubble */
+  margin-left: -20px;
+}
+
+.menu_option {
+	width: 100%;
+	padding: 7px 0;
+	margin-right: 20px;
+	cursor: default;
+}
+
+.menu_option:hover {
+	background-color: var(--selected);
+}
+
+.center {
+	text-align: center;
+}
+
+.right {
+	text-align: right;
+}
+
+.circle {
+    width: 7px;
+    height: 14px;
+	margin-top: 4px;
+    margin-bottom: 2px;
+}
+
+.circle_right {
+    border-bottom-right-radius: 500px;
+    border-top-right-radius: 500px;
+    border-left: 0;
+    display: inline-block;
+}
+
+.circle_left {
+    border-bottom-left-radius: 500px;
+    border-top-left-radius: 500px;
+    border-right: 0;
+    display: inline-block;
+}
+
+.circle_whole {
+    border-bottom-right-radius: 500px;
+    border-top-right-radius: 500px;
+    border-bottom-left-radius: 500px;
+    border-top-left-radius: 500px;
+	 width: 14px;
+	 height: 14px;
+	 margin-top: 4px;
+	 margin-bottom: 2px;
+    /* border-right: 0; */
+    display: inline-block;
+}
+
+.circle_yellow {
+    width: 6px;
+    height: 12px;
+    background-color: yellow;
+	 border-top: 1px solid var(--selected);
+	 border-right: 1px solid var(--selected);
+	 border-bottom: 1px solid var(--selected);
+
+}
+
+.circle_green {
+    background-color: lime;
+}
+
+.circle_orange {
+    background-color: orange;
+}
+
+.circle_red {
+    background-color: red;
+}
+
+.circle_black {
+    background-color: var(--text);
+}
+
+.asc_triangle:after {
+	content: ' \25B2';
+	font-size: 15px;
+	vertical-align: top;
+}
+
+.desc_triangle:after {
+	content: ' \25BC';
+	font-size: 15px;
+}
+
+.resizer {
+	display: none;
+	position: absolute;
+	border-radius: 7px;
+	background: var(--background);
+	border: 2px solid  var(--shadow);
+	top: 8px;
+	left: 50%;
+}
+
+.resizer_horizontal {
+	width: 30px;
+	height: 10px;
+	cursor: ns-resize;
+}
+
+.resizer_vertical {
+	width: 10px;
+	height: 30px;
+	cursor: ew-resize;
+}
+
+/* Cross-browser (hopefully) styling of buttons and inputs
+	Based on https://github.com/filamentgroup/select-css */
+
+/* class applies to select element itself, not a wrapper element */
+.x-css {
+	font-size: inherit;
+	font-family: inherit;
+	display: block;
+	margin: auto;
+	color: var(--text);
+	padding: .2em 1.4em .2em .3em;
+	box-sizing: border-box;
+	border: .2em solid var(--header);
+	border-radius: .3em;
+	transition: 0.15s all linear;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	appearance: none;
+	background-image:
+	/* Note: background-image uses 2 urls.
+		The first is an svg data uri for the arrow icon.
+		The second is the gradient for the icon.
+			If you want to change the color, be sure to use `%23` instead of `#`, since it's a url.
+		You can also swap in a different svg icon or an external image reference */
+		url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%233DAEE9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'),
+		linear-gradient(to bottom, var(--background) 0%,var(--selected) 100%);
+	background-repeat: no-repeat, repeat;
+	/* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
+	background-position: right .5em top 50%, 0 0;
+	/* icon size, then gradient */
+	background-size: .65em auto, 100%;
+}
+
+.x-css-left-align {
+	margin: 0;
+}
+.x-css option {
+	color: var(--text_over_colorbg);
+}
+
+.x-css label {
+	padding: 0 .5em 0 0;
+}
+
+div.x-css,
+button.x-css,
+input[type=submit].x-css,
+input[type=number].x-css,
+input[type=radio].x-css {
+	display: inline-block;
+	padding: .2em .5em;
+	background-image: linear-gradient(to bottom, var(--background) 0%,var(--selected) 100%);
+	background-repeat: repeat;
+	background-position: 0 0;
+	background-size: 100%;
+}
+
+input[type=radio].x-css {
+	margin: 0 0 0 .15em;
+}
+
+/* button.x-css,
+input[type=submit].x-css {
+	border: 2px outset var(--shadow);
+} */
+
+div.x-css {
+	padding: .25em .3em .1em .3em;
+}
+
+input[type=number].x-css {
+	padding: .1em .3em;
+}
+
+input[type=radio].x-css,
+label.x-css {
+	background-image: unset;
+	padding: 0;
+	border-radius: 49%;
+	width: .8em;
+	height: .8em;
+	border: .15em solid var(--text);
 	}
 
-    return array('color' => $color, 'status_sort_key' => $color_sort_key);
+button:active,
+input[type=submit]:active {
+	transform: translate(0.08em, 0.1em);
 }
 
-function format_date($date, $format) {
-
-    $answer = date($format, strtotime($date));
-    return $answer;
-};
-
-// null-safe version of htmlspecialchars for PHP 8+ compatibility
-// --------------------------------------------------------------------------
-function html_escape($str) {
-	if ($str == null) {
-		return null;
+input[type=radio].x-css:checked {
+		background-color: #3daee9;
 	}
-	return htmlspecialchars($str);
+
+/* Hide arrow icon in IE browsers */
+.x-css::-ms-expand {
+	display: none;
 }
 
-// Get all configuration options
-// --------------------------------------------------------------------------
-function configure() {
-
-	global $cookie_name;
-	global $cookie_options;
-	global $options;
-
-	$option = array_keys($options);
-	$cookie_options = array();
-	$cookie_timeout = 60*60*24*365;
-
-	if(!isset($_COOKIE[$cookie_name]) || $_COOKIE[$cookie_name] == "" ) {
-		// No Cookie
-		foreach ($option as $option_name) {
-			if ( $options[$option_name]['option_type'] != "heading" ) {
-				$cookie_options += array($option_name => $options[$option_name]['option_value']);
-			// 		foreach($options[$option_name] as $key=>$value) {
-			}
-		}
-		setcookie($cookie_name, json_encode($cookie_options), time() + $cookie_timeout, "/");
-	} else {
-		// Cookie exists
-		if ($_SERVER["REQUEST_METHOD"] == "POST") {
-			// POST
-			foreach ($option as $option_name) {
-				if ( $options[$option_name]['option_type'] != "heading" ) {
-					if ( is_null($_POST[$option_name]) ) {
-						$cookie_options += array($option_name => "");
-					} else {
-						$cookie_options += array($option_name => test_input($_POST[$option_name]));
-					}
-				}
-			}
-			setcookie($cookie_name, json_encode($cookie_options), time() + $cookie_timeout, "/");
-			header("Location: dmarcts-report-viewer.php");
-			exit;
-		} else {	// Not POST
-			$cookie_options = json_decode($_COOKIE[$cookie_name], true);
-
-			// Check if any options have been removed or added to $options[]
-			// Update $cookie_options with any new options from $options (excluding headings)
-			foreach ($option as $option_name) {
-				if ( $options[$option_name]['option_type'] != "heading" && is_null($cookie_options[$option_name]) ) {
-					$cookie_options[$option_name] = $options[$option_name]['option_value'];
-				}
-			}
-			// Remove any options from $cookie_options which are not in $options
-			foreach ($cookie_options as $key => $value) {
-				if ( $options[$key] == null ) {
-					unset($cookie_options[$key]);
-				}
-			}
-			setcookie($cookie_name, json_encode($cookie_options), time() + $cookie_timeout, "/");
-		}
-	}
+/* Hover style */
+.x-css:hover {
+	border-color: var(--shadow);
 }
 
-function test_input($data) {
-
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-
-  return $data;
+.x-css:focus,
+.menu_icon:focus,
+button:focus,
+input[type=number]:focus,
+input[type=submit]:focus,
+input[type=radio]:focus {
+	/* border-color: #aaa; */
+	/* It'd be nice to use -webkit-focus-ring-color here but it doesn't work on box-shadow */
+	box-shadow: 0 0 1px 2px rgba(59, 153, 252, .7);
+	box-shadow: 0 0 0 2px -moz-mac-focusring;
+	color: var(--text);
+	outline: none;
 }
 
-// This functions opens a connection to the database using PDO
-function connect_db($dbtype, $dbhost, $dbport, $dbname, $dbuser, $dbpass) {
-	$dbtype = $dbtype ?: 'mysql';
-	try {
-		$dbh = new PDO("$dbtype:host=$dbhost;port=$dbport;dbname=$dbname", $dbuser, $dbpass);
-		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$dbh->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-		return $dbh;
-	} catch (PDOException $e) {
-		echo "Error: Failed to make a database connection<br />";
-		echo "Error: " . $e->getMessage() . " ";
-	// Debug ONLY. This will expose database credentials when database connection fails
-	// 	echo "Database connection information: <br />dbhost: " . $dbhost . "<br />dbuser: " . $dbuser . "<br />dbpass: " . $dbpass . "<br />dbname: " . $dbname . "<br />dbport: " . $dbport . "<br />";
-		exit;
-	}
+/* Support for rtl text, explicit support for Arabic and Hebrew */
+*[dir="rtl"] .x-css,
+:root:lang(ar) .x-css,
+:root:lang(iw) .x-css {
+	background-position: left .7em top 50%, 0 0;
+	padding: .6em .8em .5em 1.4em;
 }
+
+/* Disabled styles */
+select.x-css:disabled,
+select.x-css[aria-disabled=true] {
+	color: var(--shadow);
+	background-image:
+	/* Note: background-image uses 2 urls.
+		The first is an svg data uri for the arrow icon.
+		The second is the gradient for the icon.
+			If you want to change the color, be sure to use `%23` instead of `#`, since it's a url.
+		You can also swap in a different svg icon or an external image reference */
+		url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22graytext%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'),
+		linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);
+}
+
+.x-css:disabled,
+.x-css[aria-disabled=true] {
+	background-image: linear-gradient(to bottom, var(--selected) 0%,var(--hover) 100%);
+	color: var(--shadow);
+}
+
+.x-css:disabled:hover,
+.x-css[aria-disabled=true] {
+	border: .1em solid var(--hover);
+}
+
+/* Will have to work on this if ever need to disable radio buttons */
+/* input[type=radio].x-css {} */
